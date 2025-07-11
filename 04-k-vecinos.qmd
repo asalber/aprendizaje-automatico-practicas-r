@@ -1,0 +1,60 @@
+---
+title: K vecinos más cercanos
+keep-md: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Ejercicios Resueltos
+
+Para la realización de esta práctica se requieren los siguientes paquetes:
+
+```r
+library(tidyverse) 
+# Incluye los siguientes paquetes:
+# - readr: para la lectura de ficheros csv. 
+# - dplyr: para el preprocesamiento y manipulación de datos.
+# - tidyr: para la organización de los datos.
+# - purrr: para aplicar funciones a vectores. 
+library(broom) # para convertir las listas con los resúmenes de los modelos de regresión a formato organizado.
+library(knitr) # para el formateo de tablas.
+```
+
+::: {#exr-k-vecinos-1}
+El conjunto de datos [pingüinos.csv](datos/pingüinos.csv) contiene un conjunto de datos sobre tres especies de pingüinos con las siguientes variables:
+
+- Especie: Especie de pingüino, comúnmente Adelie, Chinstrap o Gentoo.
+- Isla: Isla del archipiélago Palmer donde se realizó la observación.
+- Longitud_pico: Longitud del pico en mm.
+- Profundidad_pico: Profundidad del pico en mm
+- Longitud_ala: Longitud de la aleta en mm.
+- Peso: Masa corporal en gramos.
+- Sexo: Sexo
+
+a.  Cargar los datos del archivo [`pinguïnos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pingüinos.csv) en un data frame.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(readr)
+    df = read_csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-julia/datos/pingüinos.csv")
+    head(df, 5)
+    ```
+    :::
+
+b.  Explorar el data frame para ver cuántos datos perdidos hay.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(dplyr)
+    df %>% 
+      summarise(across(everything(), ~ sum(is.na(.))))
+    ```
+    :::
+
