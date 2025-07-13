@@ -434,6 +434,7 @@ window.Quarto = {
    
   <ul>
   <li><a href="#ejercicios-resueltos" id="toc-ejercicios-resueltos" class="nav-link active" data-scroll-target="#ejercicios-resueltos"><span class="header-section-number">3.1</span> Ejercicios Resueltos</a></li>
+  <li><a href="#ejercicios-propuestos" id="toc-ejercicios-propuestos" class="nav-link" data-scroll-target="#ejercicios-propuestos"><span class="header-section-number">3.2</span> Ejercicios propuestos</a></li>
   </ul>
 </nav>
     </div>
@@ -485,7 +486,7 @@ window.Quarto = {
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly) <span class="co"># para la visualización interactiva de gráficos.</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr) <span class="co"># para el formateo de tablas.</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="exr-no-supervisado-pinguinos" class="theorem exercise">
-<p><span class="theorem-title"><strong>Ejercicio 3.4</strong></span> El conjunto de datos <a href="datos/pingüinos.csv">pingüinos.csv</a> contiene un conjunto de datos sobre tres especies de pingüinos con las siguientes variables:</p>
+<p><span class="theorem-title"><strong>Ejercicio 3.1</strong></span> El conjunto de datos <a href="datos/pingüinos.csv">pingüinos.csv</a> contiene un conjunto de datos sobre tres especies de pingüinos con las siguientes variables:</p>
 <ul>
 <li>Especie: Especie de pingüino (Adelie, Chinstrap o Gentoo).</li>
 <li>Isla: Isla del archipiélago Palmer donde se realizó la observación.</li>
@@ -1508,8 +1509,9 @@ Solución
 </div>
 </div></li>
 </ol>
+</div>
 <div id="exr-no-supervisado-glaucoma" class="theorem exercise">
-<p><span class="theorem-title"><strong>Ejercicio 3.3</strong></span> El conjunto de datos <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv">glaucoma.csv</a> contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.</p>
+<p><span class="theorem-title"><strong>Ejercicio 3.2</strong></span> El conjunto de datos <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv">glaucoma.csv</a> contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./img/aprendizaje-no-supervisado/tomografia-coherencia-optica.jpg" class="img-fluid figure-img"></p>
@@ -2427,10 +2429,12 @@ Solución
 </div>
 </div></li>
 </ol>
+</div>
+</section>
 <section id="ejercicios-propuestos" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="ejercicios-propuestos"><span class="header-section-number">3.2</span> Ejercicios propuestos</h2>
 <div id="exr-no-supervisado-cancer-mama" class="theorem exercise">
-<p><span class="theorem-title"><strong>Ejercicio 3.2</strong></span> El conjunto de datos <a href="datos/cancer-mama.csv">cancer-mama.csv</a> contiene información sobre las características de núcleos de células mamarias obtenidas de imágenes digitalizadas tanto de células cancerosas como no cancerosas obtenidas por biopsia. Las variables que contiene son:</p>
+<p><span class="theorem-title"><strong>Ejercicio 3.3</strong></span> El conjunto de datos <a href="datos/cancer-mama.csv">cancer-mama.csv</a> contiene información sobre las características de núcleos de células mamarias obtenidas de imágenes digitalizadas tanto de células cancerosas como no cancerosas obtenidas por biopsia. Las variables que contiene son:</p>
 <ul>
 <li>ID: Identificador único de la muestra.</li>
 <li>Diagnóstico: Diagnóstico de la muestra (M: maligno, B: benigno).</li>
@@ -2454,8 +2458,9 @@ Solución
 <li><p>Dibujar un diagrama de dispersión de los dos primeros componentes principales coloreando los puntos según el diagnóstico.</p></li>
 <li><p>Realizar un agrupamiento en grupos utilizando el método de las <span class="math inline">\(k\)</span>-medias y representar los grupos en un diagrama de dispersión.</p></li>
 </ol>
+</div>
 <div id="exr-no-supervisado-vinos" class="theorem exercise">
-<p><span class="theorem-title"><strong>Ejercicio 3.1</strong></span> El fichero <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv"><code>vinos.csv</code></a> contiene información sobre las características de vinos blancos y tintos portugueses de la denominación “Vinho Verde”. Las variables que contiene son las siguientes:</p>
+<p><span class="theorem-title"><strong>Ejercicio 3.4</strong></span> El fichero <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv"><code>vinos.csv</code></a> contiene información sobre las características de vinos blancos y tintos portugueses de la denominación “Vinho Verde”. Las variables que contiene son las siguientes:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 29%">
@@ -2554,10 +2559,6 @@ Solución
 </div>
 
 
-</div>
-</section>
-</div>
-</div>
 </section>
 
 </main> <!-- /main -->

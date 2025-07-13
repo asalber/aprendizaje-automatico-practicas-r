@@ -217,6 +217,7 @@ a.  Mostrar los autovectores
     # Gráfico de los autovectores
     fviz_pca_var(componentes, col.var = "contrib")
     ```
+    :::
 
 a.  Dibujar un gráfico de dispersión de los dos primeros componentes principales coloreando los puntos según la especie de pingüino.
 
@@ -404,6 +405,7 @@ a.  Realizar un análisis de agrupamiento jerárquico de las especies de pingüi
     labs(title = "Dendrograma de agrupamiento Jerárquico de Pingüinos")
     ```
     :::
+:::
 
 :::{#exr-no-supervisado-glaucoma}
 
@@ -448,6 +450,7 @@ a.  Estudiar la correlación entre las variables numéricas del conjunto de dato
     df |> select(starts_with("Anillo")) |>
         ggcorr(label = TRUE, label_size = 3)
     ```
+    :::
 
 a.  Calcular los componentes principales del conjunto de variables numéricas y mostrar la varianza explicada por cada componente.
 
@@ -529,6 +532,7 @@ a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y
     ggplotly(plot)
     ```
     :::
+:::
 
 
 ## Ejercicios propuestos
@@ -562,6 +566,7 @@ a.  Dibujar un diagrama de barras con la varianza explicada por cada componente 
 a.  Dibujar un diagrama de dispersión de los dos primeros componentes principales coloreando los puntos según el diagnóstico.
 
 a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y representar los grupos en un diagrama de dispersión.
+:::
 
 :::{#exr-no-supervisado-vinos}
 El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:

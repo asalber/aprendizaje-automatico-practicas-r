@@ -69,7 +69,6 @@ a.  Dibujar un diagrama de relación entre todos los pares de variables del conj
     Se puede utilizar la función `ggpairs` del paquete `GGally` para dibujar un diagrama de relación entre todos los pares de variables del conjunto de datos. Asociar el sexo a la dimensión del color.
     :::
 
-
     :::{.callout-tip collapse="true"}
     ## Solución
 
@@ -287,7 +286,7 @@ a.  Evaluar el nuevo modelo de regresión lineal calculando el error cuadrático
     :::
 :::
 
-:::{#exr-regresion-5}
+:::{#exr-regresion-dieta}
 El fichero [`dieta.csv`](datos/dieta.csv) contiene información sobre el los kilos perdidos con una dieta de adelgazamiento.
 
 a.  Crear un data frame con los datos de la dieta a partir del fichero [`dieta.csv`](https://aprendeconalf.es/estadistica-practicas-r/datos/dieta.csv).
@@ -360,6 +359,7 @@ a.  Ajustar un modelo de regresión inverso a los datos de la dieta y evaluarlo 
         collect_metrics() |> 
         kable() 
     ```
+    :::
 
 a.  Ajustar un modelo de regresión potencial a los datos de la dieta y evaluarlo mediante validación cruzada con 5 pliegues.
 
@@ -375,8 +375,9 @@ a.  Ajustar un modelo de regresión potencial a los datos de la dieta y evaluarl
         kable() 
     ```
     :::
+:::
 
-:::{#exr-regresion-3}
+:::{#exr-regresion-infartos}
 El fichero [`infartos.csv`](datos/infartos.csv) contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:
 
 - `Edad`: Edad del paciente (años)
@@ -546,7 +547,6 @@ a.  Ajustar un modelo de regresión logística a los datos de entrenamiento util
     ```
     :::
 
-
 a.  Usar el modelo de regresión logística ajustado para predecir el riesgo de infarto en el conjunto de test y mostrar las primeras 10 predicciones.
 
     :::{.callout-tip collapse="true"}
@@ -629,6 +629,7 @@ a.  Dibujar la curva ROC del modelo de regresión logística y calcular el área
         roc_auc(truth = Infarto, .pred_No) |>
         kable()
     ```
+    :::
 :::
 
 ## Ejercicios propuestos
@@ -651,3 +652,4 @@ a.  Según el modelo anterior, ¿qué peso tendrá un recién nacido de una madr
 
 a.  ¿Existe la misma relación lineal entre el peso de los recién nacidos y el número de cigarros fumados al día por las madres que fumaron durante el embarazo en el grupo de las madres menores de 20 y en el grupo de las madres mayores de
 20? ¿Qué se puede concluir?
+:::

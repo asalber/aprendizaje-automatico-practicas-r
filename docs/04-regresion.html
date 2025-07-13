@@ -424,6 +424,7 @@ window.Quarto = {
    
   <ul>
   <li><a href="#ejercicios-resueltos" id="toc-ejercicios-resueltos" class="nav-link active" data-scroll-target="#ejercicios-resueltos"><span class="header-section-number">4.1</span> Ejercicios Resueltos</a></li>
+  <li><a href="#ejercicios-propuestos" id="toc-ejercicios-propuestos" class="nav-link" data-scroll-target="#ejercicios-propuestos"><span class="header-section-number">4.2</span> Ejercicios propuestos</a></li>
   </ul>
 </nav>
     </div>
@@ -450,7 +451,7 @@ window.Quarto = {
 </header>
 
 
-<p>Los modelos de aprendizaje basados en regresión son modelos bastante simples que pueden utilizarse para predecir variables cuantitativas (regresión lineal o no lineal) o cualitativas (regresión logística). Esta práctica contiene ejercicios que muestran como construir modelos de aprendizaje de regresión lineal, no lineal y regresión logística con R y el paquete <code>tidymodels</code>.</p>
+<p>El aprendizaje supervisado abarca técnicas para clasificar o predecir una variable respuesta a partir de un conjunto de variables predictoras. Los modelos de aprendizaje basados en regresión son modelos bastante simples que pueden utilizarse para predecir variables cuantitativas (regresión lineal o no lineal) o cualitativas (regresión logística). Esta práctica contiene ejercicios que muestran como construir modelos de aprendizaje de regresión lineal, no lineal y regresión logística con R y el paquete <code>tidymodels</code>.</p>
 <section id="ejercicios-resueltos" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="ejercicios-resueltos"><span class="header-section-number">4.1</span> Ejercicios Resueltos</h2>
 <p>Para la realización de esta práctica se requieren los siguientes paquetes:</p>
@@ -1284,8 +1285,8 @@ Solución
 </div></li>
 </ol>
 </div>
-<div id="exr-regresion-5" class="theorem exercise">
-<p><span class="theorem-title"><strong>Ejercicio 4.4</strong></span> El fichero <a href="datos/dieta.csv"><code>dieta.csv</code></a> contiene información sobre el los kilos perdidos con una dieta de adelgazamiento.</p>
+<div id="exr-regresion-dieta" class="theorem exercise">
+<p><span class="theorem-title"><strong>Ejercicio 4.2</strong></span> El fichero <a href="datos/dieta.csv"><code>dieta.csv</code></a> contiene información sobre el los kilos perdidos con una dieta de adelgazamiento.</p>
 <ol type="a">
 <li><p>Crear un data frame con los datos de la dieta a partir del fichero <a href="https://aprendeconalf.es/estadistica-practicas-r/datos/dieta.csv"><code>dieta.csv</code></a>.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -1576,8 +1577,9 @@ Solución
 </div>
 </div></li>
 </ol>
-<div id="exr-regresion-3" class="theorem exercise">
-<p><span class="theorem-title"><strong>Ejercicio 4.2</strong></span> El fichero <a href="datos/infartos.csv"><code>infartos.csv</code></a> contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:</p>
+</div>
+<div id="exr-regresion-infartos" class="theorem exercise">
+<p><span class="theorem-title"><strong>Ejercicio 4.3</strong></span> El fichero <a href="datos/infartos.csv"><code>infartos.csv</code></a> contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:</p>
 <ul>
 <li><code>Edad</code>: Edad del paciente (años)</li>
 <li><code>Sexo</code>: Sexo del paciente (H: hombre, M: mujer)</li>
@@ -2682,10 +2684,11 @@ Solución
 </div></li>
 </ol>
 </div>
+</section>
 <section id="ejercicios-propuestos" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="ejercicios-propuestos"><span class="header-section-number">4.2</span> Ejercicios propuestos</h2>
 <div id="exr-regresion-4" class="theorem exercise">
-<p><span class="theorem-title"><strong>Ejercicio 4.3</strong></span> El conjunto de datos <a href="https://aprendeconalf.es/estadistica-practicas-r/datos/neonatos.csv"><code>neonatos</code></a> contiene información sobre una muestra de 320 recién nacidos en un hospital durante un año que cumplieron el tiempo normal de gestación.</p>
+<p><span class="theorem-title"><strong>Ejercicio 4.4</strong></span> El conjunto de datos <a href="https://aprendeconalf.es/estadistica-practicas-r/datos/neonatos.csv"><code>neonatos</code></a> contiene información sobre una muestra de 320 recién nacidos en un hospital durante un año que cumplieron el tiempo normal de gestación.</p>
 <ol type="a">
 <li><p>Crear un data frame a con los datos de los neonatos a partir del fichero anterior.</p></li>
 <li><p>Construir la recta de regresión del peso de los recién nacidos sobre el número de cigarros fumados al día por las madres. ¿Existe una relación lineal fuerte entre el peso y el número de cigarros?</p></li>
@@ -2695,11 +2698,9 @@ Solución
 <li><p>Según el modelo anterior, ¿qué peso tendrá un recién nacido de una madre que ha fumado 5 cigarros diarios durante el embarazo? ¿Y si la madre ha fumado 30 cigarros diarios durante el embarazo? ¿Son fiables estas predicciones?</p></li>
 <li><p>¿Existe la misma relación lineal entre el peso de los recién nacidos y el número de cigarros fumados al día por las madres que fumaron durante el embarazo en el grupo de las madres menores de 20 y en el grupo de las madres mayores de 20? ¿Qué se puede concluir?</p></li>
 </ol>
+</div>
 
 
-</div>
-</section>
-</div>
 </section>
 
 </main> <!-- /main -->
