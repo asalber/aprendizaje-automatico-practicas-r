@@ -43,6 +43,7 @@ book:
     - 01-introduccion.qmd
     - 02-preprocesamiento.qmd
     - 03-aprendizaje-no-supervisado.qmd
+    - 04-regresion.qmd
     # - 05-naive-bayes.qmd
     # - 06-k-vecinos.qmd
     # - 07-arboles-decision.qmd

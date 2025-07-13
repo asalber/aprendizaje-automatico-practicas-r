@@ -5,25 +5,34 @@ execute:
 lang: es
 ---
 
+El aprendizaje supervisado abarca técnicas para clasificar o predecir una variable respuesta a partir de un conjunto de variables predictoras.
 Los modelos de aprendizaje basados en regresión son modelos bastante simples que pueden utilizarse para predecir variables cuantitativas (regresión lineal o no lineal) o cualitativas (regresión logística). Esta práctica contiene ejercicios que muestran como construir modelos de aprendizaje de regresión lineal, no lineal y regresión logística con R y el paquete `tidymodels`.
 
 ## Ejercicios Resueltos
 
 Para la realización de esta práctica se requieren los siguientes paquetes:
 
-```R
-library(tidyverse)
+```r
+library(tidyverse) 
 # Incluye los siguientes paquetes:
-# - readr: para la lectura de ficheros csv.
+# - readr: para la lectura de ficheros csv. 
 # - dplyr: para el preprocesamiento y manipulación de datos.
 # - ggplot2: para la visualización de datos.
-library(GGally) # para la visualización de datos.
-librar(tidymodels) # para la creación de modelos de aprendizaje automático.
-library(broom) # para convertir las listas con los resúmenes de los modelos de regresión a formato organizado.
+library(tidymodels)
+# Incluye los siguientes paquetes:
+# - recipes: para la preparación de los datos. 
+# - parsnip: para la creación de modelos.
+# - workflows: para la creación de flujos de trabajo.
+# - rsample: para la creación de particiones de los datos.
+# - yardstick: para la evaluación de modelos.
+# - tune: para la optimización de hiperparámetros.
+library(skimr) # para el análisis exploratorio de datos.
+library(GGally) # para la visualización de matrices de correlación.
+library(plotly) # para la visualización interactiva de gráficos.
 library(knitr) # para el formateo de tablas.
 ```
 
-:::{#exr-regresion-1}
+:::{#exr-regresion-medidas-fisicas}
 El conjunto de datos [medidas-fisicas.csv](datos/medidas-fisicas.csv) contiene un conjunto de datos con la edad, sexo, estatura (cm), peso (kg) y el deporte que hacen una muestra de personas (días a la semana).
 
 a.  Cargar los datos del archivo [`medidas-fisicas.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/medidas-fisicas.csv) en un data frame.

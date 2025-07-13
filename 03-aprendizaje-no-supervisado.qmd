@@ -10,6 +10,8 @@ lang: es
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
+El aprendizaje no supervisado abarca técnicas de aprendizaje automático que buscan identificar patrones en los datos sin utilizar clases o categorías predefinidas. A diferencia del aprendizaje supervisado, donde se entrena un modelo con datos etiquetados, el aprendizaje no supervisado no busca clasificar o predecir una variable respuesta, sino que se centra en descubrir estructuras ocultas en los datos. En esta práctica, exploraremos dos técnicas comunes de aprendizaje no supervisado: el análisis de componentes principales (PCA) y el agrupamiento (clustering).
+
 ## Ejercicios Resueltos
 
 Para la realización de esta práctica se requieren los siguientes paquetes:
@@ -19,13 +21,11 @@ library(tidyverse)
 # Incluye los siguientes paquetes:
 # - readr: para la lectura de ficheros csv. 
 # - dplyr: para el preprocesamiento y manipulación de datos.
-# - tidyr: para la organización de los datos.
-# - purrr: para aplicar funciones a vectores. 
 # - ggplot2: para la visualización de datos.
 library(tidymodels)
 # Incluye los siguientes paquetes:
+# - recipes: para la preparación de los datos. 
 # - parsnip: para la creación de modelos.
-# - recipes: para la preparación de los datos.
 # - workflows: para la creación de flujos de trabajo.
 # - rsample: para la creación de particiones de los datos.
 # - yardstick: para la evaluación de modelos.
@@ -50,7 +50,7 @@ El conjunto de datos [pingüinos.csv](datos/pingüinos.csv) contiene un conjunto
 - Peso: Masa corporal (g).
 - Sexo: Sexo (macho, hembra)
 
-a.  Cargar los datos del archivo [`pinguinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pinguinos.csv) en un data frame.
+a.  Cargar los datos del archivo [`pingüinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pingüinos.csv) en un data frame.
 
     :::{.callout-tip collapse="true"}
     ## Solución
@@ -58,7 +58,7 @@ a.  Cargar los datos del archivo [`pinguinos.csv`](https://aprendeconalf.es/apre
     ```{r}
     library(tidyverse)
     library(knitr)
-    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-julia/datos/pingüinos.csv", stringsAsFactors = TRUE)
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pingüinos.csv", stringsAsFactors = TRUE)
     glimpse(df)
     ```
     :::
@@ -140,10 +140,22 @@ a.  Calcular los componentes principales del conjunto de variables numéricas y 
     Parámetros:
     - `scale.unit = TRUE` para normalizar las variables.
     - `ncp = n` para obtener los primeros n componentes principales.
+
+    O bien utilizar el paquete [recipes](https://recipes.tidymodels.org/) incluido en la colección de paquetes [`tidymodels`](https://www.tidymodels.org/) para calcular los componentes principales. En este caso, se debe crear una receta con la función [`recipe`](https://recipes.tidymodels.org/reference/recipe.html) y utilizar la función [`step_pca`](https://recipes.tidymodels.org/reference/step_pca.html) para calcular los componentes principales. 
+    
+    Parámetros:
+    - `all_numeric_predictors()` para indicar que se deben utilizar todas las variables numéricas.
+    - `threshold = 0.95` para indicar el umbral de varianza explicada por los componentes principales. Esto significa que se seleccionarán los componentes principales que expliquen al menos el 95% de la varianza total.
+    - `num_comp = n` para indicar el número de componentes principales a calcular.
+
+    Previamente es recomendable normalizar las variables numéricas con la función [`step_normalize`](https://recipes.tidymodels.org/reference/step_normalize.html).
     :::
 
     :::{.callout-tip collapse="true"}
     ## Solución
+
+    :::{.panel-tabset}
+    ## `FactoMinerR
 
     ```{r}
     library(FactoMineR)
@@ -159,6 +171,29 @@ a.  Calcular los componentes principales del conjunto de variables numéricas y 
     library(factoextra)
     fviz_eig(componentes, addlabels = TRUE)
     ```
+
+    ## `tidymodels`
+
+    ```{r}
+    library(tidymodels)
+    receta <- df |> recipe(~ .) |>
+        step_normalize(all_numeric_predictors()) |> # Normalizamos las variables numéricas.
+        step_pca(all_numeric_predictors(), threshold = 0.95, id = "pca") |>  # Calculamos los componentes principales con un umbral de varianza del 95%.
+        prep()
+
+    receta |> tidy(id = "pca", type = "variance") |> 
+        filter(terms == "percent variance") |> 
+        ggplot(aes(x = `component`, y = value)) +
+        geom_col() +
+        labs(title = "Varianza explicada por los componentes principales",
+            x = "Componentes Principales",
+            y = "Porcentaje de Varianza") 
+
+    # Aplicamos la receta a los datos.
+    df_componentes <- receta |> 
+        bake(new_data = NULL)
+    ```
+    :::
     :::
 
 a.  Mostrar los autovectores
@@ -173,7 +208,7 @@ a.  Mostrar los autovectores
 
     :::{.callout-tip collapse="true"}
     ## Solución
-    
+
     ```{r}
     # Obtenemos los autovectores. 
     autovectores <- get_pca_var(componentes)
@@ -182,7 +217,6 @@ a.  Mostrar los autovectores
     # Gráfico de los autovectores
     fviz_pca_var(componentes, col.var = "contrib")
     ```
-    :::
 
 a.  Dibujar un gráfico de dispersión de los dos primeros componentes principales coloreando los puntos según la especie de pingüino.
 
@@ -198,27 +232,68 @@ a.  Dibujar un gráfico de dispersión de los dos primeros componentes principal
     :::{.callout-tip collapse="true"}
     ## Solución
 
+    :::{.panel-tabset}
+
+    ## `factoextra`
+
     ```{r}
     # Diagrama de dispersión de los dos primeros componentes principales.
-    plot <- componentes |> fviz_pca_ind(col.ind = df$Especie, label = "none") +
-        labs(title = "Gráfico de dispersión de los dos primeros componentes principales",
+    grafico <- componentes |> fviz_pca_ind(col.ind = df$Especie, label = "none") +
+        labs(title = "Diagrama de dispersión de los dos primeros componentes principales según Especie",
             x = "Componente Principal 1",
             y = "Componente Principal 2")
-    ggplotly(plot) # Convertimos el gráfico a interactivo
+    ggplotly(grafico) # Convertimos el gráfico a interactivo
     ```
+
+    ## `ggplot2`
+
+    ```{r}
+    grafico <- df_componentes  |>  ggplot(aes(x = PC1, y = PC2, color = Especie)) +
+        geom_point() +
+        labs(title = "Diagrama de dispersión de los dos primeros componentes principales según Especie",
+            x = "Componente Principal 1",
+            y = "Componente Principal 2")
+    ggplotly(grafico) # Convertimos el gráfico a interactivo
+    ```
+    :::
     :::
 
 a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y representar los grupos en un diagrama de dispersión.
 
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`fviz_nbclust`](https://rpkgs.datanovia.com/factoextra/reference/fviz_nbclust.html) del paquete [`factoextra`](https://rpkgs.datanovia.com/factoextra/index.html) para determinar el número óptimo de grupos.
+
+    Parámetros:
+    - `kmeans` para utilizar el método de las $k$-medias.
+    - `method = "wss"` para utilizar el método del codo (within-cluster sum of squares).
+  
+    Después, utilizar la función [`kmeans`](https://www.rdocumentation.org/packages/stats/topics/kmeans) del paquete `stats` para realizar el agrupamiento en grupos.
+
+    Parámetros:
+    - `centers = n` para indicar el número de grupos a crear.
+
+    O bien utilizar la funicón [`k_means`](https://tidyclust.tidymodels.org/reference/k_means.html) del paquete [`tidyclust`](https://tidyclust.tidymodels.org/index.html) para especificar un modelo de[`tidymodels`](https://www.tidymodels.org/) para realizar el agrupamiento en grupos.
+
+    Parámetros:
+    - `num_clusters = n` para indicar el número de grupos a crear.
+
+    Usar después la función [`augment`](https://parsnip.tidymodels.org/reference/augment.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para obtener el grupo asignado a cada pingüino.
+    :::
+
     :::{.callout-tip collapse="true"}
     ## Solución
+
+    :::{.panel-tabset}
+
+    ## `stats`
 
     ```{r}
     set.seed(123)
 
     # Determinamos el número óptimo de grupos.
     df |> select(where(is.numeric)) |>
-        fviz_nbclust(kmeans)
+        fviz_nbclust(kmeans, method = "wss")
     ```
 
     A la vista del gráfico anterior, el número óptimo de grupos, donde se ubica el "codo" del gráfico, sería 3 o 4, lo que se corresponde con las 3 especies de pingüinos.
@@ -229,10 +304,36 @@ a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y
         kmeans(centers = 3)
     df$Grupo <- as.factor(agrupacion$cluster)
     componentes |> fviz_pca_ind(col.ind = df$Grupo, label = "none") +
-        labs(title = "Gráfico de dispersión de los dos primeros componentes principales",
+        labs(title = "Diagrama de dispersión de los dos primeros componentes principales según Grupo",
             x = "Componente Principal 1",
             y = "Componente Principal 2")
     ```
+
+    ## `tidymodels`
+
+    ```{r}
+    library(tidyclust)
+    set.seed(123)
+    modelo_ajustado <- k_means(num_clusters = 3) |> 
+        set_engine("stats") |> 
+        fit(~., data = df)
+
+    df_grupos <- modelo_ajustado |> augment(df)
+    df_grupos |> head() |> 
+        kable()
+    ```
+
+    ```{r}
+    df_componentes <- df_componentes |> 
+        mutate(Grupo = df_grupos$.pred_cluster)
+    df_componentes |> 
+        ggplot(aes(x = PC1, y = PC2, color = Grupo)) +
+        geom_point() +
+        labs(title = "Diagrama de dispersión de los dos primeros componentes principales según Grupo",
+            x = "Componente Principal 1",
+            y = "Componente Principal 2")
+    ```
+    :::
     :::
 
 a.  Obtener una tabla de contingencia para ver la relación entre las especies de pingüinos y los grupos obtenidos.
@@ -260,7 +361,9 @@ a.  Calcular la kappa de Cohen para ver la concordancia entre las especies de pi
 
     ```{r}
     library(psych)
-    cohen.kappa(cbind(df$Especie, df$Grupo))
+    cohen.kappa(cbind(df$Especie, df$Grupo)) |> 
+        tidy() |>
+        kable()
     ```
     :::
 
@@ -304,7 +407,7 @@ a.  Realizar un análisis de agrupamiento jerárquico de las especies de pingüi
 
 :::{#exr-no-supervisado-glaucoma}
 
-El conjunto de datos [glaucoma.csv](datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
+El conjunto de datos [glaucoma.csv](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
 
 ![Tomografía de coherencia óptica](/img/aprendizaje-no-supervisado/tomografia-coherencia-optica.jpg)
 
@@ -317,7 +420,7 @@ a.  Cargar el conjunto de datos del archivo [`glaucoma.csv`](https://aprendecona
     library(tidyverse)
     library(knitr)
     # Cargamos el conjunto de datos.
-    df <- read.csv("datos/glaucoma.csv", stringsAsFactors = TRUE)
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv", stringsAsFactors = TRUE)
     glimpse(df)
     ```
     :::
@@ -461,7 +564,7 @@ a.  Dibujar un diagrama de dispersión de los dos primeros componentes principal
 a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y representar los grupos en un diagrama de dispersión.
 
 :::{#exr-no-supervisado-vinos}
-El fichero [`vinos.csv`](datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
+El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
 
 | Variable             | Descripción                                                           | Tipo (unidades)        |
 |----------------------------------------|-----------------------------------------------------------------------|------------------------|
