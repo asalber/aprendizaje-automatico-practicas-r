@@ -1,0 +1,496 @@
+---
+title: Aprendizaje no supervisado
+execute: 
+    warning: false
+    message: false
+lang: es
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Ejercicios Resueltos
+
+Para la realización de esta práctica se requieren los siguientes paquetes:
+
+```r
+library(tidyverse) 
+# Incluye los siguientes paquetes:
+# - readr: para la lectura de ficheros csv. 
+# - dplyr: para el preprocesamiento y manipulación de datos.
+# - tidyr: para la organización de los datos.
+# - purrr: para aplicar funciones a vectores. 
+# - ggplot2: para la visualización de datos.
+library(tidymodels)
+# Incluye los siguientes paquetes:
+# - parsnip: para la creación de modelos.
+# - recipes: para la preparación de los datos.
+# - workflows: para la creación de flujos de trabajo.
+# - rsample: para la creación de particiones de los datos.
+# - yardstick: para la evaluación de modelos.
+# - tune: para la optimización de hiperparámetros.
+library(skimr) # para el análisis exploratorio de datos.
+library(GGally) # para la visualización de matrices de correlación.
+library(FactoMineR) # para el análisis de componentes principales.
+library(factoextra) # para dibujar los componentes principales.
+library(psych) # para el cálculo de la kappa de Cohen.
+library(plotly) # para la visualización interactiva de gráficos.
+library(knitr) # para el formateo de tablas.
+```
+
+::: {#exr-no-supervisado-pinguinos}
+El conjunto de datos [pingüinos.csv](datos/pingüinos.csv) contiene un conjunto de datos sobre tres especies de pingüinos con las siguientes variables:
+
+- Especie: Especie de pingüino (Adelie, Chinstrap o Gentoo).
+- Isla: Isla del archipiélago Palmer donde se realizó la observación.
+- Longitud_pico: Longitud del pico (mm).
+- Profundidad_pico: Profundidad del pico (mm)
+- Longitud_ala: Longitud de la aleta en (mm).
+- Peso: Masa corporal (g).
+- Sexo: Sexo (macho, hembra)
+
+a.  Cargar los datos del archivo [`pinguinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pinguinos.csv) en un data frame.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(tidyverse)
+    library(knitr)
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-julia/datos/pingüinos.csv", stringsAsFactors = TRUE)
+    glimpse(df)
+    ```
+    :::
+
+a.  Realizar un análisis exploratorio de los datos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(skimr)
+    skim(df) 
+    ```
+    :::
+
+a.  Eliminar del data frame las columnas `Isla`, `Sexo` y `Peso` y eliminar las filas con valores perdidos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df <- df |>
+        select(-Isla, -Sexo, -Peso) |>
+        drop_na()
+    ```
+    :::
+
+a.  Realizar un análisis de correlación entre las variables numéricas del conjunto de datos.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`ggcorr`](https://ggobi.github.io/ggally/reference/ggcorr.html) del paquete [`GGally`](https://ggobi.github.io/ggally/) para dibujar un diagrama de correlación entre las variables numéricas del conjunto de datos. 
+    
+    Parámetros:
+    - `label = TRUE` para mostrar las etiquetas de correlación.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(GGally)
+    ggcorr(df, label = TRUE)
+    ```
+    :::
+
+a.  Realizar un diagrama de dispersión tridimensional de las variables `Longitud_pico`, `Profundidad_pico` y `Longitud_ala` coloreando los puntos según la especie de pingüino.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`plot_ly`](https://plotly.com/r/reference/#scatter3d) del paquete [`plotly`](https://plotly.com/r/) para dibujar un diagrama de dispersión tridimensional.
+    
+    Parámetros:
+    - `x = Longitud_pico`, `y = Profundidad_pico`, `z = Longitud_ala` para indicar las variables a utilizar.
+    - `color = Especie` para colorear los puntos según la especie de pingüino.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(plotly)
+    df |> plot_ly(x = ~Longitud_pico, y = ~Profundidad_pico, z = ~Longitud_ala, 
+            color = ~Especie,
+            type = "scatter3d", mode = "markers") |>
+        layout(title = "Diagrama de dispersión tridimensional de pingüinos",
+            scene = list(xaxis = list(title = "Longitud del Pico (mm)"),
+                            yaxis = list(title = "Profundidad del Pico (mm)"),
+                            zaxis = list(title = "Longitud de la Aleta (mm)")))
+    ```
+    :::
+
+a.  Calcular los componentes principales del conjunto de variables numéricas y mostrar la varianza explicada por cada componente.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`PCA`](https://www.rdocumentation.org/packages/FactoMineR/topics/PCA) del paquete [`FactoMineR`](http://factominer.free.fr/) para obtener los componentes principales del conjunto de variables numéricas.
+    
+    Parámetros:
+    - `scale.unit = TRUE` para normalizar las variables.
+    - `ncp = n` para obtener los primeros n componentes principales.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(FactoMineR)
+    # Calculamos los componentes principales.
+    componentes <- df |> 
+        select(where(is.numeric)) |>
+        PCA(scale.unit = TRUE, graph = FALSE)   
+
+    # Autovalores y varianza explicada
+    kable(componentes$eig)
+
+    # Gráfico de la varianza explicada
+    library(factoextra)
+    fviz_eig(componentes, addlabels = TRUE)
+    ```
+    :::
+
+a.  Mostrar los autovectores
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`get_pca_var`](https://rpkgs.datanovia.com/factoextra/reference/get_pca.html) del paquete [`factoextra`](https://rpkgs.datanovia.com/factoextra/index.html) para obtener los autovectores de los componentes principales.
+    
+    Parámetros:
+    - `componentes` para indicar el objeto con los componentes principales.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+    
+    ```{r}
+    # Obtenemos los autovectores. 
+    autovectores <- get_pca_var(componentes)
+    kable(autovectores$coord)
+
+    # Gráfico de los autovectores
+    fviz_pca_var(componentes, col.var = "contrib")
+    ```
+    :::
+
+a.  Dibujar un gráfico de dispersión de los dos primeros componentes principales coloreando los puntos según la especie de pingüino.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`fviz_pca_ind`](https://rpkgs.datanovia.com/factoextra/reference/get_pca.html) del paquete [`factoextra`](https://rpkgs.datanovia.com/factoextra/index.html) para dibujar un gráfico de dispersión de los dos primeros componentes principales.
+    
+    Parámetros:
+    - `componentes` para indicar el objeto con los componentes principales.
+    - `col.ind = df$Especie` para colorear los puntos según la especie de pingüino.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    # Diagrama de dispersión de los dos primeros componentes principales.
+    plot <- componentes |> fviz_pca_ind(col.ind = df$Especie, label = "none") +
+        labs(title = "Gráfico de dispersión de los dos primeros componentes principales",
+            x = "Componente Principal 1",
+            y = "Componente Principal 2")
+    ggplotly(plot) # Convertimos el gráfico a interactivo
+    ```
+    :::
+
+a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y representar los grupos en un diagrama de dispersión.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    set.seed(123)
+
+    # Determinamos el número óptimo de grupos.
+    df |> select(where(is.numeric)) |>
+        fviz_nbclust(kmeans)
+    ```
+
+    A la vista del gráfico anterior, el número óptimo de grupos, donde se ubica el "codo" del gráfico, sería 3 o 4, lo que se corresponde con las 3 especies de pingüinos.
+
+    ```{r}
+    agrupacion <- df |> 
+        select(where(is.numeric)) |> 
+        kmeans(centers = 3)
+    df$Grupo <- as.factor(agrupacion$cluster)
+    componentes |> fviz_pca_ind(col.ind = df$Grupo, label = "none") +
+        labs(title = "Gráfico de dispersión de los dos primeros componentes principales",
+            x = "Componente Principal 1",
+            y = "Componente Principal 2")
+    ```
+    :::
+
+a.  Obtener una tabla de contingencia para ver la relación entre las especies de pingüinos y los grupos obtenidos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+    ```{r}
+    table(df$Especie, df$Grupo) |> 
+        kable()
+    ```
+    :::
+
+a.  Calcular la kappa de Cohen para ver la concordancia entre las especies de pingüinos y los grupos obtenidos.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`cohen.kappa`](https://www.rdocumentation.org/packages/irr/topics/cohen.kappa) del paquete `irr` para calcular la kappa de Cohen.
+    
+    Parámetros:
+    - `cbind(df$Especie, df$Grupo)` dataframe con las dos variables a comparar.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(psych)
+    cohen.kappa(cbind(df$Especie, df$Grupo))
+    ```
+    :::
+
+a.  Realizar un análisis de agrupamiento jerárquico de las especies de pingüinos y dibujar el dendograma asociado coloreando los puntos según la especie de pingüino.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`hclust`](https://www.rdocumentation.org/packages/stats/topics/hclust) del paquete `stats` para realizar el análisis de agrupamiento jerárquico.
+
+    Parámetros:
+    - `dist` para calcular la matriz de distancias entre las observaciones.
+    - `method = "complete"` para utilizar el método de enlace completo.
+    
+    Utilizar la función [`fviz_dend`](https://rpkgs.datanovia.com/factoextra/reference/fviz_dend.html) del paquete [`factoextra`](https://rpkgs.datanovia.com/factoextra/index.html) para dibujar el dendograma.
+
+    Parámetros:
+    - `k = n` para crear n grupos.
+    - `color_labels_by_k = TRUE` para colorear las etiquetas según el grupo.
+    - `rect = TRUE` para dibujar rectángulos alrededor de los grupos.
+    - `rect_fill = TRUE` para rellenar los rectángulos.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    # Calculamos la matriz de distancias.
+    distancias <- df |> select(where(is.numeric)) |> 
+        dist(method = "euclidean")
+    # Realizamos el agrupamiento jerárquico.    
+    jerarquia <- hclust(distancias, method = "complete")
+    # Dendrograma coloreado por especie
+    fviz_dend(jerarquia, 
+        k = 3,  # número de grupos
+        color_labels_by_k = TRUE,
+        rect = TRUE,
+        rect_fill = TRUE) +
+    labs(title = "Dendrograma de agrupamiento Jerárquico de Pingüinos")
+    ```
+    :::
+
+:::{#exr-no-supervisado-glaucoma}
+
+El conjunto de datos [glaucoma.csv](datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
+
+![Tomografía de coherencia óptica](/img/aprendizaje-no-supervisado/tomografia-coherencia-optica.jpg)
+
+a.  Cargar el conjunto de datos del archivo [`glaucoma.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) en un data frame.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(tidyverse)
+    library(knitr)
+    # Cargamos el conjunto de datos.
+    df <- read.csv("datos/glaucoma.csv", stringsAsFactors = TRUE)
+    glimpse(df)
+    ```
+    :::
+
+a.  Realizar un análisis exploratorio de los datos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(skimr)
+    # Análisis exploratorio de los datos.
+    skim(df)
+    ```
+    :::
+
+a.  Estudiar la correlación entre las variables numéricas del conjunto de datos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(GGally)
+    # Diagrama de correlación entre las variables numéricas.
+    df |> select(starts_with("Anillo")) |>
+        ggcorr(label = TRUE, label_size = 3)
+    ```
+
+a.  Calcular los componentes principales del conjunto de variables numéricas y mostrar la varianza explicada por cada componente.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(FactoMineR)
+    # Calculamos los componentes principales.
+    componentes <- df |> 
+        select(starts_with("Anillo")) |>
+        PCA(graph = FALSE)   
+
+    # Autovalores y varianza explicada
+    kable(componentes$eig)
+
+    # Gráfico de la varianza explicada
+    library(factoextra)
+    fviz_eig(componentes, addlabels = TRUE)
+    ```
+    :::
+
+a.  Dibujar un diagrama de dispersión de los dos primeros componentes principales coloreando los puntos según el diagnóstico de glaucoma.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(plotly)
+    # Diagrama de dispersión de los dos primeros componentes principales.
+    plot <- componentes |> fviz_pca_ind(col.ind = df$Glaucoma, label = "none") +
+        labs(title = "Gráfico de dispersión de los dos primeros componentes principales",
+            x = "Componente Principal 1",
+            y = "Componente Principal 2")
+    ggplotly(plot) # Convertimos el gráfico a interactivo
+    ```
+    :::
+
+
+a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y representar los grupos en un diagrama de dispersión.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    set.seed(123)
+    # Determinamos el número óptimo de grupos.
+    df |> filter(Glaucoma == "Sí") |> 
+        select(starts_with("Anillo")) |>
+        fviz_nbclust(kmeans, method = "wss")
+    ```
+
+    A la vista del gráfico anterior, el número óptimo de grupos, donde se ubica el "codo" del gráfico, sería 3 o 4.
+
+    ```{r}
+    agrupacion <- df |> 
+        filter(Glaucoma == "Sí") |> 
+        select(starts_with("Anillo")) |>
+        kmeans(centers = 4)
+    centroides <- agrupacion$centers[order(agrupacion$centers[,1], decreasing = T),]
+    agrupacion <- df |> 
+        filter(Glaucoma == "Sí") |> 
+        select(starts_with("Anillo")) |>
+        kmeans(centers = centroides)
+    # Convertimos los grupos en un factor.
+    agrupacion$cluster <- as.factor(agrupacion$cluster)
+    # Asignamos etiquetas a los niveles del factor.
+    labels <- c("I", "II", "III", "IV")
+    levels(agrupacion$cluster) <- labels
+    # Add cluster to data frame
+    df_glaucoma <- df |> filter(Glaucoma == "Sí") |> 
+        mutate(Estadio = agrupacion$cluster)
+    df <- df |> filter(Glaucoma == "No") |> 
+        mutate(Estadio = "Sano") |> 
+        bind_rows(df_glaucoma)
+
+    plot <- componentes |> fviz_pca_ind(col.ind = df$Estadio, label = "none", addEllipses = T) +
+        labs(title = "Gráfico de dispersión de los dos primeros componentes principales según estadio de Glaucoma")
+    ggplotly(plot)
+    ```
+    :::
+
+
+## Ejercicios propuestos
+
+:::{#exr-no-supervisado-cancer-mama}
+El conjunto de datos [cancer-mama.csv](datos/cancer-mama.csv) contiene información sobre las características de núcleos de células mamarias obtenidas de imágenes digitalizadas tanto de células cancerosas como no cancerosas obtenidas por biopsia. Las variables que contiene son:
+
+- ID: Identificador único de la muestra.
+- Diagnóstico: Diagnóstico de la muestra (M: maligno, B: benigno).
+- Radio: Media de la distancia desde el centro hasta los puntos de la superficie.
+- Textura: Desviación estándar de la intensidad de gris de los puntos.
+- Perímetro: Longitud del contorno.
+- Área: Área de la imagen.
+- Suavidad: Variación local en la longitud del radio.
+- Compacidad: Perímetro^2 / Área - 1.0.
+- Concavidad: Magnitud de las porciones cóncavas del contorno.
+- Puntos_concavos: Número de puntos cóncavos del contorno.
+- Simetría: Simetría de la imagen.
+- Irregularidad: Medida de la irregularidad de la forma.
+
+a.  Crear un dataframe con los datos del archivo [`cancer-mama.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/cancer-mama.csv).
+
+a.  Realizar un análisis exploratorio de los datos.
+
+a.  Dibujar un diagrama de correlación entre las variables numéricas del conjunto de datos.
+
+a.  Calcular los componentes principales del conjunto de variables numéricas.
+
+a.  Dibujar un diagrama de barras con la varianza explicada por cada componente principal.
+
+a.  Dibujar un diagrama de dispersión de los dos primeros componentes principales coloreando los puntos según el diagnóstico.
+
+a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y representar los grupos en un diagrama de dispersión.
+
+:::{#exr-no-supervisado-vinos}
+El fichero [`vinos.csv`](datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
+
+| Variable             | Descripción                                                           | Tipo (unidades)        |
+|----------------------------------------|-----------------------------------------------------------------------|------------------------|
+| tipo                 | Tipo de vino                                                          | Factor (blanco, tinto) |
+| meses.barrica        | Mesesde envejecimiento en barrica                               | Numérica(meses)  |
+| acided.fija          | Cantidadde ácidotartárico                                 | Numérica(g/dm3)  |
+| acided.volatil       | Cantidad de ácido acético                                             | Numérica(g/dm3)  |
+| acido.citrico        | Cantidad de ácidocítrico                                        | Numérica(g/dm3)  |
+| azucar.residual      | Cantidad de azúcarremanente después de la fermentación          | Numérica(g/dm3)  |
+| cloruro.sodico       | Cantidad de clorurosódico                                       | Numérica(g/dm3)  |
+| dioxido.azufre.libre | Cantidad de dióxido de azufreen formalibre                | Numérica(mg/dm3) |
+| dioxido.azufre.total | Cantidadde dióxido de azufretotal en forma libre o ligada | Numérica(mg/dm3) |
+| densidad             | Densidad                                                              | Numérica(g/cm3)  |
+| ph                   | pH                                                                    | Numérica(0-14)   |
+| sulfatos             | Cantidadde sulfato de potasio                                   | Numérica(g/dm3)  |
+| alcohol              | Porcentajede contenidode alcohol                          | Numérica(0-100)  |
+| calidad              | Calificación otorgada porun panel de expertos                   | Numérica(0-10)   |
+
+a.  Crear un dataframe con los datos del archivo [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv).
+
+a.  Realizar un análisis exploratorio de los datos.
+
+a.  Dibujar un diagrama de correlación entre las variables numéricas del conjunto de datos.
+
+a.  Calcular los componentes principales del conjunto de variables numéricas químicas.
+
+a.  Dibujar un diagrama de barras con la varianza explicada por cada componente principal.
+
+a.  Dibujar un diagrama de dispersión de los dos primeros componentes principales coloreando los puntos según el tipo de vino. Repetir el diagrama de dispersión coloreando los puntos según el envejecimiento del vino.
+
+a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y representar los grupos en un diagrama de dispersión.
+:::

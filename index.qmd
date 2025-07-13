@@ -6,9 +6,9 @@ lang: es
 
 ¡Bienvenido a Prácticas de Aprendizaje Automático con R!
 
-Este libro presenta una recopilación de prácticas de Aprendizaje Automático (Machine Learning) con el lenguaje de programación [R](https://www.r-project.org/).
+Este sitio presenta una recopilación de prácticas de Aprendizaje Automático (Machine Learning) con el lenguaje de programación [R](https://www.r-project.org/).
 
-No es un libro para aprender a programar con R, ya que solo enseña el uso del lenguaje y de algunos de sus paquetes para implementar los algoritmos más comunes de Aprendizaje Automático. Para quienes estén interesados en aprender a programar en este R, os recomiendo leer este [manual de R](https://aprendeconalf.es/manual-r).
+No es un sitio para aprender a programar con R, ya que solo enseña el uso del lenguaje y de algunos de sus paquetes para implementar los algoritmos más comunes de Aprendizaje Automático. Además, para poder realizar estas prácticas, es necesario tener un mínimo conocimiento de los tipos de datos y las funciones básicas de R, así como de los paquetes `dplyr`, para el preprocesamiento de datos, y `ggplot2`, para la visualización de datos. Para quienes estén interesados en aprender a programar en este lenguaje y conocer estos paquetes, os recomiendo leer este [manual de R](https://aprendeconalf.es/manual-r).
 
 ## Licencia
 

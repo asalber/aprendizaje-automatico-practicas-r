@@ -1,12 +1,14 @@
 ---
 title: Preprocesamiento de datos
-knitr: 
-    opts_chunk: 
-      R.options:
-        warning: false
-        message: false
+execute: 
+    warning: false
+    message: false
 lang: es
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
 
 Esta práctica contiene ejercicios que muestran como preprocesar un conjunto de datos en R. El preprocesamiento de datos es una tarea fundamental en el análisis de datos que consiste en la limpieza, transformación y preparación de los datos para su análisis. El preprocesamiento de datos incluye tareas como 
 
@@ -14,7 +16,7 @@ Esta práctica contiene ejercicios que muestran como preprocesar un conjunto de 
 - Imputación de valores perdidos.
 - Recodificación de variables.
 - Creación de nuevas variables.
-- Transformación de variables.
+- Transformación de variables: Normalización, cambio de escala, etc.
 - Selección de variables.
 - Fusión de datos.
 - Reestructuración del conjunto de datos.
@@ -31,114 +33,7 @@ library(tidyverse)
 # - lubridate: para el procesamiento de fechas.
 ```
 
-:::{#exr-preprocesamiento-1}
-La siguiente tabla contiene los ingresos y gastos de una empresa durante el primer trimestre del año.
-
-```{r, echo = F}
-library(knitr)
-df1 <- data.frame(
-    Mes = c("Enero", "Febrero", "Marzo", "Abril"),
-    Ingresos = c(45000, 41500, 51200, 49700),
-    Gastos = c(33400, 35400, 35600, 36300), 
-    Impuestos = c(6450, 6300, 7100, 6850)
-    )
-df1 |>
-    kable()
-```
-
-a.  Crear un data frame con los datos de la tabla.
-
-    :::{.callout-tip collapse="true"}
-    ## Solución
-    ```{r}
-    df <- data.frame(
-        Mes = c("Enero", "Febrero", "Marzo", "Abril"),
-        Ingresos = c(45000, 41500, 51200, 49700),
-        Gastos = c(33400, 35400, 35600, 36300),
-        Impuestos = c(6450, 6300, 7100, 6850)
-        )
-    df |>
-        kable()
-    ```
-    :::
-
-a.  Crear una nueva columna con los beneficios de cada mes (ingresos - gastos - impuestos).
-
-    :::{.callout-tip collapse="true"}
-    ## Solución
-    :::{.panel-tabset}
-
-    ## Base
-    Con las funciones del paquete `base` de R.
-
-    ```{r}
-    df$Beneficios <- df$Ingresos - df$Gastos - df$Impuestos
-    df
-    ```
-
-    ## tidyverse
-    Con la función [`mutate`](https://dplyr.tidyverse.org/reference/mutate.html) del paquete `dplyr` de `tidyverse`. La función `mutate` permite añadir nuevas columnas a un data frame mediante una fórmula puede hacer referencia a las columnas existentes.
-
-    ```{r}
-    library(tidyverse)
-    df <- df |>
-        mutate(Beneficios = Ingresos - Gastos - Impuestos)
-    df
-    ```
-    :::
-    :::
-
-a.  Crear una nueva columna con el factor `Balance` con dos posibles categorías: `positivo` si ha habido beneficios y `negativo` si ha habido pérdidas.
-
-    :::{.callout-tip collapse="true"}
-    ## Solución
-    :::{.panel-tabset}
-
-    ## Base
-    Con la función `cut` del paquete `base` de R. La función `cut(vector, breaks, labels)` divide el vector `vector` en intervalos delimitados por los elementos del vector `breaks` y crea un factor asignando a cada intervalo una etiqueta del vector `labels`.
-
-    ```{r}
-    df$Balance <- cut(df$Beneficios, breaks = c(-Inf, 0, Inf), labels = c("negativo", "positivo"))
-    df
-    ```
-    
-    ## tidyverse
-    Con la función `mutate` del paquete `dplyr` de `tidyverse`.
-
-    ```{r}
-    df <- df |>
-        mutate(Balance = cut(Beneficios, breaks = c(-Inf, 0, Inf), labels = c("negativo", "positivo")))
-    df
-    ```
-    :::
-    :::
-
-a.  Filtrar el conjunto de datos para quedarse con los nombres de los meses y los beneficios de los meses con balance positivo. 
-
-    :::{.callout-tip collapse="true"}
-    ## Solución
-    :::{.panel-tabset}
-
-    ## Base
-    Con las funciones del paquete `base` de R.
-
-    ```{r}
-    df[df$Balance == "positivo", c("Mes", "Beneficios")]
-    ```
-    
-    ## tidyverse
-    Con las funciones [`filter`](https://dplyr.tidyverse.org/reference/filter.html) y [`select`](https://dplyr.tidyverse.org/reference/select.html) del paquete `dplyr` de `tidyverse`. La función `filter` permite seleccionar las filas de un data frame que cumplen una condición. La función `select` permite seleccionar las columnas de un data frame.
-
-    ```{r}
-    df |>
-        filter(Balance == "positivo") |> 
-        select(Mes, Beneficios)
-    ```
-    :::
-    :::
-:::
-
-:::{#exr-preprocesamiento-2}
+:::{#exr-preprocesamiento-colesterol}
 El fichero [`colesterol.csv`](datos/colesterol.csv) contiene información de una muestra de pacientes donde se han medido la edad, el sexo, el peso, la altura y el nivel de colesterol, además de su nombre.
 
 a.  Crear un data frame con los datos de todos los pacientes del estudio a partir del fichero [`colesterol.csv`](datos/colesterol.csv).
@@ -159,6 +54,7 @@ a.  Crear un data frame con los datos de todos los pacientes del estudio a parti
     Con la función [`read_csv`](https://readr.tidyverse.org/reference/read_delim.html) del paquete del paquete [`readr`](https://readr.tidyverse.org/index.html) de `tidyverse`.
 
     ```{r}
+    library(tidyverse)
     df <- read_csv("https://aprendeconalf.es/estadistica-practicas-r/datos/colesterol.csv")
     head(df)
     ```
@@ -451,7 +347,7 @@ a.  Ordenar el data frame ascendentemente por la columna `sexo` y descendentemen
     :::
 :::
 
-:::{#exr-preprocesamiento-3}
+:::{#exr-preprocesamiento-notas}
 El fichero [`notas-curso2.csv`](datos/notas-curso2.csv) contiene las notas de las asignaturas de un curso en varios grupos de alumnos.
 
 a.  Crear un data frame con los datos del curso a partir del fichero [`notas-curso2.csv`](datos/notas-curso2.csv).
@@ -504,7 +400,7 @@ a.  Filtrar el conjunto de datos para obtener las asignaturas y las notas de las
     :::
 :::
 
-:::{#exr-preprocesamiento-4}
+:::{#exr-preprocesamiento-hipertension}
 Se ha diseñado un ensayo clínico aleatorizado, doble-ciego y controlado con placebo, para estudiar el efecto de dos alternativas terapéuticas en el control de la hipertensión arterial. Se han reclutado 100 pacientes hipertensos y estos han sido distribuidos aleatoriamente en tres grupos de tratamiento. A uno de los grupos (control) se le administró un placebo, a otro grupo se le administró un inhibidor de la enzima conversora de la angiotensina (IECA) y al otro un tratamiento combinado de un diurético y un Antagonista del Calcio. Las variables respuesta final fueron las presiones arteriales sistólica y diastólica.
 
 Los datos con las claves de aleatorización han sido introducidos en una base de datos que reside en la central de aleatorización, mientras que los datos clínicos han sido archivados en dos archivos distintos, uno para cada uno de los dos centros participantes en el estudio.
@@ -724,7 +620,7 @@ a.  Guardar el data frame en un fichero csv.
 
 ## Ejercicios Propuestos
 
-:::{#exr-preprocesaimento-5}
+:::{#exr-preprocesamiento-vinos}
 Los ficheros [`vinos-blancos.xls`](datos/vinos-blancos.xls) y [`vinos-tintos.csv`](datos/vinos-tintos.csv) contienen información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables almacenadas en estos archivos son las siguientes:
 
 | Variable             | Descripción                                                           | Tipo (unidades)        |

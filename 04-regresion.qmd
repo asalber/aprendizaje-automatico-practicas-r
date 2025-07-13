@@ -1,0 +1,644 @@
+---
+title: Regresión
+execute: 
+  warning: false
+lang: es
+---
+
+Los modelos de aprendizaje basados en regresión son modelos bastante simples que pueden utilizarse para predecir variables cuantitativas (regresión lineal o no lineal) o cualitativas (regresión logística). Esta práctica contiene ejercicios que muestran como construir modelos de aprendizaje de regresión lineal, no lineal y regresión logística con R y el paquete `tidymodels`.
+
+## Ejercicios Resueltos
+
+Para la realización de esta práctica se requieren los siguientes paquetes:
+
+```R
+library(tidyverse)
+# Incluye los siguientes paquetes:
+# - readr: para la lectura de ficheros csv.
+# - dplyr: para el preprocesamiento y manipulación de datos.
+# - ggplot2: para la visualización de datos.
+library(GGally) # para la visualización de datos.
+librar(tidymodels) # para la creación de modelos de aprendizaje automático.
+library(broom) # para convertir las listas con los resúmenes de los modelos de regresión a formato organizado.
+library(knitr) # para el formateo de tablas.
+```
+
+:::{#exr-regresion-1}
+El conjunto de datos [medidas-fisicas.csv](datos/medidas-fisicas.csv) contiene un conjunto de datos con la edad, sexo, estatura (cm), peso (kg) y el deporte que hacen una muestra de personas (días a la semana).
+
+a.  Cargar los datos del archivo [`medidas-fisicas.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/medidas-fisicas.csv) en un data frame.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(tidyverse)
+    library(knitr)
+    df <- read_csv("datos/medidas-fisicas.csv") |> 
+    mutate(Peso = if_else(DiasDeporte > 0, Peso - DiasDeporte/2, Peso))
+    head(df) |> 
+        kable()
+    ```
+    :::
+
+a.  Preprocesar el conjunto de datos filtrando las personas mayores de edad y eliminando las filas con con datos perdidos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df <- df  |> 
+        filter(Edad >= 18)  |> 
+        drop_na()
+    ```
+    :::
+
+a.  Dibujar un diagrama de relación entre todos los pares de variables del conjunto de datos diferenciando por el sexo de las personas.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Se puede utilizar la función `ggpairs` del paquete `GGally` para dibujar un diagrama de relación entre todos los pares de variables del conjunto de datos. Asociar el sexo a la dimensión del color.
+    :::
+
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(GGally)
+    ggpairs(df, aes(color = Sexo, alpha = 0.5))
+    ```
+    :::
+
+a.  Descomponer el conjunto de datos en un subconjunto de entrenamiento con el 80% de los datos y un subconjunto de test con el 20% restante.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(tidymodels)
+    set.seed(123) # Semilla aleatoria para reproducibilidad
+    df_particion <- initial_split(df, prop = 0.8)  # Dividir el conjunto de datos en entrenamiento (80%) y test (20%)
+    df_entrenamiento <- training(df_particion)
+    df_test <- testing(df_particion)
+    ```
+    :::
+
+a.  Dibujar el diagrama de dispersión de la estatura y el peso.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    diagrama_dispersion <- ggplot(df_entrenamiento, aes(x = Estatura, y = Peso)) +
+      geom_point() +
+      labs(title = "Diagrama de dispersión de Estatura y Peso")
+    diagrama_dispersion
+    ```
+    :::
+
+a.  Construir un modelo de regresión lineal para predecir el peso en función de la estatura.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función `lm` del paquete `base` para crear un modelo de regresión lineal con la fórmula `Peso ~ Estatura` para indicar que el peso es la variable dependiente y la estatura es la variable independiente.
+
+    O bien, utilizar la función `linear_reg` del paquete `tidymodels` para crear un modelo de regresión lineal y usar la función `set_engine` para establecer el motor de cálculo como "lm" (mínimos cuadrados).
+    Una vez definido el tipo de modelo, utilizar la función `fit` para ajustar el modelo a los datos, pasándole la fórmula `Peso ~ Estatura` para indicar que el peso es la variable dependiente y la estatura es la variable independiente.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    :::{.panel-tabset}
+    ## Base
+
+    ```{r}
+    library(broom)
+    modelo <- lm(Peso ~ Estatura, data = df_entrenamiento)  # Crear un modelo de regresión lineal.
+    tidy(modelo) |> 
+        kable()
+    ```
+
+    ## Tidymodels
+
+    ```{r}
+    modelo <- linear_reg() |>   # Crear un modelo de regresión lineal.
+        set_engine("lm")  # Establecer como motor de cálculo el ajuste por mínimos cuadrados.
+
+    modelo_ajustado <- modelo |>
+        fit(Peso ~ Estatura, data = df_entrenamiento) # Ajustar el modelo a los datos.  
+    tidy(modelo_ajustado) |> 
+        kable()
+    ```
+    :::
+    :::
+
+a.  Dibujar el modelo de regresión lineal sobre el diagrama de dispersión de la estatura y el peso.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    diagrama_dispersion +
+      geom_smooth(method = "lm") 
+    ```
+    :::
+
+a.  Predecir el peso de las personas del conjunto de test utilizando el modelo de regresión lineal ajustado.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función `predict` del paquete `base` para predecir el peso de las personas del conjunto de test. Pasar el modelo ajustado y el conjunto de datos de test como argumentos.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df_test <- df_test |> 
+        mutate(Peso_Predicho = predict(modelo_ajustado, new_data = df_test)$.pred)  # Predecir el peso de las personas del conjunto de test.
+    head(df_test) |> 
+        kable()
+    ```
+    :::
+
+a.  Dibujar los errores predictivos entre el peso real y el peso predicho en el conjunto de datos de test.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    ggplot(df_test, aes(x = Peso, y = Peso_Predicho)) +
+      geom_abline(slope = 1, intercept = 0, color = "red") +
+      geom_point() +
+      geom_segment(aes(xend = Peso, yend = Peso), color = "blue", alpha = 0.5) +
+      labs(title = "Errores predictivos (líneas verticales) entre Peso Real y Predicho",
+           x = "Peso Real",
+           y = "Peso Predicho")
+    ```
+    :::
+
+a.  Evaluar el modelo de regresión lineal calculando el error cuadrático medio (RMSE) y el coeficiente de determinación ($R^2$).
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(yardstick)
+    df_test |> 
+        metrics(truth = Peso, estimate = Peso_Predicho) |> 
+        kable()
+    ```
+    :::
+
+a.  Incluir en el modelo de regresión lineal la variable sexo como variable categórica y volver a ajustar el modelo.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    modelo_ajustado_sexo <- modelo |>
+        fit(Peso ~ Estatura + Sexo, data = df_entrenamiento)
+    tidy(modelo_ajustado_sexo) |> 
+        kable()
+    ```
+    :::
+
+a.  Dibujar el modelo de regresión lineal con la variable sexo sobre el diagrama de dispersión de la estatura y el peso.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+    
+    ```{r}
+    df_entrenamiento  |> 
+        ggplot(aes(x = Estatura, y = Peso, color = Sexo)) +
+        geom_point() +
+        geom_smooth(method = "lm") 
+        labs(title = "Diagrama de dispersión de Estatura y Peso según Sexo") 
+    ```
+    :::
+
+a.  Predecir el peso de las personas del conjunto de test utilizando el modelo de regresión lineal ajustado con la variable sexo y evaluar el nuevo modelo de regresión lineal calculando el error cuadrático medio (RMSE) y el coeficiente de determinación ($R^2$). ¿Qué conclusiones puedes sacar de la comparación entre los dos modelos?
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df_test |> 
+        mutate(Peso_Predicho = predict(modelo_ajustado_sexo, new_data = df_test)$.pred)  |>  # Predecir el peso de las personas del conjunto de test.
+        metrics(truth = Peso, estimate = Peso_Predicho) |> 
+        kable()
+    ```
+
+    El error cuadrático medio no ha disminuido, por lo que la inclusión de la variable sexo no ha mejorado el modelo.
+    :::
+
+
+a.  Construir un nuevo modelo que explique el peso en función de la estatura y el deporte que practican las personas.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    modelo_ajustado_deporte <- modelo |>
+        fit(Peso ~ Estatura + DiasDeporte, data = df_entrenamiento)
+    tidy(modelo_ajustado_deporte) |> 
+        kable()
+    ```
+    :::
+
+a.  Dibujar el modelo de regresión lineal con la variable deporte sobre el diagrama de dispersión de la estatura y el peso.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df_entrenamiento  |> 
+        ggplot(aes(x = Estatura, y = Peso, color = DiasDeporte)) +
+        geom_point() +
+        geom_smooth(method = "lm") +
+        labs(title = "Diagrama de dispersión de Estatura y Peso según Días de Deporte") 
+    ```
+    :::
+
+a.  Evaluar el nuevo modelo de regresión lineal calculando el error cuadrático medio (RMSE) y el coeficiente de determinación ($R^2$). ¿Qué conclusiones puedes sacar ahora?
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df_test |> 
+        mutate(Peso_Predicho = predict(modelo_ajustado_deporte, new_data = df_test)$.pred)  |>  # Predecir el peso de las personas del conjunto de test.
+        metrics(truth = Peso, estimate = Peso_Predicho) |> 
+        kable()
+    ```
+
+    El error cuadrático medio ha disminuido un poco, pero aún así la inclusión de la variable deporte no ha mejorado mucho el modelo.
+    :::
+:::
+
+:::{#exr-regresion-5}
+El fichero [`dieta.csv`](datos/dieta.csv) contiene información sobre el los kilos perdidos con una dieta de adelgazamiento.
+
+a.  Crear un data frame con los datos de la dieta a partir del fichero [`dieta.csv`](https://aprendeconalf.es/estadistica-practicas-r/datos/dieta.csv).
+
+    :::{.callout-tip collapse="true"} 
+    ## Solución
+
+    ```{r}
+    library(tidyverse)
+    library(knitr)
+    df <- read_csv("datos/dieta.csv")
+    head(df) |> 
+        kable()
+    ```
+    :::
+
+a.  Dibujar el diagrama de dispersión de los kilos perdidos en función del número de días con la dieta. ¿Qué tipo de modelo de regresión se ajusta mejor a la nube de puntos?
+
+    :::{.callout-tip collapse="true"} 
+    ## Solución
+    ```{r}
+    ggplot(df, aes(x = dias, y = peso_perdido)) +
+        geom_point() +
+        labs(title = "Diagrama de dispersión del peso perdido y los días de dieta", x = "Días de dieta", y = "Peso perdido en Kg")
+    ```
+    La nube de puntos es bastante difusa aunque parece apreciarse una tendencia logarítmica o sigmoidal.
+    :::
+
+a.  Dividir el conjunto de datos en un subconjunto de entrenamiento con el 75% de los datos y un subconjunto de test con el 25% restante.
+
+    :::{.callout-tip collapse="true"} 
+    ## Solución
+
+    ```{r}
+    set.seed(123) # Semilla aleatoria para reproducibilidad
+    df_particion <- initial_split(df, prop = 0.75)  # Dividir el conjunto de datos en entrenamiento (75%) y test (25%)
+    df_entrenamiento <- training(df_particion)
+    df_test <- testing(df_particion)
+    ```
+    :::
+
+a.  Ajustar un modelo de regresión sigmoidal a los datos de la dieta y evaluarlo mediante validación cruzada con 5 pliegues.
+    
+    :::{.callout-tip collapse="true"} 
+    ## Solución
+
+    ```{r}
+    modelo <- linear_reg() |> 
+        set_engine("lm") 
+    df_cv <- vfold_cv(df_entrenamiento, v = 5) # Validación cruzada con 10 pliegues.
+    workflow() |> 
+        add_model(modelo) |> 
+        add_formula(log(peso_perdido) ~ I(1/dias))  |>  # Añadir el modelo y la fórmula al flujo de ajuste.
+        fit_resamples(resamples = df_cv)  |> # Ajustar el modelo a los pliegues de validación cruzada.
+        collect_metrics() |> 
+        kable() 
+    ```
+    :::
+
+a.  Ajustar un modelo de regresión inverso a los datos de la dieta y evaluarlo mediante validación cruzada con 5 pliegues.
+
+    :::{.callout-tip collapse="true"} 
+    ## Solución
+
+    ```{r}
+    workflow() |> 
+        add_model(modelo) |> 
+        add_formula(peso_perdido ~ I(1/dias))  |>  # Añadir el modelo y la fórmula al flujo de ajuste.
+        fit_resamples(resamples = df_cv)  |> # Ajustar el modelo a los pliegues de validación cruzada.
+        collect_metrics() |> 
+        kable() 
+    ```
+
+a.  Ajustar un modelo de regresión potencial a los datos de la dieta y evaluarlo mediante validación cruzada con 5 pliegues.
+
+    :::{.callout-tip collapse="true"} 
+    ## Solución
+
+    ```{r}
+    workflow() |> 
+        add_model(modelo) |> 
+        add_formula(log(peso_perdido) ~ log(dias))  |>  # Añadir el modelo y la fórmula al flujo de ajuste.
+        fit_resamples(resamples = df_cv)  |> # Ajustar el modelo a los pliegues de validación cruzada.
+        collect_metrics() |> 
+        kable() 
+    ```
+    :::
+
+:::{#exr-regresion-3}
+El fichero [`infartos.csv`](datos/infartos.csv) contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:
+
+- `Edad`: Edad del paciente (años)
+- `Sexo`: Sexo del paciente (H: hombre, M: mujer)
+- `DolorPecho`: Tipo de dolor torácico (TA: angina típica, ATA: angina atípica, NAP: dolor no anginoso, ASY: asintomático)
+- `PresionArterial`: Presión arterial sistólica en reposo (mm Hg)
+- `Colesterol`: Colesterol sérico (mm/dl)
+-  `Glucemia`: Glucemia en ayunas (1: si glucemia en ayunas > 120 mg/dl, 0: de lo contrario)
+- `Electro`: resultados del electrocardiograma en reposo (Normal: normal, ST: anomalía onda ST-T (inversiones de onda T y/o elevación o depresión de ST > 0,05 mV), LVH: hipertrofia ventricular izquierda probable o definitiva según criterios de Estes)
+- `Pulsaciones`: Frecuencia cardíaca máxima alcanzada (valor numérico entre 60 y 202)
+- `AnginaEjercicio`: Angina inducida por ejercicio (S: sí, N: no)
+- `DepresionST`: Depresión del segmento ST inducida por el ejercicio (valor numérico de la depresión).
+- `PendienteST`: Pendiente del segmento ST en el pico de ejercicio (Ascendente, Plano, Descencdente).
+- `Infarto`: Riesgo de infarto (1: Sí, 0: No)
+
+a.  Cargar los datos del archivo [`infartos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv) en un data frame.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución 
+
+    ```{r}
+    library(tidyverse)
+    library(knitr)
+    df <- read.csv("datos/infartos.csv", stringsAsFactors = TRUE) 
+    df |> 
+        glimpse()
+    ```
+    :::
+
+a.  Convertir las variables cualitativas en factores.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+        
+    ```{r}
+    df <- df |> 
+        mutate(Infarto = factor(Infarto, levels = c("0", "1"), labels = c("No", "Sí")),
+        Glucemia = factor(Glucemia, levels = c("0", "1"), labels = c("No", "Sí")))
+    ```
+    :::
+
+a.  Realizar un análisis exploratorio de los datos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(skimr)
+    df |> 
+        skim() 
+    ```
+    :::
+
+a.  Dibujar un diagrama de relación entre todos los pares de variables del conjunto de datos diferenciando por el riesgo de infarto.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+    
+    ```{r}
+    library(GGally)
+    df |> 
+        ggpairs(aes(color = Infarto, alpha = 0.5))
+    ```
+    :::
+
+a.  Dibujar los diagramas de barras con la distribución de frecuencias de las variables cualitativas según el riesgo de infarto.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df |> 
+        select(where(is.factor)) |> 
+        pivot_longer(cols = where(is.factor) & !all_of("Infarto"), names_to = "variable", values_to = "valor") |> 
+        ggplot(aes(x = valor, fill = Infarto)) +
+        facet_wrap(~ variable, scales = "free") +
+        geom_bar() +
+        labs(title = "Distribución de frecuencias de variables cualitativas")
+    ```
+    :::
+
+a.  Dibujar los diagramas de cajas de las variables numéricas según el riesgo de infarto.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df |>
+        select(Infarto, where(is.numeric)) |> 
+        pivot_longer(cols = where(is.numeric), names_to = "variable", values_to = "valor") |>
+        ggplot(aes(x = Infarto, y = valor, fill = Infarto)) +
+        geom_boxplot() +
+        facet_wrap(~ variable, scales = "free") +
+        labs(title = "Diagramas de cajas de las variables numéricas según Infarto")
+    ```
+    :::
+
+a.  Dibujar un diagrama de correlación entre las variables numéricas del conjunto de datos.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`ggcorr`](https://ggobi.github.io/ggally/reference/ggcorr.html) del paquete [`GGally`](https://ggobi.github.io/ggally/) para dibujar un diagrama de correlación entre las variables numéricas del conjunto de datos. 
+    
+    Parámetros:
+    - `label = TRUE` para mostrar las etiquetas de correlación.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df |>
+        select_if(is.numeric) |> 
+        ggcorr(label = TRUE, label_size = 5)
+    ```
+    :::
+
+a.  Descomponer el conjunto de datos en un subconjunto de entrenamiento con el 80% de los datos y un subconjunto de test con el 20% restante.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(tidymodels)
+    df_particion <- initial_split(df, prop = 0.8)  # Dividir el conjunto de datos en entrenamiento (80%) y test (20%)
+    df_entrenamiento <- training(df_particion)
+    df_test <- testing(df_particion)
+    ```
+    :::
+
+a.  Preprocesar el conjunto de datos de entrenamiento para eliminar las variables numéricas con alta correlación, normalizar las variables numéricas y crear variables dummy para las variables categóricas.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    receta <- recipe(Infarto ~ ., data = df_entrenamiento) |> 
+        step_corr(all_numeric_predictors(), threshold = 0.8) |> # Eliminamos las variables numéricas con alta correlación para evitar multicolinealidad.
+        step_normalize(all_numeric_predictors()) |> # Normalizamos las variables predictoras numéricas.
+        step_dummy(all_nominal_predictors()) # Creamos variables dummy para las variables categóricas.
+    summary(receta)
+    ```
+    :::
+
+a.  Ajustar un modelo de regresión logística a los datos de entrenamiento utilizando la receta de preprocesamiento definida anteriormente.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Usar la función [`logistic_reg`](https://parsnip.tidymodels.org/reference/logistic_reg.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para crear un modelo de regresión logística y establecer el motor de cálculo como "glm" (máxima verosimilitud) y el modo de clasificación para que devuelva la clase predicha.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    modelo <- logistic_reg() |> 
+        set_engine("glm") |>  # Establecer como motor de cálculo el ajuste por máxima verosimilitud.
+        set_mode("classification") # Establecer el modo de clasificación para el modelo de regresión logística.
+
+    modelo_ajustado <- workflow() |> 
+        add_recipe(receta) |> # Añadir la receta al flujo de ajuste.
+        add_model(modelo) |> # Añadir el modelo al flujo de ajuste.
+        fit(data = df_entrenamiento) # Ajustar el modelo a los datos de entrenamiento.
+
+    tidy(modelo_ajustado) |> 
+    kable()
+    ```
+    :::
+
+
+a.  Usar el modelo de regresión logística ajustado para predecir el riesgo de infarto en el conjunto de test y mostrar las primeras 10 predicciones.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+    ```{r}
+    predict(modelo_ajustado, new_data = df_test) |> 
+        head() |> 
+        kable()
+    ```
+    :::
+
+a.  Añadir al conjunto de test la clase predicha con el modelo de regresión logístcia, así como las probabilidades de infarto predichas.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Usar la función [`augment`](https://parsnip.tidymodels.org/reference/augment.html?q=augment#null) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para añadir al conjunto de test las probabilidades de infarto predichas por el modelo de regresión logística.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df_test <- augment(modelo_ajustado, new_data = df_test)
+    df_test |> 
+        head() |> 
+        kable()
+    ```
+    :::
+
+a.  Evaluar el rendimiento del modelo de regresión logística en el conjunto de test utilizando las siguientes métricas de clasificación: precisión, sensibilidad, especificidad, exactitud, recall y F1-score.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`metric_set`](https://yardstick.tidymodels.org/reference/metric_set.html) del paquete [`yardstick`](https://yardstick.tidymodels.org/index.html) para crear un conjunto de métricas de clasificación y pasarle el conjunto de datos de test aumentado con las probabilidades de infarto predichas.
+
+    Las métricas más habituales se calculan a partir de la matriz de confusión.
+
+    |                    | **Predicción Positiva** | **Predicción Negativa** |
+    |--------------------|-------------------------|-------------------------|
+    | **Real Positivo**  | VP (Verdaderos Positivos) | FN (Falsos Negativos) |
+    | **Real Negativo**  | FP (Falsos Positivos)   | VN (Verdaderos Negativos) |
+
+    - Exactitud (Accuracy): Proporción de predicciones correctas sobre el total de predicciones: (VP + VN) / (VP + VN + FP + FN). Es la métrica más básica.
+    - Precisión (Precision): Proporción de predicciones positivas correctas. Mide qué tan "preciso" es el modelo cuando predice positivo: VP / (VP + FP).
+    - Sensibilidad/Recall: Proporción de casos positivos reales que fueron correctamente clasificados por el modelo: VP / (VP + FN). También se llama "tasa de verdaderos positivos".
+    - Especificidad: Proporción de casos negativos reales que fueron correctamente clasificados por el modelo: VN / (VN + FP). Es la "tasa de verdaderos negativos".
+    - F1-score: Media armónica entre precisión y recall: 2 × (Precisión × Recall) / (Precisión + Recall). Es útil cuando quieres balancear tanto la precisión como el recall, especialmente con clases desbalanceadas.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+    ```{r}
+    metricas <- metric_set(accuracy, sensitivity, specificity, precision, f_meas)
+    df_test |> 
+        metricas(truth = Infarto, estimate = .pred_class) |> 
+        kable()
+    ```
+    :::
+
+a.  Dibujar la curva ROC del modelo de regresión logística y calcular el área bajo la curva (AUC).
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`roc_curve`](https://yardstick.tidymodels.org/reference/roc_curve.html) del paquete [`yardstick`](https://yardstick.tidymodels.org/index.html) para calcular la curva ROC y la función [`roc_auc`](https://yardstick.tidymodels.org/reference/roc_auc.html) para calcular el área bajo la curva (AUC).
+
+    Parámetros:
+    - `truth`: variable de verdad (real).
+    - `.pred_No`: probabilidad de la clase negativa.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df_test|> 
+        roc_curve(truth = Infarto, .pred_No) |>
+        autoplot()
+
+    df_test |> 
+        roc_auc(truth = Infarto, .pred_No) |>
+        kable()
+    ```
+:::
+
+## Ejercicios propuestos
+
+:::{#exr-regresion-4}
+El conjunto de datos [`neonatos`](https://aprendeconalf.es/estadistica-practicas-r/datos/neonatos.csv) contiene información sobre una muestra de 320 recién nacidos en un hospital durante un año que cumplieron el tiempo normal de gestación. 
+
+a.  Crear un data frame a con los datos de los neonatos a partir del fichero anterior.
+
+a.  Construir la recta de regresión del peso de los recién nacidos sobre el número de cigarros fumados al día por las madres. ¿Existe una relación lineal fuerte entre el peso y el número de cigarros?
+
+a.  Dibujar la recta de regresión calculada en el apartado anterior. ¿Por qué la recta no se ajusta bien a la nube de puntos?
+
+a.  Calcular y dibujar la recta de regresión del peso de los recién nacidos sobre el número de cigarros fumados al día por las madres en el grupo de las madres que si fumaron durante el embarazo. ¿Es este modelo mejor o pero que la recta
+del apartado anterior? 
+
+a.  Según este modelo, ¿cuánto disminuirá el peso del recién nacido por cada cigarro más diario que fume la madre? 
+
+a.  Según el modelo anterior, ¿qué peso tendrá un recién nacido de una madre que ha fumado 5 cigarros diarios durante el embarazo? ¿Y si la madre ha fumado 30 cigarros diarios durante el embarazo? ¿Son fiables estas predicciones?
+
+a.  ¿Existe la misma relación lineal entre el peso de los recién nacidos y el número de cigarros fumados al día por las madres que fumaron durante el embarazo en el grupo de las madres menores de 20 y en el grupo de las madres mayores de
+20? ¿Qué se puede concluir?
