@@ -11,6 +11,8 @@ execute:
   freeze: auto
   cache: true
   daemon: 3600
+  warning: false
+  message: false
 
 website:
   favicon: "img/logos/favicon.ico"
@@ -44,6 +46,7 @@ book:
     - 02-preprocesamiento.qmd
     - 03-aprendizaje-no-supervisado.qmd
     - 04-regresion.qmd
+    - 05-k-vecinos.qmd
     # - 05-naive-bayes.qmd
     # - 06-k-vecinos.qmd
     # - 07-arboles-decision.qmd

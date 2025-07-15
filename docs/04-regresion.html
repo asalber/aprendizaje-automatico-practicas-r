@@ -65,6 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./05-k-vecinos.html" rel="next">
 <link href="./03-aprendizaje-no-supervisado.html" rel="prev">
 <link href="./img/logos/favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
@@ -413,6 +414,12 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Regresión</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-k-vecinos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">K vecinos más próximos</span></span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -747,9 +754,9 @@ Solución
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>modelo <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span>   <span class="co"># Crear un modelo de regresión lineal.</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">"lm"</span>)  <span class="co"># Establecer como motor de cálculo el ajuste por mínimos cuadrados.</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>modelo_ajustado <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>modelo_entrenado <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(Peso <span class="sc">~</span> Estatura, <span class="at">data =</span> df_entrenamiento) <span class="co"># Ajustar el modelo a los datos.  </span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_ajustado) <span class="sc">|&gt;</span> </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado) <span class="sc">|&gt;</span> </span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -845,7 +852,7 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> df_test <span class="sc">|&gt;</span> </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Peso_Predicho =</span> <span class="fu">predict</span>(modelo_ajustado, <span class="at">new_data =</span> df_test)<span class="sc">$</span>.pred)  <span class="co"># Predecir el peso de las personas del conjunto de test.</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Peso_Predicho =</span> <span class="fu">predict</span>(modelo_entrenado, <span class="at">new_data =</span> df_test)<span class="sc">$</span>.pred)  <span class="co"># Predecir el peso de las personas del conjunto de test.</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_test) <span class="sc">|&gt;</span> </span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1012,9 +1019,9 @@ Solución
 <div id="callout-14" class="callout-14-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>modelo_ajustado_sexo <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>modelo_entrenado_sexo <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(Peso <span class="sc">~</span> Estatura <span class="sc">+</span> Sexo, <span class="at">data =</span> df_entrenamiento)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_ajustado_sexo) <span class="sc">|&gt;</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado_sexo) <span class="sc">|&gt;</span> </span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1108,7 +1115,7 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Peso_Predicho =</span> <span class="fu">predict</span>(modelo_ajustado_sexo, <span class="at">new_data =</span> df_test)<span class="sc">$</span>.pred)  <span class="sc">|&gt;</span>  <span class="co"># Predecir el peso de las personas del conjunto de test.</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Peso_Predicho =</span> <span class="fu">predict</span>(modelo_entrenado_sexo, <span class="at">new_data =</span> df_test)<span class="sc">$</span>.pred)  <span class="sc">|&gt;</span>  <span class="co"># Predecir el peso de las personas del conjunto de test.</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> Peso, <span class="at">estimate =</span> Peso_Predicho) <span class="sc">|&gt;</span> </span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1158,9 +1165,9 @@ Solución
 <div id="callout-17" class="callout-17-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>modelo_ajustado_deporte <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>modelo_entrenado_deporte <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(Peso <span class="sc">~</span> Estatura <span class="sc">+</span> DiasDeporte, <span class="at">data =</span> df_entrenamiento)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_ajustado_deporte) <span class="sc">|&gt;</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado_deporte) <span class="sc">|&gt;</span> </span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1247,7 +1254,7 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Peso_Predicho =</span> <span class="fu">predict</span>(modelo_ajustado_deporte, <span class="at">new_data =</span> df_test)<span class="sc">$</span>.pred)  <span class="sc">|&gt;</span>  <span class="co"># Predecir el peso de las personas del conjunto de test.</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Peso_Predicho =</span> <span class="fu">predict</span>(modelo_entrenado_deporte, <span class="at">new_data =</span> df_test)<span class="sc">$</span>.pred)  <span class="sc">|&gt;</span>  <span class="co"># Predecir el peso de las personas del conjunto de test.</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> Peso, <span class="at">estimate =</span> Peso_Predicho) <span class="sc">|&gt;</span> </span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -2132,12 +2139,12 @@ Solución
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">"glm"</span>) <span class="sc">|&gt;</span>  <span class="co"># Establecer como motor de cálculo el ajuste por máxima verosimilitud.</span></span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="co"># Establecer el modo de clasificación para el modelo de regresión logística.</span></span>
 <span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>modelo_ajustado <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>modelo_entrenado <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
 <span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span> <span class="co"># Añadir la receta al flujo de ajuste.</span></span>
 <span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo) <span class="sc">|&gt;</span> <span class="co"># Añadir el modelo al flujo de ajuste.</span></span>
 <span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(<span class="at">data =</span> df_entrenamiento) <span class="co"># Ajustar el modelo a los datos de entrenamiento.</span></span>
 <span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_ajustado) <span class="sc">|&gt;</span> </span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado) <span class="sc">|&gt;</span> </span>
 <span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -2284,7 +2291,7 @@ Solución
 <div id="callout-38" class="callout-38-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(modelo_ajustado, <span class="at">new_data =</span> df_test) <span class="sc">|&gt;</span> </span>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(modelo_entrenado, <span class="at">new_data =</span> df_test) <span class="sc">|&gt;</span> </span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>() <span class="sc">|&gt;</span> </span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -2320,7 +2327,7 @@ Solución
 </div>
 </div>
 </div></li>
-<li><p>Añadir al conjunto de test la clase predicha con el modelo de regresión logístcia, así como las probabilidades de infarto predichas.</p>
+<li><p>Añadir al conjunto de test la clase predicha con el modelo de regresión logística, así como las probabilidades de infarto predichas.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-39-contents" aria-controls="callout-39" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -2334,6 +2341,10 @@ Ayuda
 <div id="callout-39" class="callout-39-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Usar la función <a href="https://parsnip.tidymodels.org/reference/augment.html?q=augment#null"><code>augment</code></a> del paquete <a href="https://parsnip.tidymodels.org/index.html"><code>parsnip</code></a> para añadir al conjunto de test las probabilidades de infarto predichas por el modelo de regresión logística.</p>
+Parámetros:
+<ul>
+<li><code>new_data</code>: el conjunto de datos de test.</li>
+</ul>
 </div>
 </div>
 </div>
@@ -2350,7 +2361,7 @@ Solución
 <div id="callout-40" class="callout-40-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">augment</span>(modelo_ajustado, <span class="at">new_data =</span> df_test)</span>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">augment</span>(modelo_entrenado, <span class="at">new_data =</span> df_test)</span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> </span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>() <span class="sc">|&gt;</span> </span>
 <span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2687,7 +2698,7 @@ Solución
 </section>
 <section id="ejercicios-propuestos" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="ejercicios-propuestos"><span class="header-section-number">4.2</span> Ejercicios propuestos</h2>
-<div id="exr-regresion-4" class="theorem exercise">
+<div id="exr-regresion-neonatos" class="theorem exercise">
 <p><span class="theorem-title"><strong>Ejercicio 4.4</strong></span> El conjunto de datos <a href="https://aprendeconalf.es/estadistica-practicas-r/datos/neonatos.csv"><code>neonatos</code></a> contiene información sobre una muestra de 320 recién nacidos en un hospital durante un año que cumplieron el tiempo normal de gestación.</p>
 <ol type="a">
 <li><p>Crear un data frame a con los datos de los neonatos a partir del fichero anterior.</p></li>
@@ -2697,6 +2708,14 @@ Solución
 <li><p>Según este modelo, ¿cuánto disminuirá el peso del recién nacido por cada cigarro más diario que fume la madre?</p></li>
 <li><p>Según el modelo anterior, ¿qué peso tendrá un recién nacido de una madre que ha fumado 5 cigarros diarios durante el embarazo? ¿Y si la madre ha fumado 30 cigarros diarios durante el embarazo? ¿Son fiables estas predicciones?</p></li>
 <li><p>¿Existe la misma relación lineal entre el peso de los recién nacidos y el número de cigarros fumados al día por las madres que fumaron durante el embarazo en el grupo de las madres menores de 20 y en el grupo de las madres mayores de 20? ¿Qué se puede concluir?</p></li>
+</ol>
+</div>
+<div id="exr-regresion-glaucoma" class="theorem exercise">
+<p><span class="theorem-title"><strong>Ejercicio 4.5</strong></span> El conjunto de datos <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv"><code>glaucoma.csv</code></a> contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.</p>
+<ol type="a">
+<li><p>Crear un data frame con los datos del fichero <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv"><code>glaucoma</code></a>.</p></li>
+<li><p>Construir un modelo de regresión logística para predecir si un paciente tiene glaucoma o no a partir de los datos de la OTC. Utilizar la variable <code>Glaucoma</code> como variable dependiente y las variables de los anillos y sectores como variables independientes.</p></li>
+<li><p>Evaluar el modelo de regresión logística calculando la matriz de confusión y las métricas de clasificación. Dibujar la curva ROC del modelo.</p></li>
 </ol>
 </div>
 
@@ -3123,6 +3142,9 @@ Solución
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./05-k-vecinos.html" class="pagination-link" aria-label="K vecinos más próximos">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">K vecinos más próximos</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

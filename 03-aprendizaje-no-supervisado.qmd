@@ -10,7 +10,7 @@ lang: es
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-El aprendizaje no supervisado abarca técnicas de aprendizaje automático que buscan identificar patrones en los datos sin utilizar clases o categorías predefinidas. A diferencia del aprendizaje supervisado, donde se entrena un modelo con datos etiquetados, el aprendizaje no supervisado no busca clasificar o predecir una variable respuesta, sino que se centra en descubrir estructuras ocultas en los datos. En esta práctica, exploraremos dos técnicas comunes de aprendizaje no supervisado: el análisis de componentes principales (PCA) y el agrupamiento (clustering).
+El aprendizaje no supervisado abarca técnicas de aprendizaje automático que buscan identificar patrones en los datos sin utilizar clases o categorías predefinidas. A diferencia del aprendizaje supervisado, donde se entrena un modelo con datos etiquetados, el aprendizaje no supervisado no busca clasificar o predecir una variable respuesta, sino que se centra en descubrir estructuras ocultas en los datos. En esta práctica, exploraremos dos técnicas comunes de aprendizaje no supervisado: el análisis de componentes principales (PCA) que consiste en buscar una representación de los datos en un espacio de menor dimensión preservando la mayor cantidad de varianza posible, y el agrupamiento (clustering) que busca agrupar los datos en grupos similares basándose en sus características. Estas técnicas son útiles para la exploración de datos, la reducción de dimensionalidad y la identificación de patrones subyacentes en conjuntos de datos complejos.
 
 ## Ejercicios Resueltos
 
@@ -50,7 +50,7 @@ El conjunto de datos [pingüinos.csv](datos/pingüinos.csv) contiene un conjunto
 - Peso: Masa corporal (g).
 - Sexo: Sexo (macho, hembra)
 
-a.  Cargar los datos del archivo [`pingüinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pingüinos.csv) en un data frame.
+a.  Cargar los datos del archivo [`pingüinos.csv`](datos/pingüinos.csv) en un data frame.
 
     :::{.callout-tip collapse="true"}
     ## Solución
@@ -141,7 +141,12 @@ a.  Calcular los componentes principales del conjunto de variables numéricas y 
     - `scale.unit = TRUE` para normalizar las variables.
     - `ncp = n` para obtener los primeros n componentes principales.
 
-    O bien utilizar el paquete [recipes](https://recipes.tidymodels.org/) incluido en la colección de paquetes [`tidymodels`](https://www.tidymodels.org/) para calcular los componentes principales. En este caso, se debe crear una receta con la función [`recipe`](https://recipes.tidymodels.org/reference/recipe.html) y utilizar la función [`step_pca`](https://recipes.tidymodels.org/reference/step_pca.html) para calcular los componentes principales. 
+    O bien utilizar la función [`recipe`](https://recipes.tidymodels.org/reference/recipe.html) del paquete [recipes](https://recipes.tidymodels.org/) incluido en la colección de paquetes [`tidymodels`](https://www.tidymodels.org/) para crear una receta de preprocesamiento. 
+    
+    Parmámetros:
+    - `~.` para indicar que se deben utilizar todas las variables.
+  
+    Después, utilizar la función [`step_pca`](https://recipes.tidymodels.org/reference/step_pca.html) para calcular los componentes principales.
     
     Parámetros:
     - `all_numeric_predictors()` para indicar que se deben utilizar todas las variables numéricas.
@@ -408,7 +413,6 @@ a.  Realizar un análisis de agrupamiento jerárquico de las especies de pingüi
 :::
 
 :::{#exr-no-supervisado-glaucoma}
-
 El conjunto de datos [glaucoma.csv](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
 
 ![Tomografía de coherencia óptica](/img/aprendizaje-no-supervisado/tomografia-coherencia-optica.jpg)

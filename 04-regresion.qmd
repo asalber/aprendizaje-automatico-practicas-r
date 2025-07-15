@@ -134,9 +134,9 @@ a.  Construir un modelo de regresión lineal para predecir el peso en función d
     modelo <- linear_reg() |>   # Crear un modelo de regresión lineal.
         set_engine("lm")  # Establecer como motor de cálculo el ajuste por mínimos cuadrados.
 
-    modelo_ajustado <- modelo |>
+    modelo_entrenado <- modelo |>
         fit(Peso ~ Estatura, data = df_entrenamiento) # Ajustar el modelo a los datos.  
-    tidy(modelo_ajustado) |> 
+    tidy(modelo_entrenado) |> 
         kable()
     ```
     :::
@@ -165,7 +165,7 @@ a.  Predecir el peso de las personas del conjunto de test utilizando el modelo d
 
     ```{r}
     df_test <- df_test |> 
-        mutate(Peso_Predicho = predict(modelo_ajustado, new_data = df_test)$.pred)  # Predecir el peso de las personas del conjunto de test.
+        mutate(Peso_Predicho = predict(modelo_entrenado, new_data = df_test)$.pred)  # Predecir el peso de las personas del conjunto de test.
     head(df_test) |> 
         kable()
     ```
@@ -206,9 +206,9 @@ a.  Incluir en el modelo de regresión lineal la variable sexo como variable cat
     ## Solución
 
     ```{r}
-    modelo_ajustado_sexo <- modelo |>
+    modelo_entrenado_sexo <- modelo |>
         fit(Peso ~ Estatura + Sexo, data = df_entrenamiento)
-    tidy(modelo_ajustado_sexo) |> 
+    tidy(modelo_entrenado_sexo) |> 
         kable()
     ```
     :::
@@ -234,7 +234,7 @@ a.  Predecir el peso de las personas del conjunto de test utilizando el modelo d
 
     ```{r}
     df_test |> 
-        mutate(Peso_Predicho = predict(modelo_ajustado_sexo, new_data = df_test)$.pred)  |>  # Predecir el peso de las personas del conjunto de test.
+        mutate(Peso_Predicho = predict(modelo_entrenado_sexo, new_data = df_test)$.pred)  |>  # Predecir el peso de las personas del conjunto de test.
         metrics(truth = Peso, estimate = Peso_Predicho) |> 
         kable()
     ```
@@ -249,9 +249,9 @@ a.  Construir un nuevo modelo que explique el peso en función de la estatura y 
     ## Solución
 
     ```{r}
-    modelo_ajustado_deporte <- modelo |>
+    modelo_entrenado_deporte <- modelo |>
         fit(Peso ~ Estatura + DiasDeporte, data = df_entrenamiento)
-    tidy(modelo_ajustado_deporte) |> 
+    tidy(modelo_entrenado_deporte) |> 
         kable()
     ```
     :::
@@ -277,7 +277,7 @@ a.  Evaluar el nuevo modelo de regresión lineal calculando el error cuadrático
 
     ```{r}
     df_test |> 
-        mutate(Peso_Predicho = predict(modelo_ajustado_deporte, new_data = df_test)$.pred)  |>  # Predecir el peso de las personas del conjunto de test.
+        mutate(Peso_Predicho = predict(modelo_entrenado_deporte, new_data = df_test)$.pred)  |>  # Predecir el peso de las personas del conjunto de test.
         metrics(truth = Peso, estimate = Peso_Predicho) |> 
         kable()
     ```
@@ -537,12 +537,12 @@ a.  Ajustar un modelo de regresión logística a los datos de entrenamiento util
         set_engine("glm") |>  # Establecer como motor de cálculo el ajuste por máxima verosimilitud.
         set_mode("classification") # Establecer el modo de clasificación para el modelo de regresión logística.
 
-    modelo_ajustado <- workflow() |> 
+    modelo_entrenado <- workflow() |> 
         add_recipe(receta) |> # Añadir la receta al flujo de ajuste.
         add_model(modelo) |> # Añadir el modelo al flujo de ajuste.
         fit(data = df_entrenamiento) # Ajustar el modelo a los datos de entrenamiento.
 
-    tidy(modelo_ajustado) |> 
+    tidy(modelo_entrenado) |> 
     kable()
     ```
     :::
@@ -552,24 +552,27 @@ a.  Usar el modelo de regresión logística ajustado para predecir el riesgo de 
     :::{.callout-tip collapse="true"}
     ## Solución
     ```{r}
-    predict(modelo_ajustado, new_data = df_test) |> 
+    predict(modelo_entrenado, new_data = df_test) |> 
         head() |> 
         kable()
     ```
     :::
 
-a.  Añadir al conjunto de test la clase predicha con el modelo de regresión logístcia, así como las probabilidades de infarto predichas.
+a.  Añadir al conjunto de test la clase predicha con el modelo de regresión logística, así como las probabilidades de infarto predichas.
 
     :::{.callout-note collapse="true"}
     ## Ayuda
     Usar la función [`augment`](https://parsnip.tidymodels.org/reference/augment.html?q=augment#null) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para añadir al conjunto de test las probabilidades de infarto predichas por el modelo de regresión logística.
+
+    Parámetros:
+    - `new_data`: el conjunto de datos de test.
     :::
 
     :::{.callout-tip collapse="true"}
     ## Solución
 
     ```{r}
-    df_test <- augment(modelo_ajustado, new_data = df_test)
+    df_test <- augment(modelo_entrenado, new_data = df_test)
     df_test |> 
         head() |> 
         kable()
@@ -634,7 +637,7 @@ a.  Dibujar la curva ROC del modelo de regresión logística y calcular el área
 
 ## Ejercicios propuestos
 
-:::{#exr-regresion-4}
+:::{#exr-regresion-neonatos}
 El conjunto de datos [`neonatos`](https://aprendeconalf.es/estadistica-practicas-r/datos/neonatos.csv) contiene información sobre una muestra de 320 recién nacidos en un hospital durante un año que cumplieron el tiempo normal de gestación. 
 
 a.  Crear un data frame a con los datos de los neonatos a partir del fichero anterior.
@@ -643,13 +646,21 @@ a.  Construir la recta de regresión del peso de los recién nacidos sobre el n�
 
 a.  Dibujar la recta de regresión calculada en el apartado anterior. ¿Por qué la recta no se ajusta bien a la nube de puntos?
 
-a.  Calcular y dibujar la recta de regresión del peso de los recién nacidos sobre el número de cigarros fumados al día por las madres en el grupo de las madres que si fumaron durante el embarazo. ¿Es este modelo mejor o pero que la recta
-del apartado anterior? 
+a.  Calcular y dibujar la recta de regresión del peso de los recién nacidos sobre el número de cigarros fumados al día por las madres en el grupo de las madres que si fumaron durante el embarazo. ¿Es este modelo mejor o pero que la recta del apartado anterior? 
 
 a.  Según este modelo, ¿cuánto disminuirá el peso del recién nacido por cada cigarro más diario que fume la madre? 
 
 a.  Según el modelo anterior, ¿qué peso tendrá un recién nacido de una madre que ha fumado 5 cigarros diarios durante el embarazo? ¿Y si la madre ha fumado 30 cigarros diarios durante el embarazo? ¿Son fiables estas predicciones?
 
-a.  ¿Existe la misma relación lineal entre el peso de los recién nacidos y el número de cigarros fumados al día por las madres que fumaron durante el embarazo en el grupo de las madres menores de 20 y en el grupo de las madres mayores de
-20? ¿Qué se puede concluir?
+a.  ¿Existe la misma relación lineal entre el peso de los recién nacidos y el número de cigarros fumados al día por las madres que fumaron durante el embarazo en el grupo de las madres menores de 20 y en el grupo de las madres mayores de 20? ¿Qué se puede concluir?
+:::
+
+:::{#exr-regresion-glaucoma}
+El conjunto de datos [`glaucoma.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
+
+a.  Crear un data frame con los datos del fichero [`glaucoma`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv).
+
+a.  Construir un modelo de regresión logística para predecir si un paciente tiene glaucoma o no a partir de los datos de la OTC. Utilizar la variable `Glaucoma` como variable dependiente y las variables de los anillos y sectores como variables independientes.
+
+a.  Evaluar el modelo de regresión logística calculando la matriz de confusión y las métricas de clasificación. Dibujar la curva ROC del modelo.
 :::

@@ -423,6 +423,12 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Regresión</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-k-vecinos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">K vecinos más próximos</span></span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -461,7 +467,7 @@ window.Quarto = {
 </header>
 
 
-<p>El aprendizaje no supervisado abarca técnicas de aprendizaje automático que buscan identificar patrones en los datos sin utilizar clases o categorías predefinidas. A diferencia del aprendizaje supervisado, donde se entrena un modelo con datos etiquetados, el aprendizaje no supervisado no busca clasificar o predecir una variable respuesta, sino que se centra en descubrir estructuras ocultas en los datos. En esta práctica, exploraremos dos técnicas comunes de aprendizaje no supervisado: el análisis de componentes principales (PCA) y el agrupamiento (clustering).</p>
+<p>El aprendizaje no supervisado abarca técnicas de aprendizaje automático que buscan identificar patrones en los datos sin utilizar clases o categorías predefinidas. A diferencia del aprendizaje supervisado, donde se entrena un modelo con datos etiquetados, el aprendizaje no supervisado no busca clasificar o predecir una variable respuesta, sino que se centra en descubrir estructuras ocultas en los datos. En esta práctica, exploraremos dos técnicas comunes de aprendizaje no supervisado: el análisis de componentes principales (PCA) que consiste en buscar una representación de los datos en un espacio de menor dimensión preservando la mayor cantidad de varianza posible, y el agrupamiento (clustering) que busca agrupar los datos en grupos similares basándose en sus características. Estas técnicas son útiles para la exploración de datos, la reducción de dimensionalidad y la identificación de patrones subyacentes en conjuntos de datos complejos.</p>
 <section id="ejercicios-resueltos" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="ejercicios-resueltos"><span class="header-section-number">3.1</span> Ejercicios Resueltos</h2>
 <p>Para la realización de esta práctica se requieren los siguientes paquetes:</p>
@@ -497,7 +503,7 @@ window.Quarto = {
 <li>Sexo: Sexo (macho, hembra)</li>
 </ul>
 <ol type="a">
-<li><p>Cargar los datos del archivo <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pingüinos.csv"><code>pingüinos.csv</code></a> en un data frame.</p>
+<li><p>Cargar los datos del archivo <a href="datos/pingüinos.csv"><code>pingüinos.csv</code></a> en un data frame.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -863,7 +869,12 @@ Parámetros:
 <li><code>scale.unit = TRUE</code> para normalizar las variables.</li>
 <li><code>ncp = n</code> para obtener los primeros n componentes principales.</li>
 </ul>
-<p>O bien utilizar el paquete <a href="https://recipes.tidymodels.org/">recipes</a> incluido en la colección de paquetes <a href="https://www.tidymodels.org/"><code>tidymodels</code></a> para calcular los componentes principales. En este caso, se debe crear una receta con la función <a href="https://recipes.tidymodels.org/reference/recipe.html"><code>recipe</code></a> y utilizar la función <a href="https://recipes.tidymodels.org/reference/step_pca.html"><code>step_pca</code></a> para calcular los componentes principales.</p>
+<p>O bien utilizar la función <a href="https://recipes.tidymodels.org/reference/recipe.html"><code>recipe</code></a> del paquete <a href="https://recipes.tidymodels.org/">recipes</a> incluido en la colección de paquetes <a href="https://www.tidymodels.org/"><code>tidymodels</code></a> para crear una receta de preprocesamiento.</p>
+Parmámetros:
+<ul>
+<li><code>~.</code> para indicar que se deben utilizar todas las variables.</li>
+</ul>
+<p>Después, utilizar la función <a href="https://recipes.tidymodels.org/reference/step_pca.html"><code>step_pca</code></a> para calcular los componentes principales.</p>
 Parámetros:
 <ul>
 <li><code>all_numeric_predictors()</code> para indicar que se deben utilizar todas las variables numéricas.</li>

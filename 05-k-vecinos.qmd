@@ -1,12 +1,13 @@
 ---
-title: K vecinos más cercanos
-keep-md: true
+title: K vecinos más próximos
 lang: es
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
+
+En esta práctica veremos cómo utilizar la técnica de los K vecinos más próximos (KNN) tanto para tareas de clasificación como regresión. Esta técnica es uno de los métodos de aprendizaje supervisado más simples que consiste en clasificar un caso en función de las clases de sus vecinos más cercanos en el espacio de características.
 
 ## Ejercicios Resueltos
 
@@ -17,44 +18,430 @@ library(tidyverse)
 # Incluye los siguientes paquetes:
 # - readr: para la lectura de ficheros csv. 
 # - dplyr: para el preprocesamiento y manipulación de datos.
-# - tidyr: para la organización de los datos.
-# - purrr: para aplicar funciones a vectores. 
-library(broom) # para convertir las listas con los resúmenes de los modelos de regresión a formato organizado.
+# - ggplot2: para la visualización de datos.
+library(tidymodels)
+# Incluye los siguientes paquetes:
+# - recipes: para la preparación de los datos. 
+# - parsnip: para la creación de modelos.
+# - workflows: para la creación de flujos de trabajo.
+# - rsample: para la creación de particiones de los datos.
+# - yardstick: para la evaluación de modelos.
+# - tune: para la optimización de hiperparámetros.
+library(kknn) # para la implementación del algoritmo KNN.
+library(skimr) # para el análisis exploratorio de datos.
+library(plotly) # para la visualización interactiva de gráficos.
 library(knitr) # para el formateo de tablas.
 ```
 
 ::: {#exr-k-vecinos-1}
 El conjunto de datos [pingüinos.csv](datos/pingüinos.csv) contiene un conjunto de datos sobre tres especies de pingüinos con las siguientes variables:
 
-- Especie: Especie de pingüino, comúnmente Adelie, Chinstrap o Gentoo.
+- Especie: Especie de pingüino (Adelie, Chinstrap o Gentoo).
 - Isla: Isla del archipiélago Palmer donde se realizó la observación.
-- Longitud_pico: Longitud del pico en mm.
-- Profundidad_pico: Profundidad del pico en mm
-- Longitud_ala: Longitud de la aleta en mm.
-- Peso: Masa corporal en gramos.
-- Sexo: Sexo
+- Longitud_pico: Longitud del pico (mm).
+- Profundidad_pico: Profundidad del pico (mm)
+- Longitud_ala: Longitud de la aleta en (mm).
+- Peso: Masa corporal (g).
+- Sexo: Sexo (macho, hembra)
 
-a.  Cargar los datos del archivo [`pinguïnos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pingüinos.csv) en un data frame.
-
-    :::{.callout-tip collapse="true"}
-    ## Solución
-
-    ```{r}
-    library(readr)
-    df = read_csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-julia/datos/pingüinos.csv")
-    head(df, 5)
-    ```
-    :::
-
-b.  Explorar el data frame para ver cuántos datos perdidos hay.
+a.  Cargar los datos del archivo [`pingüinos.csv`](datos/pingüinos.csv) en un data frame.
 
     :::{.callout-tip collapse="true"}
     ## Solución
 
     ```{r}
-    library(dplyr)
-    df %>% 
-      summarise(across(everything(), ~ sum(is.na(.))))
+    library(tidyverse)
+    library(knitr)
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pingüinos.csv", stringsAsFactors = TRUE)
+    glimpse(df)
     ```
     :::
 
+a.  Realizar un análisis exploratorio de los datos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(skimr)
+    skim(df) 
+    ```
+    :::
+
+a.  Eliminar del data frame las columnas `Isla`, `Sexo` y `Peso` y eliminar las filas con valores perdidos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df <- df |>
+        select(-Isla, -Sexo, -Peso) |>
+        drop_na()
+    ```
+    :::
+
+a.  Realizar un diagrama de dispersión tridimensional de las variables `Longitud_pico`, `Profundidad_pico` y `Longitud_ala` coloreando los puntos según la especie de pingüino.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`plot_ly`](https://plotly.com/r/reference/#scatter3d) del paquete [`plotly`](https://plotly.com/r/) para dibujar un diagrama de dispersión tridimensional.
+    
+    Parámetros:
+    - `x = Longitud_pico`, `y = Profundidad_pico`, `z = Longitud_ala` para indicar las variables a utilizar.
+    - `color = Especie` para colorear los puntos según la especie de pingüino.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(plotly)
+    df |> plot_ly(x = ~Longitud_pico, y = ~Profundidad_pico, z = ~Longitud_ala, 
+            color = ~Especie,
+            type = "scatter3d", mode = "markers") |>
+        layout(title = "Diagrama de dispersión tridimensional de pingüinos",
+            scene = list(xaxis = list(title = "Longitud del Pico (mm)"),
+                            yaxis = list(title = "Profundidad del Pico (mm)"),
+                            zaxis = list(title = "Longitud de la Aleta (mm)")))
+    ```
+    :::
+
+a.  Dividir el conjunto de datos en un conjunto de entrenamiento (80%) y un conjunto de prueba (20%).
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`initial_split`](https://rsample.tidymodels.org/reference/initial_split.html) del paquete [`rsample`](https://rsample.tidymodels.org/) para dividir el conjunto de datos en entrenamiento y test.
+
+    Parámetros:
+    - `data`: el data frame con los datos.
+    - `prop`: la proporción del conjunto de datos que se utilizará para el conjunto de entrenamiento (en este caso, 0.8 para el 80%).
+    - `strata`: la variable de estratificación (en este caso, `Especie`) para asegurar que la distribución de clases se mantenga en ambos conjuntos.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(tidymodels)
+    set.seed(123) # Semilla aleatoria para la reproducibilidad.
+    df_particion <- initial_split(df, prop = 0.8, strata = "Especie")  # Dividir el conjunto de datos en entrenamiento (80%) y test (20%).
+    df_entrenamiento <- training(df_particion) # Extraemos el conjunto de entrenamiento.
+    df_test <- testing(df_particion) # Extraemos el conjunto de test.
+    ```
+    :::
+
+a.  Normalizar las variables `Longitud_pico`, `Profundidad_pico` y `Longitud_ala` en el conjunto de entrenamiento.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`recipe`](https://recipes.tidymodels.org/reference/recipe.html) del paquete [recipes](https://recipes.tidymodels.org/) incluido en la colección de paquetes [`tidymodels`](https://www.tidymodels.org/) para crear una receta de preprocesamiento. 
+    
+    Parmámetros:
+    - `Especie ~.` para indicar que la variable `Especie` es la variable respuesta y se deben utilizar todas las demás variables como predictoras.
+  
+    Después, utilizar la función [`step_normalize`](https://recipes.tidymodels.org/reference/step_normalize.html) para normalizar las variables numéricas.
+    
+    Parámetros:
+    - `all_numeric_predictors()` para indicar que se deben utilizar todas las variables numéricas.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+    ```{r}
+    receta <- recipe(Especie ~ ., data = df_entrenamiento) |> # Definimos la receta de preprocesamiento.
+        step_normalize(all_numeric_predictors()) # Normalizamos las variables numéricas.
+    ```
+    :::
+
+a.  Construir un modelo de clasificación de K=11 vecinos más próximos (KNN) para predecir la especie de pingüino a partir de las variables `Longitud_pico`, `Profundidad_pico` y `Longitud_ala`.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`nearest_neighbor`](https://parsnip.tidymodels.org/reference/nearest_neighbor.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para crear un modelo de KNN.
+
+    Parámetros:
+    - `neighbors`: el número de vecinos a considerar (en este caso, 11).
+  
+    Después, utilizar la función [`set_engine`](https://parsnip.tidymodels.org/reference/set_engine.html) para especificar el motor a utilizar (en este caso, `kknn`).
+
+    Finalmente, utilizar la función [`set_mode`](https://parsnip.tidymodels.org/reference/set_mode.html) para especificar que se trata de un modelo de clasificación.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    modelo <- nearest_neighbor(neighbors = 11) |> # Definimos el modelo KNN
+        set_engine("kknn") |> # Especificamos el motor de entrenamiento.
+        set_mode("classification") # Especificamos que es un modelo de clasificación.
+    modelo_entrenado <- workflow() |> # Definimos el flujo de trabajo.
+        add_recipe(receta) |> # Añadimos la receta de preprocesamiento.
+        add_model(modelo) |> # Añadimos el modelo KNN.
+        fit(data = df_entrenamiento) # Entrenamos el modelo con el conjunto de entrenamiento.
+    ```
+    :::
+
+
+a.  Evaluar el modelo de KNN en el conjunto de test y calcular la matriz de confusión y la precisión del modelo.
+
+    :::{.callout-note collapse="true"}
+    Usar la función [`augment`](https://parsnip.tidymodels.org/reference/augment.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para añadir al conjunto de test las probabilidades cada especie de pingüino.
+
+    Parámetros:
+    - `new_data`: el conjunto de datos de test.
+
+    Usar la función [`conf_mat`](https://yardstick.tidymodels.org/reference/conf_mat.html) del paquete [`yardstick`](https://yardstick.tidymodels.org/) para calcular la matriz de confusión.
+
+    Parámetros:
+    - `truth`: la variable respuesta (en este caso, `Especie`).
+    - `estimate`: la variable con las clases predichas por el modelo (en este caso, `.pred_class`).
+
+    Usar la función [`metrics`](https://yardstick.tidymodels.org/reference/metrics.html) del paquete [`yardstick`](https://yardstick.tidymodels.org/) para calcular las métricas de evaluación del modelo.
+
+    Parámetros:
+    - `truth`: la variable respuesta (en este caso, `Especie`).
+    - `estimate`: la variable con las clases predichas por el modelo (en este case, `.pred_class`).
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+    ```{r}
+    matriz_confusion <- modelo_entrenado |> augment(new_data = df_test) |> # Añadimos las predicciones al conjunto de test.
+        conf_mat(truth = Especie, estimate = .pred_class) # Calculamos la matriz de confusión.
+    matriz_confusion$table |> 
+        kable()
+    ```
+
+    ```{r}
+    augment(modelo_entrenado, new_data = df_test) |>
+        metrics(truth = Especie, estimate = .pred_class) |> # Calculamos las métricas de evaluación del modelo.
+        kable()
+    ```
+    :::
+
+a.  Explorar para qué número de vecinos (K) el modelo de KNN tiene mejor precisión. Para ello, entrenar el modelo de KNN con diferentes valores de K (por ejemplo, 1, 3, 5, 7, 9, 11, 13, 15) y calcular la precisión para cada valor de K mediante validación cruzada de 5 pliegues.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`tune()`](https://hardhat.tidymodels.org/reference/tune.html) del paquete [`hardhat`](https://hardhat.tidymodels.org/) para definir el parámetro `neighbors` como un parámetro a afinar en la especificación del modelo KNN.
+
+    Después, utilizar la función [`tune_grid`](https://tune.tidymodels.org/reference/tune_grid.html) del paquete [`tune`](https://tune.tidymodels.org/) para optimizar el número de vecinos (K) del modelo KNN.
+
+    Parámetros:
+    - `resamples`: el conjunto de datos de entrenamiento particionado en pliegues para validación cruzada (en este caso, `vfold_cv(df_entrenamiento, v = 5)`).
+    - `grid`: un data frame con los valores de K a probar.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    modelo <- nearest_neighbor(neighbors = tune()) |> # Definimos el modelo KNN con el parámetro neighbors a afinar.
+        set_engine("kknn") |> # Especificamos el motor de entrenamiento.
+        set_mode("classification") # Especificamos que es un modelo de clasificación.
+    flujo <- workflow() |> # Definimos el flujo de trabajo.
+        add_recipe(receta) |> # Añadimos la receta de preprocesamiento.
+        add_model(modelo) # Añadimos el modelo KNN.
+
+    modelos_entrenados <- tune_grid(
+        flujo,
+        resamples = vfold_cv(df_entrenamiento, v = 5), # Validación cruzada con 5 pliegues
+        grid = tibble(neighbors = seq(1, 15, by = 2)), # Valores de K a probar
+        metrics = metric_set(accuracy, roc_auc)
+    ) # Entrenamos el modelo con los diferentes valores de K y calculamos las métricas de evaluación.
+
+    collect_metrics(modelos_entrenados) |>  # Extraemos las métricas de evaluación de los modelos entrenados.
+        kable()
+    ```
+
+    ```{r}
+    k_final <- select_best(modelos_entrenados, metric = "accuracy") # Seleccionamos el mejor valor de K según la precisión.
+
+    modelo_entrenado <- finalize_workflow(flujo, k_final) |> # Finalizamos el flujo de trabajo con el mejor valor de K.
+        last_fit(modelo_entrenado, split = df_particion) # Entrenamos el modelo con el conjunto de entrenamiento.
+
+    collect_metrics(modelo_entrenado) |>  # Extraemos las métricas de evaluación del modelo entrenado.
+        kable()
+    ```
+    :::
+
+a.  Predecir la especie de un pingüino con las siguientes características: longitud del pico 40 mm, profundidad del pico 20 mm y longitud del ala 200 mm.  
+ 
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`extract_workflow`](https://workflows.tidymodels.org/reference/extract-workflow.html) del paquete [`workflows`](https://workflows.tidymodels.org/) para extraer el modelo entrenado del flujo de trabajo.
+
+    Utilizar la función [`predict`](https://parsnip.tidymodels.org/reference/predict.model_fit.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para predecir la especie de pingüino.
+
+    Parámetros:
+    - `new_data`: un data frame con las características del pingüino a predecir.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    nuevo_pingüino <- tibble(Longitud_pico = 40, Profundidad_pico = 20, Longitud_ala = 200) # Creamos un data frame con las características del pingüino a predecir.
+    extract_workflow(modelo_entrenado) |> # Extraemos el modelo entrenado del flujo de trabajo.
+        predict(new_data = nuevo_pingüino) |>  # Predecimos la especie del pingüino.
+        kable()
+    ```
+    :::
+:::
+
+:::{#exr-k-vecinos-vinos}
+El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
+
+| Variable             | Descripción                                                           | Tipo (unidades)        |
+|----------------------------------------|-----------------------------------------------------------------------|------------------------|
+| tipo                 | Tipo de vino                                                          | Factor (blanco, tinto) |
+| meses.barrica        | Mesesde envejecimiento en barrica                               | Numérica(meses)  |
+| acided.fija          | Cantidadde ácidotartárico                                 | Numérica(g/dm3)  |
+| acided.volatil       | Cantidad de ácido acético                                             | Numérica(g/dm3)  |
+| acido.citrico        | Cantidad de ácidocítrico                                        | Numérica(g/dm3)  |
+| azucar.residual      | Cantidad de azúcarremanente después de la fermentación          | Numérica(g/dm3)  |
+| cloruro.sodico       | Cantidad de clorurosódico                                       | Numérica(g/dm3)  |
+| dioxido.azufre.libre | Cantidad de dióxido de azufreen formalibre                | Numérica(mg/dm3) |
+| dioxido.azufre.total | Cantidadde dióxido de azufretotal en forma libre o ligada | Numérica(mg/dm3) |
+| densidad             | Densidad                                                              | Numérica(g/cm3)  |
+| ph                   | pH                                                                    | Numérica(0-14)   |
+| sulfatos             | Cantidadde sulfato de potasio                                   | Numérica(g/dm3)  |
+| alcohol              | Porcentajede contenidode alcohol                          | Numérica(0-100)  |
+| calidad              | Calificación otorgada porun panel de expertos                   | Numérica(0-10)   |
+
+a.  Crear un data frame con los datos del archivo [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv).
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(tidyverse)
+    df <- read.csv("datos/vinos.csv", stringsAsFactors = TRUE)
+    glimpse(df)
+    ```
+    :::
+
+a.  Realizar un análisis exploratorio de los datos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+    ```{r}
+    library(skimr)
+    skim(df)
+    ```
+    :::
+
+a.  Dividir el conjunto de datos en un conjunto de entrenamiento (80%) y un conjunto de prueba (20%).
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(tidymodels)
+    set.seed(123) # Semilla aleatoria para la reproducibilidad.
+    df_particion <- initial_split(df, prop = 0.8, strata = "tipo")  # Dividir el conjunto de datos en entrenamiento (80%) y test (20%).
+    df_entrenamiento <- training(df_particion) # Extraemos el conjunto de entrenamiento.
+    df_test <- testing(df_particion) # Extraemos el conjunto de test.
+    ```
+    :::
+
+a.  Normalizar las variables físico-químicas del vino.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    receta <- recipe(tipo ~ ., data = df_entrenamiento) |> # Definimos la receta de preprocesamiento.
+        step_normalize(all_numeric_predictors()) # Normalizamos las variables numéricas.
+    ```
+    :::
+
+a.  Construir un modelo de K vecinos más próximos para clasificar el vino como blanco o tinto a partir de todas las variables físico-químicas del vino. Explorar para qué número de vecinos (K) el modelo de KNN tiene mejor precisión. Para ello, entrenar el modelo de KNN con diferentes valores de K y calcular la precisión para cada valor de K mediante validación cruzada de 10 pliegues.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(knitr)
+    modelo <- nearest_neighbor(neighbors = tune()) |> # Definimos el modelo KNN con el parámetro neighbors a afinar.
+        set_engine("kknn") |> # Especificamos el motor de entrenamiento.
+        set_mode("classification") # Especificamos que es un modelo de clasificación.
+    flujo <- workflow() |> # Definimos el flujo de trabajo.
+        add_recipe(receta) |> # Añadimos la receta de preprocesamiento.
+        add_model(modelo) # Añadimos el modelo KNN.
+    modelos_entrenados <- tune_grid(
+        flujo,
+        resamples = vfold_cv(df_entrenamiento, v = 10), # Validación cruzada con 10 pliegues
+        grid = tibble(neighbors = seq(1, 15, by = 2)), # Valores de K a probar
+        metrics = metric_set(accuracy, roc_auc)
+    ) # Entrenamos el modelo con los diferentes valores de K y calculamos las métricas de evaluación.
+    k_final <- select_best(modelos_entrenados, metric = "accuracy") # Seleccionamos el mejor valor de K según la precisión.
+    modelo_entrenado <- finalize_workflow(flujo, k_final) |> # Finalizamos el flujo de trabajo con el mejor valor de K.
+        last_fit(modelo_entrenado, split = df_particion) # Entrenamos el modelo con el conjunto de entrenamiento.
+    collect_metrics(modelo_entrenado) |>  # Extraemos las métricas de evaluación del modelo entrenado.
+        kable()
+    ```
+
+
+a.  Construir otro modelo de K vecinos más próximos para predecir la calidad del vino a partir de todas las variables físico-químicas del vino. Explorar para qué número de vecinos (K) el modelo de KNN tiene mejor precisión. Para ello, entrenar el modelo de KNN con diferentes valores de K (por ejemplo de 10 a 30) y calcular la precisión para cada valor de K mediante validación cruzada de 10 pliegues. Dibujar un gráfico con el RMSE en función del número de vecinos (K).
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    receta <- recipe(calidad ~ ., data = df_entrenamiento) |> # Definimos la receta de preprocesamiento.
+        step_normalize(all_numeric_predictors()) # Normalizamos las variables numéricas.
+    
+    modelo <- nearest_neighbor(neighbors = tune()) |> # Definimos el modelo KNN con el parámetro neighbors a afinar.
+        set_engine("kknn") |> # Especificamos el motor de entrenamiento.
+        set_mode("regression") # Especificamos que es un modelo de regresión.
+    
+    flujo <- workflow() |> # Definimos el flujo de trabajo.
+        add_recipe(receta) |> # Añadimos la receta de preprocesamiento.
+        add_model(modelo) # Añadimos el modelo KNN.
+    
+    modelos_entrenados <- tune_grid(
+        flujo,
+        resamples = vfold_cv(df_entrenamiento, v = 10), # Validación cruzada con 10 pliegues
+        grid = tibble(neighbors = 20:40), # Valores de K a probar
+        metrics = metric_set(rmse, rsq)
+    ) # Entrenamos el modelo con los diferentes valores de K y calculamos las métricas de evaluación.
+
+    collect_metrics(modelos_entrenados) |>  # Extraemos las métricas de evaluación de los modelos entrenados.
+        filter(.metric == "rmse") |> # Filtramos las métricas para quedarnos con el RMSE.
+        ggplot(aes(x = neighbors, y = mean)) + # Graficamos el RMSE en función del número de vecinos.
+        geom_line() +
+        labs(title = "RMSE en función del número de vecinos (K)",
+            x = "Número de vecinos (K)",
+            y = "RMSE")
+    ```
+
+    A la vista del gráfico, el mejor modelo se obtiene para K=31 vecinos.
+
+    :::
+
+a.  Construir el modelo de K vecinos más próximos con el mejor valor de K y evaluarlo en el conjunto de test.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+    
+    ```{r}
+    k_final <- select_best(modelos_entrenados, metric = "rmse") # Seleccionamos el mejor valor de K según el RMSE.
+    modelo_entrenado <- finalize_workflow(flujo, k_final) |> # Finalizamos el flujo de trabajo con el mejor valor de K.
+        last_fit(modelo_entrenado, split = df_particion) # Entrenamos el modelo con el conjunto de entrenamiento.
+    collect_metrics(modelo_entrenado) |>  # Extraemos las métricas de evaluación del modelo entrenado.
+        kable()
+    ```
+    :::
+:::
+
+## Ejercicios Propuestos
+
+:::{#exr-k-vecinos-glaucoma}
+El conjunto de datos [glaucoma.csv](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
+
+![Tomografía de coherencia óptica](/img/aprendizaje-no-supervisado/tomografia-coherencia-optica.jpg)
+
+a.  Cargar el conjunto de datos del archivo [`glaucoma.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) en un data frame.
+
+a.  Construir otro modelo de K vecinos más próximos para predecir el glaucoma a partir del grosor de los anillos peripapilares usando el número de vecinos óptimo.
