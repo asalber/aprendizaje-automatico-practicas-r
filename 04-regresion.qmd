@@ -246,7 +246,6 @@ a.  Evaluar el modelo de regresión lineal calculando el error cuadrático medio
     ## Solución
 
     ```{r}
-    library(yardstick)
     df_test |> 
         metrics(truth = Peso, estimate = Peso_Predicho) |> 
         kable()
