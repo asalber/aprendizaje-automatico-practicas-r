@@ -255,10 +255,11 @@ a.  Explorar para qué número de vecinos (K) el modelo de KNN tiene mejor preci
     ```
 
     ```{r}
-    k_final <- select_best(modelos_entrenados, metric = "accuracy") # Seleccionamos el mejor valor de K según la precisión.
-
-    modelo_final <- finalize_workflow(flujo, k_final) |> # Finalizamos el flujo de trabajo con el mejor valor de K.
-        last_fit(modelo_final, split = df_particion) # Entrenamos el modelo con el conjunto de entrenamiento.
+    # Seleccionamos el mejor valor de K según la precisión.
+    k_final <- select_best(modelos_entrenados, metric = "accuracy") 
+    # Finalizamos el flujo de trabajo construyendo el modelo con el mejor valor de K.
+    modelo_final <- flujo |> finalize_workflow(k_final) |> 
+        last_fit(modelo_final, split = df_particion)
 
     collect_metrics(modelo_final) |>  # Extraemos las métricas de evaluación del modelo entrenado.
         kable()

@@ -1,7 +1,5 @@
 ---
 title: Regresión
-execute: 
-  warning: false
 lang: es
 ---
 

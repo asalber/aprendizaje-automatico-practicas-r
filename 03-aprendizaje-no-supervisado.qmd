@@ -1,8 +1,5 @@
 ---
 title: Aprendizaje no supervisado
-execute: 
-    warning: false
-    message: false
 lang: es
 ---
 
@@ -578,19 +575,19 @@ El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practic
 | Variable             | Descripción                                                           | Tipo (unidades)        |
 |----------------------------------------|-----------------------------------------------------------------------|------------------------|
 | tipo                 | Tipo de vino                                                          | Factor (blanco, tinto) |
-| meses.barrica        | Mesesde envejecimiento en barrica                               | Numérica(meses)  |
-| acided.fija          | Cantidadde ácidotartárico                                 | Numérica(g/dm3)  |
+| meses.barrica        | Meses de envejecimiento en barrica                               | Numérica(meses)  |
+| acided.fija          | Cantidad de ácidotartárico                                 | Numérica(g/dm3)  |
 | acided.volatil       | Cantidad de ácido acético                                             | Numérica(g/dm3)  |
 | acido.citrico        | Cantidad de ácidocítrico                                        | Numérica(g/dm3)  |
-| azucar.residual      | Cantidad de azúcarremanente después de la fermentación          | Numérica(g/dm3)  |
+| azucar.residual      | Cantidad de azúcar remanente después de la fermentación          | Numérica(g/dm3)  |
 | cloruro.sodico       | Cantidad de clorurosódico                                       | Numérica(g/dm3)  |
-| dioxido.azufre.libre | Cantidad de dióxido de azufreen formalibre                | Numérica(mg/dm3) |
-| dioxido.azufre.total | Cantidadde dióxido de azufretotal en forma libre o ligada | Numérica(mg/dm3) |
+| dioxido.azufre.libre | Cantidad de dióxido de azufre en forma libre                | Numérica(mg/dm3) |
+| dioxido.azufre.total | Cantidad de dióxido de azufre total en forma libre o ligada | Numérica(mg/dm3) |
 | densidad             | Densidad                                                              | Numérica(g/cm3)  |
 | ph                   | pH                                                                    | Numérica(0-14)   |
-| sulfatos             | Cantidadde sulfato de potasio                                   | Numérica(g/dm3)  |
-| alcohol              | Porcentajede contenidode alcohol                          | Numérica(0-100)  |
-| calidad              | Calificación otorgada porun panel de expertos                   | Numérica(0-10)   |
+| sulfatos             | Cantidad de sulfato de potasio                                   | Numérica(g/dm3)  |
+| alcohol              | Porcentaje de contenido de alcohol                          | Numérica(0-100)  |
+| calidad              | Calificación otorgada por un panel de expertos                   | Numérica(0-10)   |
 
 a.  Crear un dataframe con los datos del archivo [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv).
 

@@ -1,14 +1,13 @@
 ---
 title: Árboles de decisión y bosques aleatorios
 lang: es
-toc: false
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-Los árboles de decisión son modelos de aprendizaje supervisado sencillos que además son fáciles de interpretar. Los árboles crecen desde la raíz, que contine todos los casos del ejemplo de entrenamiento, hasta las hojas, que contienen los casos clasificados. En cada nodo del árbol se realiza una división del conjunto de casos del nodo en función de una característica del conjunto de datos, de manera que para cada valor de la característica se obtiene un subconjunto de casos que presentan ese valor. El objetivo es dividir los datos de tal manera que las instancias en cada hoja sean lo más homogéneas posible con respecto a la variable respuesta. Aunque su uso más habitual es para problemas de clasificación, también pueden ser utilizados para problemas de regresión.
+Los árboles de decisión son modelos de aprendizaje supervisado sencillos que además son fáciles de interpretar. Los árboles crecen desde la raíz, que contiene todos los casos del ejemplo de entrenamiento, hasta las hojas, que contienen los casos clasificados. En cada nodo del árbol se realiza una división del conjunto de casos del nodo en función de una característica del conjunto de datos, de manera que para cada valor de la característica se obtiene un subconjunto de casos que presentan ese valor. El objetivo es dividir los datos de tal manera que las instancias en cada hoja sean lo más homogéneas posible con respecto a la variable respuesta. Aunque su uso más habitual es para problemas de clasificación, también pueden ser utilizados para problemas de regresión.
 
 En esta práctica también veremos los bosques aleatorios, que son un conjunto de árboles de decisión entrenados con diferentes subconjuntos de datos y características. Los bosques aleatorios son una técnica de ensamblaje que mejora la precisión y la robustez de los modelos de árboles de decisión individuales.
 
@@ -32,6 +31,7 @@ library(tidymodels)
 # - tune: para la optimización de hiperparámetros.
 library(skimr) # para el análisis exploratorio de datos.
 library(rpart.plot) # para la visualización de árboles de decisión.
+library(parallel) # para el entrenamiento en paralelo de modelos.
 library(ranger) # para la creación de modelos de bosque aleatorio.
 library(vip) # para la visualización de la importancia de las variables.
 library(knitr) # para el formateo de tablas.
@@ -251,9 +251,8 @@ a.  Explorar para qué parámetros del árbol se obtiene el mejor modelo. En par
         # Añadimos el modelo de árbol de decisión.
         add_model(modelo)
 
-    modelos_entrenados <- tune_grid(
-            flujo,
-            resamples = vfold_cv(df_entrenamiento, v = 5), # Validación cruzada con 10 pliegues
+    modelos_entrenados <- flujo |> tune_grid(
+            resamples = vfold_cv(df_entrenamiento, v = 5), # Validación cruzada con 5 pliegues
             grid = expand.grid(
                 tree_depth = 3:6, # Profundidad máxima del árbol
                 cost_complexity = seq(0, 0.5, by = 0.02), # Coste por complejidad
@@ -266,6 +265,26 @@ a.  Explorar para qué parámetros del árbol se obtiene el mejor modelo. En par
 
 a.  Construir el árbol de decisión con los parámetros óptimos obtenidos en el apartado anterior.
 
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`select_best`](https://tune.tidymodels.org/reference/select_best.html) del paquete [`tune`](https://tune.tidymodels.org/) para seleccionar los mejores parámetros de los modelos entrenados.
+    
+    Parámetros:
+    - `modelos_entrenados`: el objeto con los modelos entrenados.
+    - `metric`: la métrica a utilizar para seleccionar los mejores parámetros (en este caso, `accuracy`).
+
+    Después, utilizar la función [`finalize_workflow`](https://workflows.tidymodels.org/reference/finalize_workflow.html) del paquete [`workflows`](https://workflows.tidymodels.org/) para finalizar el flujo de trabajo con los mejores parámetros.
+
+    Parámetros:
+    - Los mejores parámetros de los modelos entrenados.
+    
+    Finalmente, utilizar la función [`last_fit`](https://workflows.tidymodels.org/reference/last_fit.html) del paquete [`workflows`](https://workflows.tidymodels.org/) para entrenar el modelo con el conjunto de entrenamiento y evaluarlo con el conjunto de test.
+
+    Parámetros:
+    - `split`: el objeto con la partición de los datos (en este caso, `df_particion`).
+    - `metrics`: las métricas a utilizar para evaluar el modelo.
+    :::
+
     :::{.callout-tip collapse="true"}
     ## Solución 
     ```{r}
@@ -273,12 +292,12 @@ a.  Construir el árbol de decisión con los parámetros óptimos obtenidos en e
     parametros_optimos <- select_best(modelos_entrenados, metric = "accuracy") 
     parametros_optimos |> kable()
     # Construimos el modelo con los mejores parámetros.
-    modelo_final <- flujo |> finalize_workflow(parametros_optimos) |> # Finalizamos el flujo de trabajo con el mejor valor de K.
-            last_fit(modelo_final, split = df_particion, metrics = metricas) # Entrenamos el modelo con el conjunto de entrenamiento.
+    modelo_final <- flujo |> finalize_workflow(parametros_optimos) |>
+            last_fit(split = df_particion, metrics = metricas) 
 
-    collect_metrics(modelo_final) |>  # Extraemos las métricas de evaluación del modelo entrenado.
-        kable()
-    ```    
+    # Extraemos las métricas de evaluación del modelo entrenado.
+    collect_metrics(modelo_final) |> kable()
+    ```   
     :::
 
 a.  Dibujar el árbol de decisión final.
@@ -297,77 +316,159 @@ a.  Dibujar el árbol de decisión final.
 
 a.  Dibujar un diagrama con la importancia de las variables del árbol de decisión.
 
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`vip`](https://koalaverse.github.io/vip/reference/vip.html) del paquete [`vip`](https://koalaverse.github.io/vip/index.html) para dibujar la importancia de las variables del modelo.
+    :::
+
     :::{.callout-tip collapse="true"}
     ## Solución
 
     ```{r}
     library(vip)
-    modelo_final |> 
-        # Extraemos el modelo ajustado.
-        extract_fit_engine() |> 
+    # Extraemos el modelo ajustado.
+    modelo_final |> extract_fit_engine() |> 
         # Dibujamos la importancia de las variables.
         vip()
     ```
     :::
 
-a.  Construir un bosque aleatorio para predecir el riesgo de infarto.
+a.  Construir bosques aleatorios para predecir el riesgo de infarto, explorando para qué parámetros se obtiene el mejor modelo. En particular, estudiar el número de variables a considerar en cada división y el mínimo número de casos necesario para dividir un nodo. Calcular la precisión y en área bajo la curva ROC del modelo mediante validación cruzada de 5 pliegues.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`rand_forest`](https://parsnip.tidymodels.org/reference/rand_forest.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/) para crear un modelo de bosque aleatorio.
+
+    Parámetros:
+    - `trees`: el número de árboles en el bosque (1000 por defecto).
+    - `mtry`: el número de variables a considerar en cada división (se puede utilizar `tune()` para optimizar este parámetro).
+    - `min_n`: el número mínimo de casos necesario para dividir un nodo (se puede utilizar `tune()` para optimizar este parámetro).
+    :::
 
     :::{.callout-tip collapse="true"}
     ## Solución
 
-```{r}
-# Número de procesadores para el entrenamiento en paralelo.
-library(parallel)
-procesadores <- detectCores() - 1 # Usamos todos menos uno para evitar saturar el sistema.
-# Creamos un modelo de bosque aleatorio.
-modelo_bosque <- rand_forest(
-    trees = 1000, # Número de árboles en el bosque.
-    mtry = tune(), # Número de variables a considerar en cada división.
-    min_n = tune() # Mínimo número de casos necesario para dividir un nodo.
-) |> 
-    set_engine("ranger", num.threads = procesadores, importance = "impurity") |> 
-    set_mode("classification")
+    ```{r}
+    # Número de procesadores para el entrenamiento en paralelo.
+    library(parallel)
+    procesadores <- detectCores() - 1 # Usamos todos menos uno para evitar saturar el sistema.
+    # Creamos un modelo de bosque aleatorio.
+    modelo_bosque <- rand_forest(
+        trees = 1000, # Número de árboles en el bosque.
+        mtry = tune(), # Número de variables a considerar en cada división.
+        min_n = tune() # Mínimo número de casos necesario para dividir un nodo.
+    ) |> 
+        # Establecemos el motor de ranger.
+        set_engine("ranger", num.threads = procesadores, importance = "impurity") |> 
+        # Establecemos el modo de clasificación.
+        set_mode("classification")
 
-# Creamos un flujo de trabajo con el modelo y los datos de entrenamiento.
-flujo_bosque <- workflow() |>
-    # Añadimos la fórmula del modelo.
-    add_formula(Infarto ~ .) |>
-    # Añadimos el modelo de bosque aleatorio.
-    add_model(modelo_bosque)
+    # Creamos un flujo de trabajo con el modelo y los datos de entrenamiento.
+    flujo_bosque <- workflow() |>
+        # Añadimos la fórmula del modelo.
+        add_formula(Infarto ~ .) |>
+        # Añadimos el modelo de bosque aleatorio.
+        add_model(modelo_bosque)
 
-df_validacion <- validation_split(df_entrenamiento, prop = 0.8, strata = Infarto) # Dividimos el conjunto de entrenamiento en entrenamiento y validación.
+    df_validacion <- validation_split(df_entrenamiento, prop = 0.8, strata = Infarto) # Dividimos el conjunto de entrenamiento en entrenamiento y validación.
 
-set.seed(123)
-modelos_entrenados <- flujo_bosque |>  
-    tune_grid(df_validacion,
+    set.seed(123)
+    modelos_entrenados <- flujo_bosque |> tune_grid(
+        # Validación cruzada con 5 pliegues,
+        resamples = vfold_cv(df_entrenamiento, v = 5), 
+        # Indicamos que pruebe con 25 valores distintos de mtry y min_n.
         grid = 25,
-        control = control_grid(save_pred = TRUE),
+        # Guardamos las predicciones para cada pliegue.
+        control = control_grid(save_pred = TRUE), 
+        # Definimos como métricas la precisión y el área bajo la curva ROC.
         metrics = metric_set(accuracy, roc_auc))
 
-autoplot(modelos_entrenados) 
+    # Visualizamos los resultados de la validación cruzada.
+    autoplot(modelos_entrenados) 
 
-modelo_mejor <- modelos_entrenados |> select_best(metric = "roc_auc")
-
-modelos_entrenados |> collect_predictions(parameters = modelo_mejor) |> 
-    roc_curve(Infarto, .pred_No) |> 
-    mutate(model = "Random Forest") |> 
-    ggplot(aes(x = 1 - specificity, y = sensitivity, col = model)) + 
-  geom_path(lwd = 1.5, alpha = 0.8) +
-  geom_abline(lty = 3) + 
-  coord_equal()
-
-modelo_final <- flujo_bosque |> 
-    finalize_workflow(select_best(modelos_entrenados, metric = "accuracy")) |> 
-    last_fit(df_particion, metrics = metric_set(accuracy, roc_auc))
-
-collect_metrics(modelo_final) |> 
-    kable()
-
-
-modelo_final |> 
-    extract_fit_engine() |> 
-    vip()
-```
-
+    # Extraemos los parámetros del mejor modelo entrenado.
+    parametros_optimos <- modelos_entrenados |> select_best(metric = "roc_auc")
+    ```
     :::
+
+a.  Construir el bosque aleatorio con los parámetros óptimos obtenidos en el apartado anterior y evaluarlo con el conjunto de test. Calcular la precisión, el área bajo la curva ROC y dibujar la curva ROC del modelo.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    modelo_final <- flujo_bosque |> 
+        # Seleccionamos el mejor modelo entrenado según el área bajo la curva ROC.
+        finalize_workflow(select_best(modelos_entrenados, metric = "roc_auc")) |> 
+        # Entrenamos el modelo con el conjunto de entrenamiento y lo evaluamos con el conjunto de test usando las métricas de precisión y área bajo la curva ROC.
+        last_fit(df_particion, metrics = metric_set(accuracy, roc_auc))
+
+    # Extraemos las métricas de evaluación del modelo entrenado.
+    collect_metrics(modelo_final) |> kable()
+
+    # Extraemos las predicciones del modelo.
+    modelo_final |> collect_predictions() |> 
+        # Dibujamos la curva ROC.
+        roc_curve(Infarto, .pred_No) |> 
+        autoplot() + 
+        labs(title = "Curva ROC del modelo de bosque aleatorio")
+    ```
+    :::
+
+a.  Dibujar un diagrama con la importancia de las variables del bosque aleatorio.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    # Extraemos el modelo ajustado del flujo de trabajo.
+    modelo_final |> extract_fit_engine() |> 
+        # Dibujamos la importancia de las variables.
+        vip()
+    ```
+    :::
+:::
+
+
+## Ejercicios Propuestos
+
+:::{#exr-no-supervisado-vinos}
+El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
+
+| Variable             | Descripción                                                           | Tipo (unidades)        |
+|----------------------------------------|-----------------------------------------------------------------------|------------------------|
+| tipo                 | Tipo de vino                                                          | Factor (blanco, tinto) |
+| meses.barrica        | Meses de envejecimiento en barrica                               | Numérica(meses)  |
+| acided.fija          | Cantidad de ácidotartárico                                 | Numérica(g/dm3)  |
+| acided.volatil       | Cantidad de ácido acético                                             | Numérica(g/dm3)  |
+| acido.citrico        | Cantidad de ácidocítrico                                        | Numérica(g/dm3)  |
+| azucar.residual      | Cantidad de azúcar remanente después de la fermentación          | Numérica(g/dm3)  |
+| cloruro.sodico       | Cantidad de clorurosódico                                       | Numérica(g/dm3)  |
+| dioxido.azufre.libre | Cantidad de dióxido de azufre en forma libre                | Numérica(mg/dm3) |
+| dioxido.azufre.total | Cantidad de dióxido de azufre total en forma libre o ligada | Numérica(mg/dm3) |
+| densidad             | Densidad                                                              | Numérica(g/cm3)  |
+| ph                   | pH                                                                    | Numérica(0-14)   |
+| sulfatos             | Cantidad de sulfato de potasio                                   | Numérica(g/dm3)  |
+| alcohol              | Porcentaje de contenido de alcohol                          | Numérica(0-100)  |
+| calidad              | Calificación otorgada por un panel de expertos                   | Numérica(0-10)   |
+
+a.  Crear un dataframe con los datos del archivo [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv).
+
+a.  Realizar un análisis exploratorio de los datos.
+
+a.  Dividir el conjunto de datos en dos subconjuntos, uno de entrenamiento y otro de test. Utilizar el 80% de los datos para entrenamiento y el 20% restante para test.
+
+a.  Construir un árbol de decisión para predecir la calidad del vino. Explorar para qué parámetros del árbol se obtiene el mejor modelo evaluando los modelos con validación cruzada de 5 pliegues.
+
+a.  Evaluar el mejor modelo de árbol de decisión con el conjunto de test. Calcular la matriz de confusión y también la precisión, sensibilidad y la especificidad.
+
+a.  Dibujar el árbol de decisión construido.
+
+a.  Dibujar un diagrama con la importancia de las variables del árbol de decisión.
+
+a.  Construir bosques aleatorios para predecir la calidad del vino, explorando para qué parámetros se obtiene el mejor modelo evaluando los modelos con validación cruzada de 5 pliegues.
+
+a.  Construir el bosque aleatorio con los parámetros óptimos obtenidos en el apartado anterior y evaluarlo con el conjunto de test. Calcular la precisión, el área bajo la curva ROC y dibujar la curva ROC del modelo.
+
+a.  Dibujar un diagrama con la importancia de las variables del bosque aleatorio.
 :::
