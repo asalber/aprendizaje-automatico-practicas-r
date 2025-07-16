@@ -1,0 +1,373 @@
+---
+title: Árboles de decisión y bosques aleatorios
+lang: es
+toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+Los árboles de decisión son modelos de aprendizaje supervisado sencillos que además son fáciles de interpretar. Los árboles crecen desde la raíz, que contine todos los casos del ejemplo de entrenamiento, hasta las hojas, que contienen los casos clasificados. En cada nodo del árbol se realiza una división del conjunto de casos del nodo en función de una característica del conjunto de datos, de manera que para cada valor de la característica se obtiene un subconjunto de casos que presentan ese valor. El objetivo es dividir los datos de tal manera que las instancias en cada hoja sean lo más homogéneas posible con respecto a la variable respuesta. Aunque su uso más habitual es para problemas de clasificación, también pueden ser utilizados para problemas de regresión.
+
+En esta práctica también veremos los bosques aleatorios, que son un conjunto de árboles de decisión entrenados con diferentes subconjuntos de datos y características. Los bosques aleatorios son una técnica de ensamblaje que mejora la precisión y la robustez de los modelos de árboles de decisión individuales.
+
+## Ejercicios Resueltos
+
+Para la realización de esta práctica se requieren los siguientes paquetes:
+
+```r
+library(tidyverse) 
+# Incluye los siguientes paquetes:
+# - readr: para la lectura de ficheros csv. 
+# - dplyr: para el preprocesamiento y manipulación de datos.
+# - ggplot2: para la visualización de datos.
+library(tidymodels)
+# Incluye los siguientes paquetes:
+# - recipes: para la preparación de los datos. 
+# - parsnip: para la creación de modelos.
+# - workflows: para la creación de flujos de trabajo.
+# - rsample: para la creación de particiones de los datos.
+# - yardstick: para la evaluación de modelos.
+# - tune: para la optimización de hiperparámetros.
+library(skimr) # para el análisis exploratorio de datos.
+library(rpart.plot) # para la visualización de árboles de decisión.
+library(ranger) # para la creación de modelos de bosque aleatorio.
+library(vip) # para la visualización de la importancia de las variables.
+library(knitr) # para el formateo de tablas.
+```
+
+:::{#exr-arboles-decision-infarto}
+El fichero [`infartos.csv`](datos/infartos.csv) contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:
+
+- `Edad`: Edad del paciente (años)
+- `Sexo`: Sexo del paciente (H: hombre, M: mujer)
+- `DolorPecho`: Tipo de dolor torácico (TA: angina típica, ATA: angina atípica, NAP: dolor no anginoso, ASY: asintomático)
+- `PresionArterial`: Presión arterial sistólica en reposo (mm Hg)
+- `Colesterol`: Colesterol sérico (mm/dl)
+-  `Glucemia`: Glucemia en ayunas (1: si glucemia en ayunas > 120 mg/dl, 0: de lo contrario)
+- `Electro`: resultados del electrocardiograma en reposo (Normal: normal, ST: anomalía onda ST-T (inversiones de onda T y/o elevación o depresión de ST > 0,05 mV), LVH: hipertrofia ventricular izquierda probable o definitiva según criterios de Estes)
+- `Pulsaciones`: Frecuencia cardíaca máxima alcanzada (valor numérico entre 60 y 202)
+- `AnginaEjercicio`: Angina inducida por ejercicio (S: sí, N: no)
+- `DepresionST`: Depresión del segmento ST inducida por el ejercicio (valor numérico de la depresión).
+- `PendienteST`: Pendiente del segmento ST en el pico de ejercicio (Ascendente, Plano, Descencdente).
+- `Infarto`: Riesgo de infarto (1: Sí, 0: No)
+
+a.  Cargar los datos del archivo [`infartos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv) en un data frame.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución 
+
+    ```{r}
+    library(tidyverse)
+    library(knitr)
+    df <- read.csv("datos/infartos.csv", stringsAsFactors = TRUE) 
+    df |> 
+        glimpse()
+    ```
+    :::
+
+a.  Convertir la variable `Infarto` a un factor con dos niveles: Sí (1) y No (0).
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    df <- df |> 
+        # Recodificamos los valors de Infarto y lo convertimos en un factor.
+        mutate(Infarto = factor(case_match(Infarto,
+            0 ~ "No",
+            1 ~ "Sí"
+        )))
+    ```
+    :::
+
+a.  Realizar un análisis exploratorio de los datos. ¿Qué variables son numéricas y cuáles categóricas? ¿Hay valores perdidos? ¿Qué tipo de variables son las que contienen información sobre el riesgo de infarto?
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(skimr)
+    skim(df)
+    ```
+    :::
+
+a.  Dividir el conjunto de datos en dos subconjuntos, uno de entrenamiento y otro de test. Utilizar el 80% de los datos para entrenamiento y el 20% restante para test.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`initial_split`](https://rsample.tidymodels.org/reference/initial_split.html) del paquete [`rsample`](https://rsample.tidymodels.org/) para dividir el conjunto de datos en entrenamiento y test.
+
+    Parámetros:
+    - `data`: el data frame con los datos.
+    - `prop`: la proporción del conjunto de datos que se utilizará para el conjunto de entrenamiento (en este caso, 0.8 para el 80%).
+    - `strata`: la variable de estratificación (en este caso, `Especie`) para asegurar que la distribución de clases se mantenga en ambos conjuntos.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(tidymodels)
+    set.seed(123)
+    df_particion <- initial_split(df, prop = 0.8, strata = Infarto)
+    df_entrenamiento <- training(df_particion)
+    df_test <- testing(df_particion)
+    ```
+    :::
+
+a.  Construir un árbol de decisión para predecir el riesgo de infarto.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`decision_tree`](https://parsnip.tidymodels.org/reference/decision_tree.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para crear un modelo de árbol de decisión.
+
+    Parámetros:
+    - `tree_depth`: la profundidad máxima del árbol (5 por defecto).
+    - `cost_complexity`: el coste por complejidad del árbol (0.01 por defecto).
+    - `min_n`: el número mínimo de observaciones en un nodo para que se realice una división (1 por defecto).
+
+    Después, utilizar la función [`set_engine`](https://parsnip.tidymodels.org/reference/set_engine.html) para especificar el motor a utilizar (en este caso, `rpart`).
+
+    Finalmente, utilizar la función [`set_mode`](https://parsnip.tidymodels.org/reference/set_mode.html) para especificar que se trata de un modelo de clasificación.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    # Creamos un modelo de árbol de decisión.
+    modelo <- decision_tree() |> 
+        # Establecemos el motor de rpart.
+        set_engine("rpart") |> 
+        # Establecemos el modo de clasificación.
+        set_mode("classification") 
+
+    # Crear un flujo de trabajo con el modelo y los datos de entrenamiento.
+    modelo_entrenado <- workflow() |>
+        # Añadimos la fórmula del modelo.
+        add_formula(Infarto ~ .) |>
+        # Añadimos el modelo de árbol de decisión.
+        add_model(modelo) |>
+        # Ajustamos el modelo a los datos de entrenamiento.
+        fit(data = df_entrenamiento)
+    ```
+    :::
+
+a.  Dibujar el árbol de decisión construido.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`extract_fit_engine`](https://parsnip.tidymodels.org/reference/extract_fit_engine.html) para extraer el modelo ajustado del flujo de trabajo y luego utilizar la función [`rpart.plot`](https://cran.r-project.org/web/packages/rpart.plot/rpart.plot.pdf) para dibujar el árbol de decisión.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(rpart.plot)
+    modelo_entrenado |> 
+        # Extraemos el modelo ajustado.
+        extract_fit_engine() |> 
+        # Dibujamos el árbol de decisión.
+        rpart.plot()
+    ```
+    :::
+
+a.  Evaluar el modelo de árbol de decisión con el conjunto de test. Calcular la matriz de confusión y también la precisión, sensibilidad y la especificidad.
+
+    :::{.callout-note collapse="true"}
+    Usar la función [`augment`](https://parsnip.tidymodels.org/reference/augment.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para añadir al conjunto de test las probabilidades cada especie de pingüino.
+
+    Parámetros:
+    - `new_data`: el conjunto de datos de test.
+
+    Usar la función [`conf_mat`](https://yardstick.tidymodels.org/reference/conf_mat.html) del paquete [`yardstick`](https://yardstick.tidymodels.org/) para calcular la matriz de confusión.
+
+    Parámetros:
+    - `truth`: la variable respuesta (en este caso, `Especie`).
+    - `estimate`: la variable con las clases predichas por el modelo (en este caso, `.pred_class`).
+
+    Usar la función [`metric_set`](https://yardstick.tidymodels.org/reference/metric_set.html) del paquete [`yardstick`](https://yardstick.tidymodels.org/) para crear un conjunto de métricas de evaluación del modelo. En este caso se utilizarán las métricas de precisión (`accuracy`), sensibilidad (`sensitivity`) y especificidad (`specificity`).
+
+    Usar la función [`metrics`](https://yardstick.tidymodels.org/reference/metrics.html) del paquete [`yardstick`](https://yardstick.tidymodels.org/) para calcular las métricas de evaluación del modelo.
+
+    Parámetros:
+    - `truth`: la variable respuesta (en este caso, `Especie`).
+    - `estimate`: la variable con las clases predichas por el modelo (en este case, `.pred_class`).
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    # Ampliamos el conjunto de test con las predicciones del modelo.
+    df_test_aumentado <- augment(modelo_entrenado, new_data = df_test) 
+    # Calculamos la matriz de confusión.
+    matriz_confusion <- df_test_aumentado |> conf_mat(truth = Infarto, estimate = .pred_class)
+    matriz_confusion$table |> 
+        kable()
+
+    # Calculamos la precisión, sensibilidad y especificidad.
+    metricas <- metric_set(accuracy, sensitivity, specificity)
+    df_test_aumentado |> metricas(truth = Infarto, estimate = .pred_class) |> 
+        kable()
+    ```
+    :::
+
+a.  Explorar para qué parámetros del árbol se obtiene el mejor modelo. En particular, estudiar la profundidad máxima del árbol, el coste por complejidad y el mínimo número de casos necesario para dividir un nodo. Calcular la precisión del modelo mediante validación cruzada de 5 pliegues.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`tune()`](https://hardhat.tidymodels.org/reference/tune.html) del paquete [`hardhat`](https://hardhat.tidymodels.org/) para definir el parámetro a optimizar en el modelo de árbol de decisión. En este caso, se pueden definir los siguientes parámetros:
+    - `tree_depth`: la profundidad máxima del árbol.
+    - `cost_complexity`: el coste por complejidad del árbol.
+    - `min_n`: el número mínimo de casos necesario para dividir un nodo.
+
+    Después, utilizar la función [`tune_grid`](https://tune.tidymodels.org/reference/tune_grid.html) del paquete [`tune`](https://tune.tidymodels.org/) para optimizar los parámetros del modelo de árbol de decisión.
+
+    Parámetros:
+    - `resamples`: el conjunto de datos de entrenamiento particionado en pliegues para validación cruzada (en este caso, `vfold_cv(df_entrenamiento, v = 5)`).
+    - `grid`: un data frame con los valores de los parámetros a probar.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    modelo <- decision_tree(
+        tree_depth = tune(), # Profundidad máxima del árbol.
+        cost_complexity = tune(), # Coste por complejidad.
+        min_n = tune() # Mínimo número de casos necesario para dividir un nodo.
+    ) |> 
+        set_engine("rpart") |> 
+        set_mode("classification")
+
+    # Creamos un flujo de trabajo con el modelo y los datos de entrenamiento.
+    flujo <- workflow() |>
+        # Añadimos la fórmula del modelo.
+        add_formula(Infarto ~ .) |>
+        # Añadimos el modelo de árbol de decisión.
+        add_model(modelo)
+
+    modelos_entrenados <- tune_grid(
+            flujo,
+            resamples = vfold_cv(df_entrenamiento, v = 5), # Validación cruzada con 10 pliegues
+            grid = expand.grid(
+                tree_depth = 3:6, # Profundidad máxima del árbol
+                cost_complexity = seq(0, 0.5, by = 0.02), # Coste por complejidad
+                min_n = 10:15 # Mínimo número de casos necesario para dividir un nodo
+            ),
+            metrics = metric_set(accuracy) # Métricas a calcular
+        ) 
+    ```
+    :::
+
+a.  Construir el árbol de decisión con los parámetros óptimos obtenidos en el apartado anterior.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución 
+    ```{r}
+    # Extraemos los mejores parámetros.
+    parametros_optimos <- select_best(modelos_entrenados, metric = "accuracy") 
+    parametros_optimos |> kable()
+    # Construimos el modelo con los mejores parámetros.
+    modelo_final <- flujo |> finalize_workflow(parametros_optimos) |> # Finalizamos el flujo de trabajo con el mejor valor de K.
+            last_fit(modelo_final, split = df_particion, metrics = metricas) # Entrenamos el modelo con el conjunto de entrenamiento.
+
+    collect_metrics(modelo_final) |>  # Extraemos las métricas de evaluación del modelo entrenado.
+        kable()
+    ```    
+    :::
+
+a.  Dibujar el árbol de decisión final.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    modelo_final |> 
+        # Extraemos el modelo ajustado.
+        extract_fit_engine() |> 
+        # Dibujamos el árbol de decisión.
+        rpart.plot()
+    ```
+    :::
+
+a.  Dibujar un diagrama con la importancia de las variables del árbol de decisión.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(vip)
+    modelo_final |> 
+        # Extraemos el modelo ajustado.
+        extract_fit_engine() |> 
+        # Dibujamos la importancia de las variables.
+        vip()
+    ```
+    :::
+
+a.  Construir un bosque aleatorio para predecir el riesgo de infarto.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+```{r}
+# Número de procesadores para el entrenamiento en paralelo.
+library(parallel)
+procesadores <- detectCores() - 1 # Usamos todos menos uno para evitar saturar el sistema.
+# Creamos un modelo de bosque aleatorio.
+modelo_bosque <- rand_forest(
+    trees = 1000, # Número de árboles en el bosque.
+    mtry = tune(), # Número de variables a considerar en cada división.
+    min_n = tune() # Mínimo número de casos necesario para dividir un nodo.
+) |> 
+    set_engine("ranger", num.threads = procesadores, importance = "impurity") |> 
+    set_mode("classification")
+
+# Creamos un flujo de trabajo con el modelo y los datos de entrenamiento.
+flujo_bosque <- workflow() |>
+    # Añadimos la fórmula del modelo.
+    add_formula(Infarto ~ .) |>
+    # Añadimos el modelo de bosque aleatorio.
+    add_model(modelo_bosque)
+
+df_validacion <- validation_split(df_entrenamiento, prop = 0.8, strata = Infarto) # Dividimos el conjunto de entrenamiento en entrenamiento y validación.
+
+set.seed(123)
+modelos_entrenados <- flujo_bosque |>  
+    tune_grid(df_validacion,
+        grid = 25,
+        control = control_grid(save_pred = TRUE),
+        metrics = metric_set(accuracy, roc_auc))
+
+autoplot(modelos_entrenados) 
+
+modelo_mejor <- modelos_entrenados |> select_best(metric = "roc_auc")
+
+modelos_entrenados |> collect_predictions(parameters = modelo_mejor) |> 
+    roc_curve(Infarto, .pred_No) |> 
+    mutate(model = "Random Forest") |> 
+    ggplot(aes(x = 1 - specificity, y = sensitivity, col = model)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) +
+  geom_abline(lty = 3) + 
+  coord_equal()
+
+modelo_final <- flujo_bosque |> 
+    finalize_workflow(select_best(modelos_entrenados, metric = "accuracy")) |> 
+    last_fit(df_particion, metrics = metric_set(accuracy, roc_auc))
+
+collect_metrics(modelo_final) |> 
+    kable()
+
+
+modelo_final |> 
+    extract_fit_engine() |> 
+    vip()
+```
+
+    :::
+:::

@@ -46,11 +46,9 @@ book:
     - 02-preprocesamiento.qmd
     - 03-aprendizaje-no-supervisado.qmd
     - 04-regresion.qmd
-    - 05-k-vecinos.qmd
-    # - 05-naive-bayes.qmd
-    # - 06-k-vecinos.qmd
-    # - 07-arboles-decision.qmd
-    # - 09-redes-neuronales.qmd
+    # - 05-k-vecinos.qmd
+    # - 06-arboles-decision.qmd
+    #- 09-redes-neuronales.qmd
 
 #bibliography: references.bib
 
@@ -63,6 +61,7 @@ format:
     html-math-method: mathjax
     default-image-extension: svg
     code-overflow: wrap
+    toc: false
   pdf:
     documentclass: scrreport
     papersize: a4

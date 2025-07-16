@@ -43,10 +43,20 @@ a.  Cargar los datos del archivo [`medidas-fisicas.csv`](https://aprendeconalf.e
     ```{r}
     library(tidyverse)
     library(knitr)
-    df <- read_csv("datos/medidas-fisicas.csv") |> 
-    mutate(Peso = if_else(DiasDeporte > 0, Peso - DiasDeporte/2, Peso))
-    head(df) |> 
-        kable()
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/medidas-fisicas.csv", stringsAsFactors = TRUE)
+    glimpse(df)
+    ```
+    :::
+
+a.  Realizar un análisis exploratorio de los datos.
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    library(skimr)
+    df |> 
+        skim() 
     ```
     :::
 
@@ -80,14 +90,26 @@ a.  Dibujar un diagrama de relación entre todos los pares de variables del conj
 
 a.  Descomponer el conjunto de datos en un subconjunto de entrenamiento con el 80% de los datos y un subconjunto de test con el 20% restante.
 
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`initial_split`](https://rsample.tidymodels.org/reference/initial_split.html) del paquete [`rsample`](https://rsample.tidymodels.org/) para dividir el conjunto de datos en entrenamiento y test.
+
+    Parámetros:
+    - `data`: el data frame con los datos.
+    - `prop`: la proporción del conjunto de datos que se utilizará para el conjunto de entrenamiento (en este caso, 0.8 para el 80%).
+    :::
+
     :::{.callout-tip collapse="true"}
     ## Solución
 
     ```{r}
     library(tidymodels)
     set.seed(123) # Semilla aleatoria para reproducibilidad
-    df_particion <- initial_split(df, prop = 0.8)  # Dividir el conjunto de datos en entrenamiento (80%) y test (20%)
+    # Dividimos el conjunto de datos en entrenamiento (80%) y test (20%).
+    df_particion <- initial_split(df, prop = 0.8)
+    # Extraemos el conjunto de entrenamiento.
     df_entrenamiento <- training(df_particion)
+    # Extraemos el conjunto de test.
     df_test <- testing(df_particion)
     ```
     :::
@@ -122,22 +144,23 @@ a.  Construir un modelo de regresión lineal para predecir el peso en función d
     ## Base
 
     ```{r}
-    library(broom)
-    modelo <- lm(Peso ~ Estatura, data = df_entrenamiento)  # Crear un modelo de regresión lineal.
-    tidy(modelo) |> 
-        kable()
+    # Creamos un modelo de regresión lineal.
+    modelo <- lm(Peso ~ Estatura, data = df_entrenamiento) 
+    tidy(modelo) |> kable()
     ```
 
     ## Tidymodels
 
     ```{r}
-    modelo <- linear_reg() |>   # Crear un modelo de regresión lineal.
-        set_engine("lm")  # Establecer como motor de cálculo el ajuste por mínimos cuadrados.
+    # Creamos un modelo de regresión lineal.
+    modelo <- linear_reg() |>  
+        # Establecemos como motor de cálculo el ajuste por mínimos cuadrados.
+        set_engine("lm")  
 
     modelo_entrenado <- modelo |>
-        fit(Peso ~ Estatura, data = df_entrenamiento) # Ajustar el modelo a los datos.  
-    tidy(modelo_entrenado) |> 
-        kable()
+        # Entrenamos el modelo con los datos de entrenamiento.
+        fit(Peso ~ Estatura, data = df_entrenamiento) 
+    tidy(modelo_entrenado) |> kable()
     ```
     :::
     :::
@@ -158,17 +181,37 @@ a.  Predecir el peso de las personas del conjunto de test utilizando el modelo d
     :::{.callout-note collapse="true"}
     ## Ayuda
     Utilizar la función `predict` del paquete `base` para predecir el peso de las personas del conjunto de test. Pasar el modelo ajustado y el conjunto de datos de test como argumentos.
+
+    Parámetros:
+    - `new_data`: el conjunto de datos de test.
+    
+    O bien usar la función [`augment`](https://parsnip.tidymodels.org/reference/augment.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para añadir al conjunto de test las probabilidades cada especie de pingüino.
+
+    Parámetros:
+    - `new_data`: el conjunto de datos de test.
     :::
 
     :::{.callout-tip collapse="true"}
     ## Solución
+    
+    :::{.panel-tabset}
+    ## Base
 
     ```{r}
     df_test <- df_test |> 
+        # Predecir el peso de las personas 
         mutate(Peso_Predicho = predict(modelo_entrenado, new_data = df_test)$.pred)  # Predecir el peso de las personas del conjunto de test.
-    head(df_test) |> 
+    head(df_test) |> kable()
+    ```
+
+    ## Tidymodels
+    ```{r}
+    modelo_entrenado |> 
+        augment(new_data = df_test) |> 
+        head() |> 
         kable()
     ```
+    :::
     :::
 
 a.  Dibujar los errores predictivos entre el peso real y el peso predicho en el conjunto de datos de test.
@@ -189,6 +232,16 @@ a.  Dibujar los errores predictivos entre el peso real y el peso predicho en el 
 
 a.  Evaluar el modelo de regresión lineal calculando el error cuadrático medio (RMSE) y el coeficiente de determinación ($R^2$).
 
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    
+    Usar la función [`metrics`](https://yardstick.tidymodels.org/reference/metrics.html) del paquete [`yardstick`](https://yardstick.tidymodels.org/) para calcular las métricas de evaluación del modelo.
+
+    Parámetros:
+    - `truth`: la variable respuesta (en este caso, `Especie`).
+    - `estimate`: la variable con las predicciones modelo (en este caso, `Peso_Predicho`).
+    :::
+
     :::{.callout-tip collapse="true"}
     ## Solución
 
@@ -207,7 +260,7 @@ a.  Incluir en el modelo de regresión lineal la variable sexo como variable cat
 
     ```{r}
     modelo_entrenado_sexo <- modelo |>
-        fit(Peso ~ Estatura + Sexo, data = df_entrenamiento)
+        fit(Peso ~ Estatura * Sexo, data = df_entrenamiento)
     tidy(modelo_entrenado_sexo) |> 
         kable()
     ```
@@ -232,10 +285,10 @@ a.  Predecir el peso de las personas del conjunto de test utilizando el modelo d
     :::{.callout-tip collapse="true"}
     ## Solución
 
-    ```{r}
-    df_test |> 
-        mutate(Peso_Predicho = predict(modelo_entrenado_sexo, new_data = df_test)$.pred)  |>  # Predecir el peso de las personas del conjunto de test.
-        metrics(truth = Peso, estimate = Peso_Predicho) |> 
+    ```{r prediccion}
+    modelo_entrenado_sexo |> 
+        augment(new_data = df_test) |> 
+        metrics(truth = Peso, estimate = .pred) |> 
         kable()
     ```
 
@@ -276,9 +329,9 @@ a.  Evaluar el nuevo modelo de regresión lineal calculando el error cuadrático
     ## Solución
 
     ```{r}
-    df_test |> 
-        mutate(Peso_Predicho = predict(modelo_entrenado_deporte, new_data = df_test)$.pred)  |>  # Predecir el peso de las personas del conjunto de test.
-        metrics(truth = Peso, estimate = Peso_Predicho) |> 
+    modelo_entrenado_deporte |> 
+        augment(new_data = df_test) |> 
+        metrics(truth = Peso, estimate = .pred) |> 
         kable()
     ```
 
@@ -296,10 +349,8 @@ a.  Crear un data frame con los datos de la dieta a partir del fichero [`dieta.c
 
     ```{r}
     library(tidyverse)
-    library(knitr)
-    df <- read_csv("datos/dieta.csv")
-    head(df) |> 
-        kable()
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/dieta.csv", stringsAsFactors = TRUE)
+    glimpse(df)
     ```
     :::
 
@@ -322,6 +373,7 @@ a.  Dividir el conjunto de datos en un subconjunto de entrenamiento con el 75% d
 
     ```{r}
     set.seed(123) # Semilla aleatoria para reproducibilidad
+    # Dividimos el conjunto de datos en entrenamiento (75%) y test (25%)
     df_particion <- initial_split(df, prop = 0.75)  # Dividir el conjunto de datos en entrenamiento (75%) y test (25%)
     df_entrenamiento <- training(df_particion)
     df_test <- testing(df_particion)
@@ -401,9 +453,8 @@ a.  Cargar los datos del archivo [`infartos.csv`](https://aprendeconalf.es/apren
     ```{r}
     library(tidyverse)
     library(knitr)
-    df <- read.csv("datos/infartos.csv", stringsAsFactors = TRUE) 
-    df |> 
-        glimpse()
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv", stringsAsFactors = TRUE) 
+    glimpse(df)
     ```
     :::
 
@@ -426,8 +477,7 @@ a.  Realizar un análisis exploratorio de los datos.
 
     ```{r}
     library(skimr)
-    df |> 
-        skim() 
+    skim(df) 
     ```
     :::
 
@@ -438,8 +488,7 @@ a.  Dibujar un diagrama de relación entre todos los pares de variables del conj
     
     ```{r}
     library(GGally)
-    df |> 
-        ggpairs(aes(color = Infarto, alpha = 0.5))
+    df |> ggpairs(aes(color = Infarto, alpha = 0.5))
     ```
     :::
 
@@ -489,8 +538,7 @@ a.  Dibujar un diagrama de correlación entre las variables numéricas del conju
     ## Solución
 
     ```{r}
-    df |>
-        select_if(is.numeric) |> 
+    df |> select_if(is.numeric) |> 
         ggcorr(label = TRUE, label_size = 5)
     ```
     :::
@@ -509,6 +557,24 @@ a.  Descomponer el conjunto de datos en un subconjunto de entrenamiento con el 8
     :::
 
 a.  Preprocesar el conjunto de datos de entrenamiento para eliminar las variables numéricas con alta correlación, normalizar las variables numéricas y crear variables dummy para las variables categóricas.
+
+    :::{.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`recipe`](https://recipes.tidymodels.org/reference/recipe.html) del paquete [recipes](https://recipes.tidymodels.org/) incluido en la colección de paquetes [`tidymodels`](https://www.tidymodels.org/) para crear una receta de preprocesamiento. 
+    
+    Parmámetros:
+    - `Infarto ~.` para indicar que la variable `Especie` es la variable respuesta y se deben utilizar todas las demás variables como predictoras.
+  
+    Después, utilizar la función [`step_normalize`](https://recipes.tidymodels.org/reference/step_normalize.html) para normalizar las variables numéricas.
+    
+    Parámetros:
+    - `all_numeric_predictors()` para indicar que se deben utilizar todas las variables numéricas.
+
+    Y usar también la función [`step_dummy`](https://recipes.tidymodels.org/reference/step_dummy.html) para crear variables dummy para las variables categóricas.
+
+    Parámetros:
+    - `all_nominal_predictors()` para indicar que se deben utilizar todas las variables categóricas.
+    :::
 
     :::{.callout-tip collapse="true"}
     ## Solución

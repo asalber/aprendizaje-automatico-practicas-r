@@ -200,7 +200,7 @@ a.  Evaluar el modelo de KNN en el conjunto de test y calcular la matriz de conf
 
     Parámetros:
     - `truth`: la variable respuesta (en este caso, `Especie`).
-    - `estimate`: la variable con las clases predichas por el modelo (en este case, `.pred_class`).
+    - `estimate`: la variable con las clases predichas por el modelo (en este caso, `.pred_class`).
     :::
 
     :::{.callout-tip collapse="true"}
@@ -257,10 +257,10 @@ a.  Explorar para qué número de vecinos (K) el modelo de KNN tiene mejor preci
     ```{r}
     k_final <- select_best(modelos_entrenados, metric = "accuracy") # Seleccionamos el mejor valor de K según la precisión.
 
-    modelo_entrenado <- finalize_workflow(flujo, k_final) |> # Finalizamos el flujo de trabajo con el mejor valor de K.
-        last_fit(modelo_entrenado, split = df_particion) # Entrenamos el modelo con el conjunto de entrenamiento.
+    modelo_final <- finalize_workflow(flujo, k_final) |> # Finalizamos el flujo de trabajo con el mejor valor de K.
+        last_fit(modelo_final, split = df_particion) # Entrenamos el modelo con el conjunto de entrenamiento.
 
-    collect_metrics(modelo_entrenado) |>  # Extraemos las métricas de evaluación del modelo entrenado.
+    collect_metrics(modelo_final) |>  # Extraemos las métricas de evaluación del modelo entrenado.
         kable()
     ```
     :::

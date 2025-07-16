@@ -9,6 +9,7 @@ stringr
 forcats
 lubridate
 knitr
+skimr
 GGally
 tidymodels
 broom
@@ -23,4 +24,3 @@ tune
 workflows
 workflowsets
 yardstick
-skimr
