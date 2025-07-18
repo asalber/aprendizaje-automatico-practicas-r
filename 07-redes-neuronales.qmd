@@ -175,7 +175,7 @@ a.  Construir una red neuronal con una capa oculta de 10 neuronas para predecir 
         # Mostramos un resumen del modelo.
         extract_fit_engine()
     ```
-:::
+    :::
 
 a.  Evaluar el modelo con el conjunto de test y calcular la matriz de confusión, la exactitud, y el area bajo la curva ROC.
 
