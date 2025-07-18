@@ -119,8 +119,7 @@ a.  Dividir el conjunto de datos en un conjunto de entrenamiento y un conjunto d
     ```
     :::
 
-a.  Preprocesar el conjunto de entrenamiento convertir la variable respuesta, el diagnóstico, en una variable numérica y normalizar el resto de variables predictivas
-
+a.  Preprocesar el conjunto de entrenamiento para normalizar las variables numéricas.
 
     :::{.callout-tip collapse="true"}
     ## Solución
@@ -128,14 +127,12 @@ a.  Preprocesar el conjunto de entrenamiento convertir la variable respuesta, el
     ```{r}
     # Creamos una receta de preprocesamiento.
     receta <- recipe(Diagnostico ~ ., data = df_entrenamiento) |>
-        # Convertimos la variable respuesta en una variable numérica.
-        #step_dummy(Diagnostico) |>
         # Normalizamos las variables numéricas.
         step_normalize(all_numeric_predictors())
     ```
     :::
 
-a.  Construir una red neuronal con una capa oculta de 10 neuronas para predecir el diagnóstico.
+a.  Construir una red neuronal con una capa oculta de 10 neuronas para predecir el diagnóstico. Realizar solo dos iteraciones (épocas) de entrenamiento.
 
     ::: {.callout-note collapse="true"}
     ## Ayuda
@@ -162,7 +159,7 @@ a.  Construir una red neuronal con una capa oculta de 10 neuronas para predecir 
     library(brulee)
     library(knitr)
     # Creamos un modelo de red neuronal.
-    modelo <- mlp(hidden_units = 10) |>
+    modelo <- mlp(hidden_units = 10, epochs = 2) |>
         set_engine("brulee") |>
         set_mode("classification")
 
@@ -178,7 +175,7 @@ a.  Construir una red neuronal con una capa oculta de 10 neuronas para predecir 
         # Mostramos un resumen del modelo.
         extract_fit_engine()
     ```
-    :::
+:::
 
 a.  Evaluar el modelo con el conjunto de test y calcular la matriz de confusión, la exactitud, y el area bajo la curva ROC.
 
@@ -213,25 +210,73 @@ a.  Evaluar el modelo con el conjunto de test y calcular la matriz de confusión
 
     ```{r}
     # Añadimos las predicciones al conjunto de test.
-    df_test <- modelo_entrenado |> augment(new_data = df_test)
+    df_test_2 <- modelo_entrenado |> augment(new_data = df_test)
 
     # Calculamos la matriz de confusión.
-    matriz_confusion <- df_test |> conf_mat(truth = Diagnostico, estimate = .pred_class) 
+    matriz_confusion <- df_test_2 |> conf_mat(truth = Diagnostico, estimate = .pred_class) 
     matriz_confusion$table |> kable()
 
     # Calculamos la exactitud.
-    df_test |> metrics(truth = Diagnostico, estimate = .pred_class) |>
+    df_test_2 |> metrics(truth = Diagnostico, estimate = .pred_class) |>
         # Mostramos las métricas de evaluación del modelo.
         kable()
 
     # Calculamos el área bajo la curva ROC.
-    df_test |> roc_auc(truth = Diagnostico, .pred_Benigno) |>
+    df_test_2 |> roc_auc(truth = Diagnostico, .pred_Benigno) |>
         # Mostramos el área bajo la curva ROC.
         kable()
     ```
     :::
-:::
 
+a.  Volver a entrenar la red neuronal anterior con 10 iteraciones (épocas) y evaluar la exactitud del modelo con el conjunto de test.
+
+    ::: {.callout-note collapse="true"}
+    ## Ayuda
+    Utilizar la función [`mlp`](https://parsnip.tidymodels.org/reference/mlp.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para crear un modelo de red neuronal.
+
+    Parámetros:
+    - `hidden_units`: el número de neuronas en la capa oculta (10 en este caso).
+    - `activation`: la función de activación a utilizar (por defecto "relu").
+    - `dropout`: la proporción de parámetros reseteados a 0 durante el entrenamiento (0.1 por defecto).
+    - `epochs`: el número de épocas de entrenamiento (100 por defecto).
+
+    Después, utilizar la función [`set_engine`](https://parsnip.tidymodels.org/reference/set_engine.html) para especificar el motor a utilizar (en este caso, `brulee`).
+
+    Utilizar la función [`set_mode`](https://parsnip.tidymodels.org/reference/set_mode.html) para especificar que se trata de un modelo de clasificación.
+
+    Finalmente, utilizar la función [`extract_fit_engine`](https://parsnip.tidymodels.org/reference/extract_fit_engine.html) para extraer el modelo entrenado del flujo de trabajo.
+    :::
+
+    :::{.callout-tip collapse="true"}
+    ## Solución
+
+    ```{r}
+    set.seed(123)
+    library(brulee)
+    library(knitr)
+    # Creamos un modelo de red neuronal.
+    modelo <- mlp(hidden_units = 10, epochs = 10) |>
+        set_engine("brulee") |>
+        set_mode("classification")
+
+    modelo_entrenado <- workflow() |>
+        # Añadimos la receta de preprocesamiento.
+        add_recipe(receta) |>
+        # Añadimos el modelo.
+        add_model(modelo) |>
+        # Entrenamos el modelo.
+        fit(data = df_entrenamiento)
+
+    # Añadimos las predicciones al conjunto de test.
+    df_test_10 <- modelo_entrenado |> augment(new_data = df_test)
+
+    # Calculamos la exactitud.
+    df_test_10 |> metrics(truth = Diagnostico, estimate = .pred_class) |>
+        # Mostramos las métricas de evaluación del modelo.
+        kable()
+    ```
+    :::
+:::
 
 :::{#exr-redes-neuronales-vinos}
 El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
