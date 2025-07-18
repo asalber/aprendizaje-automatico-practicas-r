@@ -159,7 +159,7 @@ a.  Dibujar el árbol de decisión construido.
 
     :::{.callout-note collapse="true"}
     ## Ayuda
-    Utilizar la función [`extract_fit_engine`](https://parsnip.tidymodels.org/reference/extract_fit_engine.html) para extraer el modelo ajustado del flujo de trabajo y luego utilizar la función [`rpart.plot`](https://cran.r-project.org/web/packages/rpart.plot/rpart.plot.pdf) para dibujar el árbol de decisión.
+    Utilizar la función [`extract_fit_engine`](https://parsnip.tidymodels.org/reference/extract_fit_engine.html) para extraer el modelo entrenado del flujo de trabajo y luego utilizar la función [`rpart.plot`](https://cran.r-project.org/web/packages/rpart.plot/rpart.plot.pdf) para dibujar el árbol de decisión.
     :::
 
     :::{.callout-tip collapse="true"}
@@ -178,6 +178,7 @@ a.  Dibujar el árbol de decisión construido.
 a.  Evaluar el modelo de árbol de decisión con el conjunto de test. Calcular la matriz de confusión y también la precisión, sensibilidad y la especificidad.
 
     :::{.callout-note collapse="true"}
+    ## Ayuda
     Usar la función [`augment`](https://parsnip.tidymodels.org/reference/augment.html) del paquete [`parsnip`](https://parsnip.tidymodels.org/index.html) para añadir al conjunto de test las probabilidades cada especie de pingüino.
 
     Parámetros:

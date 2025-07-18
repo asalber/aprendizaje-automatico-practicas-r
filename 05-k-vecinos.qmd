@@ -137,7 +137,7 @@ a.  Normalizar las variables `Longitud_pico`, `Profundidad_pico` y `Longitud_ala
     Utilizar la función [`recipe`](https://recipes.tidymodels.org/reference/recipe.html) del paquete [recipes](https://recipes.tidymodels.org/) incluido en la colección de paquetes [`tidymodels`](https://www.tidymodels.org/) para crear una receta de preprocesamiento. 
     
     Parmámetros:
-    - `Especie ~.` para indicar que la variable `Especie` es la variable respuesta y se deben utilizar todas las demás variables como predictoras.
+    - `Especie ~.` para indicar que la variable `Especie` es la variable respuesta y se deben utilizar todas las demás variables como predictivas.
   
     Después, utilizar la función [`step_normalize`](https://recipes.tidymodels.org/reference/step_normalize.html) para normalizar las variables numéricas.
     
@@ -293,22 +293,23 @@ a.  Predecir la especie de un pingüino con las siguientes características: lon
 :::{#exr-k-vecinos-vinos}
 El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
 
+
 | Variable             | Descripción                                                           | Tipo (unidades)        |
 |----------------------------------------|-----------------------------------------------------------------------|------------------------|
 | tipo                 | Tipo de vino                                                          | Factor (blanco, tinto) |
-| meses.barrica        | Mesesde envejecimiento en barrica                               | Numérica(meses)  |
-| acided.fija          | Cantidadde ácidotartárico                                 | Numérica(g/dm3)  |
+| meses.barrica        | Meses de envejecimiento en barrica                               | Numérica(meses)  |
+| acided.fija          | Cantidad de ácidotartárico                                 | Numérica(g/dm3)  |
 | acided.volatil       | Cantidad de ácido acético                                             | Numérica(g/dm3)  |
 | acido.citrico        | Cantidad de ácidocítrico                                        | Numérica(g/dm3)  |
-| azucar.residual      | Cantidad de azúcarremanente después de la fermentación          | Numérica(g/dm3)  |
+| azucar.residual      | Cantidad de azúcar remanente después de la fermentación          | Numérica(g/dm3)  |
 | cloruro.sodico       | Cantidad de clorurosódico                                       | Numérica(g/dm3)  |
-| dioxido.azufre.libre | Cantidad de dióxido de azufreen formalibre                | Numérica(mg/dm3) |
-| dioxido.azufre.total | Cantidadde dióxido de azufretotal en forma libre o ligada | Numérica(mg/dm3) |
+| dioxido.azufre.libre | Cantidad de dióxido de azufre en forma libre                | Numérica(mg/dm3) |
+| dioxido.azufre.total | Cantidad de dióxido de azufre total en forma libre o ligada | Numérica(mg/dm3) |
 | densidad             | Densidad                                                              | Numérica(g/cm3)  |
 | ph                   | pH                                                                    | Numérica(0-14)   |
-| sulfatos             | Cantidadde sulfato de potasio                                   | Numérica(g/dm3)  |
-| alcohol              | Porcentajede contenidode alcohol                          | Numérica(0-100)  |
-| calidad              | Calificación otorgada porun panel de expertos                   | Numérica(0-10)   |
+| sulfatos             | Cantidad de sulfato de potasio                                   | Numérica(g/dm3)  |
+| alcohol              | Porcentaje de contenido de alcohol                          | Numérica(0-100)  |
+| calidad              | Calificación otorgada por un panel de expertos                   | Numérica(0-10)   |
 
 a.  Crear un data frame con los datos del archivo [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv).
 

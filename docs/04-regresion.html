@@ -455,7 +455,7 @@ window.Quarto = {
 </header>
 
 
-<p>El aprendizaje supervisado abarca técnicas para clasificar o predecir una variable respuesta a partir de un conjunto de variables predictoras. Los modelos de aprendizaje basados en regresión son modelos bastante simples que pueden utilizarse para predecir variables cuantitativas (regresión lineal o no lineal) o cualitativas (regresión logística). Esta práctica contiene ejercicios que muestran como construir modelos de aprendizaje de regresión lineal, no lineal y regresión logística con R y el paquete <code>tidymodels</code>.</p>
+<p>El aprendizaje supervisado abarca técnicas para clasificar o predecir una variable respuesta a partir de un conjunto de variables predictivas. Los modelos de aprendizaje basados en regresión son modelos bastante simples que pueden utilizarse para predecir variables cuantitativas (regresión lineal o no lineal) o cualitativas (regresión logística). Esta práctica contiene ejercicios que muestran como construir modelos de aprendizaje de regresión lineal, no lineal y regresión logística con R y el paquete <code>tidymodels</code>.</p>
 <section id="ejercicios-resueltos" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="ejercicios-resueltos"><span class="header-section-number">4.1</span> Ejercicios Resueltos</h2>
 <p>Para la realización de esta práctica se requieren los siguientes paquetes:</p>
@@ -2331,7 +2331,7 @@ Ayuda
 <p>Utilizar la función <a href="https://recipes.tidymodels.org/reference/recipe.html"><code>recipe</code></a> del paquete <a href="https://recipes.tidymodels.org/">recipes</a> incluido en la colección de paquetes <a href="https://www.tidymodels.org/"><code>tidymodels</code></a> para crear una receta de preprocesamiento.</p>
 Parmámetros:
 <ul>
-<li><code>Infarto ~.</code> para indicar que la variable <code>Especie</code> es la variable respuesta y se deben utilizar todas las demás variables como predictoras.</li>
+<li><code>Infarto ~.</code> para indicar que la variable <code>Especie</code> es la variable respuesta y se deben utilizar todas las demás variables como predictivas.</li>
 </ul>
 <p>Después, utilizar la función <a href="https://recipes.tidymodels.org/reference/step_normalize.html"><code>step_normalize</code></a> para normalizar las variables numéricas.</p>
 Parámetros:
@@ -2361,7 +2361,7 @@ Solución
 <div class="cell">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>receta <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Infarto <span class="sc">~</span> ., <span class="at">data =</span> df_entrenamiento) <span class="sc">|&gt;</span> </span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_corr</span>(<span class="fu">all_numeric_predictors</span>(), <span class="at">threshold =</span> <span class="fl">0.8</span>) <span class="sc">|&gt;</span> <span class="co"># Eliminamos las variables numéricas con alta correlación para evitar multicolinealidad.</span></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span> <span class="co"># Normalizamos las variables predictoras numéricas.</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span> <span class="co"># Normalizamos las variables predictivas numéricas.</span></span>
 <span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="co"># Creamos variables dummy para las variables categóricas.</span></span>
 <span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(receta)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">

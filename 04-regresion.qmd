@@ -3,7 +3,7 @@ title: Regresión
 lang: es
 ---
 
-El aprendizaje supervisado abarca técnicas para clasificar o predecir una variable respuesta a partir de un conjunto de variables predictoras.
+El aprendizaje supervisado abarca técnicas para clasificar o predecir una variable respuesta a partir de un conjunto de variables predictivas.
 Los modelos de aprendizaje basados en regresión son modelos bastante simples que pueden utilizarse para predecir variables cuantitativas (regresión lineal o no lineal) o cualitativas (regresión logística). Esta práctica contiene ejercicios que muestran como construir modelos de aprendizaje de regresión lineal, no lineal y regresión logística con R y el paquete `tidymodels`.
 
 ## Ejercicios Resueltos
@@ -560,7 +560,7 @@ a.  Preprocesar el conjunto de datos de entrenamiento para eliminar las variable
     Utilizar la función [`recipe`](https://recipes.tidymodels.org/reference/recipe.html) del paquete [recipes](https://recipes.tidymodels.org/) incluido en la colección de paquetes [`tidymodels`](https://www.tidymodels.org/) para crear una receta de preprocesamiento. 
     
     Parmámetros:
-    - `Infarto ~.` para indicar que la variable `Especie` es la variable respuesta y se deben utilizar todas las demás variables como predictoras.
+    - `Infarto ~.` para indicar que la variable `Especie` es la variable respuesta y se deben utilizar todas las demás variables como predictivas.
   
     Después, utilizar la función [`step_normalize`](https://recipes.tidymodels.org/reference/step_normalize.html) para normalizar las variables numéricas.
     
@@ -579,7 +579,7 @@ a.  Preprocesar el conjunto de datos de entrenamiento para eliminar las variable
     ```{r}
     receta <- recipe(Infarto ~ ., data = df_entrenamiento) |> 
         step_corr(all_numeric_predictors(), threshold = 0.8) |> # Eliminamos las variables numéricas con alta correlación para evitar multicolinealidad.
-        step_normalize(all_numeric_predictors()) |> # Normalizamos las variables predictoras numéricas.
+        step_normalize(all_numeric_predictors()) |> # Normalizamos las variables predictivas numéricas.
         step_dummy(all_nominal_predictors()) # Creamos variables dummy para las variables categóricas.
     summary(receta)
     ```
