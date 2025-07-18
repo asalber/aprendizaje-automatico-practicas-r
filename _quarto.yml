@@ -49,7 +49,7 @@ book:
     - 04-regresion.qmd
     - 05-k-vecinos.qmd
     - 06-arboles-decision.qmd
-    #- 09-redes-neuronales.qmd
+    - 07-redes-neuronales.qmd
 
 #bibliography: references.bib
 
