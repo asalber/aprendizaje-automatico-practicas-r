@@ -318,7 +318,7 @@ a.  Crear un data frame con los datos del archivo [`vinos.csv`](https://aprendec
 
     ```{r}
     library(tidyverse)
-    df <- read.csv("datos/vinos.csv", stringsAsFactors = TRUE)
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv", stringsAsFactors = TRUE)
     glimpse(df)
     ```
     :::

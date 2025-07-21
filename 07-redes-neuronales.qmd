@@ -305,7 +305,7 @@ a.  Crear un data frame con los datos del archivo [`vinos.csv`](https://aprendec
 
     ```{r}
     library(tidyverse)
-    df <- read.csv("datos/vinos.csv", stringsAsFactors = TRUE)
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv", stringsAsFactors = TRUE)
     glimpse(df)
     ```
     :::
@@ -468,7 +468,7 @@ a.  Evaluar el modelo con el conjunto de test y la exactitud y el área bajo la 
 ## Ejercicios Propuestos
 
 :::{#exr-redes-neuronales-infartos}
-El fichero [`infartos.csv`](datos/infartos.csv) contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:
+El fichero [`infartos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv) contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:
 
 - `Edad`: Edad del paciente (años)
 - `Sexo`: Sexo del paciente (H: hombre, M: mujer)
@@ -483,7 +483,7 @@ El fichero [`infartos.csv`](datos/infartos.csv) contiene información sobre dist
 - `PendienteST`: Pendiente del segmento ST en el pico de ejercicio (Ascendente, Plano, Descencdente).
 - `Infarto`: Riesgo de infarto (1: Sí, 0: No)
 
-a.  Crear un dataframe con los datos del archivo [`infartos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv).
+a.  Crear un dataframe con los datos del archivo [`infartos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv).
 
 a.  Realizar un análisis exploratorio de los datos.
 
@@ -492,5 +492,4 @@ a.  Dividir el conjunto de datos en dos subconjuntos, uno de entrenamiento y otr
 a.  Construir una red neuronal para predecir el riesgo de infarto explorando distinto número de neuronas en la capa oculta y validando los modelos mediante validación cruzada de 5 pliegues. ¿Qué número de neuronas tiene el mejor modelo según la exactitud?
 
 a.  Entrenar el mejor modelo del apartado anterior con el conjunto de entrenamiento y evaluarlo con el conjunto de test. Calcular la matriz de confusión y también la precisión, sensibilidad y la especificidad.
-
 :::

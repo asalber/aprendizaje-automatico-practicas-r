@@ -421,7 +421,7 @@ El archivo de claves de aleatorización contiene sólo dos variables.
 - CLAVE: Clave de aleatorización
 - FARMACO: Fármaco administrado (0: Placebo, 1: IECA,  2:Ca Antagonista + diurético)
 
-a.  Crear un data frame con los datos de los pacientes del hospital A del fichero de Excel [datos-hospital-a.xls](datos/hipertension/datos-hospital-a.xls).
+a.  Crear un data frame con los datos de los pacientes del hospital A del fichero de Excel [datos-hospital-a.xls](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/hipertension/datos-hospital-a.xls).
 
     :::{.callout-tip collapse="true"}
     ## Solución

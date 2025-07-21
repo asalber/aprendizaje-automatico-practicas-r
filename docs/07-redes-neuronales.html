@@ -1299,7 +1299,7 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/vinos.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(df)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 5,320
@@ -1924,7 +1924,7 @@ Solución
 <section id="ejercicios-propuestos" class="level2" data-number="7.2">
 <h2 data-number="7.2" class="anchored" data-anchor-id="ejercicios-propuestos"><span class="header-section-number">7.2</span> Ejercicios Propuestos</h2>
 <div id="exr-redes-neuronales-infartos" class="theorem exercise">
-<p><span class="theorem-title"><strong>Ejercicio 7.3</strong></span> El fichero <a href="datos/infartos.csv"><code>infartos.csv</code></a> contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:</p>
+<p><span class="theorem-title"><strong>Ejercicio 7.3</strong></span> El fichero <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv"><code>infartos.csv</code></a> contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:</p>
 <ul>
 <li><code>Edad</code>: Edad del paciente (años)</li>
 <li><code>Sexo</code>: Sexo del paciente (H: hombre, M: mujer)</li>
@@ -1940,7 +1940,7 @@ Solución
 <li><code>Infarto</code>: Riesgo de infarto (1: Sí, 0: No)</li>
 </ul>
 <ol type="a">
-<li><p>Crear un dataframe con los datos del archivo <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv"><code>infartos.csv</code></a>.</p></li>
+<li><p>Crear un dataframe con los datos del archivo <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv"><code>infartos.csv</code></a>.</p></li>
 <li><p>Realizar un análisis exploratorio de los datos.</p></li>
 <li><p>Dividir el conjunto de datos en dos subconjuntos, uno de entrenamiento y otro de test. Utilizar el 80% de los datos para entrenamiento y el 20% restante para test.</p></li>
 <li><p>Construir una red neuronal para predecir el riesgo de infarto explorando distinto número de neuronas en la capa oculta y validando los modelos mediante validación cruzada de 5 pliegues. ¿Qué número de neuronas tiene el mejor modelo según la exactitud?</p></li>

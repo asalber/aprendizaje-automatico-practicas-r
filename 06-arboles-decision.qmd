@@ -61,7 +61,7 @@ a.  Cargar los datos del archivo [`infartos.csv`](https://aprendeconalf.es/apren
     ```{r}
     library(tidyverse)
     library(knitr)
-    df <- read.csv("datos/infartos.csv", stringsAsFactors = TRUE) 
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv", stringsAsFactors = TRUE) 
     df |> 
         glimpse()
     ```
@@ -74,7 +74,7 @@ a.  Convertir la variable `Infarto` a un factor con dos niveles: Sí (1) y No (0
 
     ```{r}
     df <- df |> 
-        # Recodificamos los valors de Infarto y lo convertimos en un factor.
+        # Recodificamos los valores de Infarto y lo convertimos en un factor.
         mutate(Infarto = factor(case_match(Infarto,
             0 ~ "No",
             1 ~ "Sí"
