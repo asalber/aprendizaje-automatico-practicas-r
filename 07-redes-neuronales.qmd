@@ -50,16 +50,18 @@ El conjunto de datos [cancer-mama.csv](datos/cancer-mama.csv) contiene informaci
 - Simetría: Simetría de la imagen.
 - Irregularidad: Medida de la irregularidad de la forma.
 
-a.  Crear un dataframe con los datos del archivo [`cancer-mama.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/cancer-mama.csv).
+a.  Crear un dataframe con los datos del archivo [`cancer-mama.csv`](datos/cancer-mama.csv).
 
     :::{.callout-tip collapse="true"}
     ## Solución 
 
     ```{r}
     library(tidyverse)
+    # Cargamos los datos del fichero csv en un dataframe.
     df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/cancer-mama.csv", stringsAsFactors = TRUE) |>
         # Convertimos la variable Diagnostico a un factor.
         mutate(Diagnostico = factor(Diagnostico, levels = c("B", "M"), labels = c("Benigno", "Maligno")))
+    # Mostramos un resumen del dataframe.
     glimpse(df)
     ```
     :::
@@ -71,6 +73,7 @@ a.  Hacer un análisis exploratorio de los datos.
 
     ```{r}
     library(skimr)
+    # Realizamos un análisis exploratorio de los datos.
     skim(df)
     ```
     :::
@@ -155,14 +158,17 @@ a.  Construir una red neuronal con una capa oculta de 10 neuronas para predecir 
     ## Solución
 
     ```{r}
-    set.seed(123)
     library(brulee)
-    library(knitr)
-    # Creamos un modelo de red neuronal.
+    # Establecemos la semilla aleatoria para la reproducibilidad.
+    set.seed(123)
+    # Creamos un modelo de red neuronal perceptrón multicapa.
     modelo <- mlp(hidden_units = 10, epochs = 2) |>
+        # Establecemos el motor de entrenamiento del paquete brulee.
         set_engine("brulee") |>
+        # Establecemos el modo de entrenamiento como clasificación.
         set_mode("classification")
 
+    # Creamos un flujo de trabajo para entrenar el modelo.
     modelo_entrenado <- workflow() |>
         # Añadimos la receta de preprocesamiento.
         add_recipe(receta) |>
@@ -171,9 +177,8 @@ a.  Construir una red neuronal con una capa oculta de 10 neuronas para predecir 
         # Entrenamos el modelo.
         fit(data = df_entrenamiento)
 
-    modelo_entrenado |>
-        # Mostramos un resumen del modelo.
-        extract_fit_engine()
+    # Mostramos un resumen del modelo.
+    modelo_entrenado |> extract_fit_engine()
     ```
     :::
 
@@ -209,6 +214,7 @@ a.  Evaluar el modelo con el conjunto de test y calcular la matriz de confusión
     ## Solución
 
     ```{r}
+    library(knitr)
     # Añadimos las predicciones al conjunto de test.
     df_test_2 <- modelo_entrenado |> augment(new_data = df_test)
 
@@ -216,14 +222,12 @@ a.  Evaluar el modelo con el conjunto de test y calcular la matriz de confusión
     matriz_confusion <- df_test_2 |> conf_mat(truth = Diagnostico, estimate = .pred_class) 
     matriz_confusion$table |> kable()
 
-    # Calculamos la exactitud.
+    # Calculamos las métricas de evaluación del modelo con el conjunto de test.
     df_test_2 |> metrics(truth = Diagnostico, estimate = .pred_class) |>
-        # Mostramos las métricas de evaluación del modelo.
         kable()
 
     # Calculamos el área bajo la curva ROC.
     df_test_2 |> roc_auc(truth = Diagnostico, .pred_Benigno) |>
-        # Mostramos el área bajo la curva ROC.
         kable()
     ```
     :::
@@ -251,14 +255,16 @@ a.  Volver a entrenar la red neuronal anterior con 10 iteraciones (épocas) y ev
     ## Solución
 
     ```{r}
+    # Establecemos la semilla aleatoria para la reproducibilidad.
     set.seed(123)
-    library(brulee)
-    library(knitr)
-    # Creamos un modelo de red neuronal.
+    # Creamos un modelo de red neuronal perceptrón multicapa.
     modelo <- mlp(hidden_units = 10, epochs = 10) |>
+        # Establecemos el motor de entrenamiento del paquete brulee.
         set_engine("brulee") |>
+        # Establecemos el modo de entrenamiento como clasificación.
         set_mode("classification")
 
+    # Creamos un flujo de trabajo para entrenar el modelo.
     modelo_entrenado <- workflow() |>
         # Añadimos la receta de preprocesamiento.
         add_recipe(receta) |>
@@ -267,19 +273,18 @@ a.  Volver a entrenar la red neuronal anterior con 10 iteraciones (épocas) y ev
         # Entrenamos el modelo.
         fit(data = df_entrenamiento)
 
-    # Añadimos las predicciones al conjunto de test.
+    # Añadimos las predicciones al conjunto de test.    
     df_test_10 <- modelo_entrenado |> augment(new_data = df_test)
 
-    # Calculamos la exactitud.
+    # Calculamos las métricas de evaluación del modelo.
     df_test_10 |> metrics(truth = Diagnostico, estimate = .pred_class) |>
-        # Mostramos las métricas de evaluación del modelo.
         kable()
     ```
     :::
 :::
 
 :::{#exr-redes-neuronales-vinos}
-El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
+El fichero [`vinos.csv`](datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
 
 
 | Variable             | Descripción                                                           | Tipo (unidades)        |
@@ -298,14 +303,16 @@ El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practic
 | sulfatos             | Cantidad de sulfato de potasio                                   | Numérica(g/dm3)  |
 | alcohol              | Porcentaje de contenido de alcohol                          | Numérica(0-100)  |
 | calidad              | Calificación otorgada por un panel de expertos                   | Numérica(0-10)   |
-a.  Crear un data frame con los datos del archivo [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv).
+a.  Crear un data frame con los datos del archivo [`vinos.csv`](datos/vinos.csv).
 
     :::{.callout-tip collapse="true"}
     ## Solución
 
     ```{r}
     library(tidyverse)
+    # Cargamos los datos del fichero csv en un dataframe.
     df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv", stringsAsFactors = TRUE)
+    # Mostramos un resumen del dataframe.
     glimpse(df)
     ```
     :::
@@ -314,8 +321,10 @@ a.  Realizar un análisis exploratorio de los datos.
 
     :::{.callout-tip collapse="true"}
     ## Solución
+
     ```{r}
     library(skimr)
+    # Realizamos un análisis exploratorio de los datos.
     skim(df)
     ```
     :::
@@ -334,7 +343,7 @@ a.  Recodificar la variable `calidad` en una variable categórica con las siguie
 
     ```{r}
     df <- df |>
-        # Convertimos la variable calidad a un factor.
+        # Convertimos la variable calidad a un factor recodificando sus valores en distintas categorías.
         mutate(calidad = factor(case_when(
             calidad %in% c(1, 2) ~ "Muy malo",
             calidad %in% c(3, 4) ~ "Malo",
@@ -352,10 +361,9 @@ a.  Mostrar la tabla de frecuencias de la variable `calidad`.
     ## Solución
 
     ```{r}
-    df |>
-        # Mostramos la tabla de frecuencias de la variable calidad.
-        count(calidad) |>
-        # Mostramos la tabla de frecuencias.
+    library(knitr)
+    # Obtenemos la tabla de frecuencias de la variable calidad.
+    df |> count(calidad) |>
         kable()
     ```
     :::
@@ -367,10 +375,14 @@ a.  Dividir el conjunto de datos en un conjunto de entrenamiento (80%) y un conj
 
     ```{r}
     library(tidymodels)
-    set.seed(123) # Semilla aleatoria para la reproducibilidad.
-    df_particion <- initial_split(df, prop = 0.8, strata = "calidad")  # Dividir el conjunto de datos en entrenamiento (80%) y test (20%).
-    df_entrenamiento <- training(df_particion) # Extraemos el conjunto de entrenamiento.
-    df_test <- testing(df_particion) # Extraemos el conjunto de test.
+    # Establecemos la semilla aleatoria para la reproducibilidad.
+    set.seed(123)
+    # Dividimos el conjunto de datos en un conjunto de entrenamiento (80%) y un conjunto de test (20%) estratificando por la variable calidad.
+    df_particion <- initial_split(df, prop = 0.8, strata = "calidad")
+    # Extraemos el conjunto de datos de entrenamiento.
+    df_entrenamiento <- training(df_particion)
+    # Extraemos el conjunto de datos de test.
+    df_test <- testing(df_particion)
     ```
     :::
 
@@ -380,7 +392,7 @@ a.  Establecer la `calidad` como variable objetivo, normalizar las variables pre
     ## Solución
 
     ```{r}
-    # Definimos la receta de preprocesamiento.
+    # Definimos la receta de preprocesamiento indicando que la variable respuesta es calidad y el resto son variables predictivas.
     receta <- recipe(calidad ~ ., data = df_entrenamiento) |> 
         # Normalizamos las variables numéricas.
         step_normalize(all_numeric_predictors()) |> 
@@ -409,21 +421,25 @@ a.  Construir una red neuronal para predecir la calidad del vino explorando dist
     ## Solución
 
     ```{r}
-    set.seed(123) # Semilla aleatoria para la reproducibilidad.
     library(brulee)
-    # Creamos un modelo de red neuronal con un número variable de neuronas en la capa oculta.
+    # Semilla aleatoria para la reproducibilidad.****
+    set.seed(123) 
+    # Creamos un modelo de red neuronal perceptrón multicapa con un número variable de neuronas en la capa oculta.
     modelo <- mlp(hidden_units = tune()) |>
+        # Establecemos el motor de entrenamiento del paquete brulee.
         set_engine("brulee") |>
+        # Establecemos el modo de entrenamiento como clasificación.
         set_mode("classification")
 
+    # Creamos un flujo de trabajo para entrenar el modelo.
     flujo <- workflow() |>
         # Añadimos la receta de preprocesamiento.
         add_recipe(receta) |>
         # Añadimos el modelo.
         add_model(modelo)
 
-    modelos_entrenados <- flujo |>
     # Entrenamos los modelos con diferentes valores de neuronas en la capa oculta.
+    modelos_entrenados <- flujo |>
         tune_grid(
             resamples = vfold_cv(df_entrenamiento, v = 5), # Validación cruzada con 5 pliegues.
             control = control_grid(save_pred = TRUE), # Guardamos las predicciones.
@@ -432,7 +448,7 @@ a.  Construir una red neuronal para predecir la calidad del vino explorando dist
         ) 
 
     # Visualizamos los resultados de la validación cruzada.
-        autoplot(modelos_entrenados) 
+    autoplot(modelos_entrenados) 
     ``` 
     :::
 
@@ -447,9 +463,9 @@ a.  Seleccionar el mejor modelo según la exactitud y entrenarlo con el conjunto
         finalize_workflow(select_best(modelos_entrenados, metric = "accuracy")) |> 
         # Entrenamos el modelo con el conjunto de entrenamiento.
         last_fit(df_particion, metrics = metric_set(accuracy, roc_auc))
+    
     # Mostramos un resumen del modelo.
-    modelo_final |>
-        extract_fit_engine() 
+    modelo_final |> extract_fit_engine() 
     ```
     :::
 
@@ -460,7 +476,7 @@ a.  Evaluar el modelo con el conjunto de test y la exactitud y el área bajo la 
 
     ```{r}
     # Extraemos las métricas de evaluación del modelo entrenado.
-        collect_metrics(modelo_final) |> kable()
+    collect_metrics(modelo_final) |> kable()
     ```
     :::
 :::
@@ -468,7 +484,7 @@ a.  Evaluar el modelo con el conjunto de test y la exactitud y el área bajo la 
 ## Ejercicios Propuestos
 
 :::{#exr-redes-neuronales-infartos}
-El fichero [`infartos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv) contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:
+El fichero [`infartos.csv`](datos/infartos.csv) contiene información sobre distintas variables fisiológicas relacionadas con el riesgo de infarto de una muestra de personas. Las variables que contienen son:
 
 - `Edad`: Edad del paciente (años)
 - `Sexo`: Sexo del paciente (H: hombre, M: mujer)
@@ -483,7 +499,7 @@ El fichero [`infartos.csv`](https://aprendeconalf.es/aprendizaje-automatico-prac
 - `PendienteST`: Pendiente del segmento ST en el pico de ejercicio (Ascendente, Plano, Descencdente).
 - `Infarto`: Riesgo de infarto (1: Sí, 0: No)
 
-a.  Crear un dataframe con los datos del archivo [`infartos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv).
+a.  Crear un dataframe con los datos del archivo [`infartos.csv`](datos/infartos.csv).
 
 a.  Realizar un análisis exploratorio de los datos.
 

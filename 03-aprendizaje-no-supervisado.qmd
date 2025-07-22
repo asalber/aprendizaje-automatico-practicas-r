@@ -54,8 +54,9 @@ a.  Cargar los datos del archivo [`pingüinos.csv`](datos/pingüinos.csv) en un 
 
     ```{r}
     library(tidyverse)
-    library(knitr)
+    # Cargamos el conjunto de datos en un data frame.
     df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pingüinos.csv", stringsAsFactors = TRUE)
+    # Mostramos un resumen del data frame.
     glimpse(df)
     ```
     :::
@@ -67,6 +68,7 @@ a.  Realizar un análisis exploratorio de los datos.
 
     ```{r}
     library(skimr)
+    # Análisis exploratorio de los datos.
     skim(df) 
     ```
     :::
@@ -77,8 +79,9 @@ a.  Eliminar del data frame las columnas `Isla`, `Sexo` y `Peso` y eliminar las 
     ## Solución
 
     ```{r}
-    df <- df |>
-        select(-Isla, -Sexo, -Peso) |>
+    # Eliminamos las columnas Isla, Sexo y Peso.
+    df <- df |> select(-Isla, -Sexo, -Peso) |>
+        # Eliminamos las filas con valores perdidos.
         drop_na()
     ```
     :::
@@ -118,6 +121,7 @@ a.  Realizar un diagrama de dispersión tridimensional de las variables `Longitu
 
     ```{r}
     library(plotly)
+    # Diagrama de dispersión tridimensional de las variables Longitud_pico, Profundidad_pico y Longitud_ala. Coloreamos los puntos según la especie de pingüino.
     df |> plot_ly(x = ~Longitud_pico, y = ~Profundidad_pico, z = ~Longitud_ala, 
             color = ~Especie,
             type = "scatter3d", mode = "markers") |>
@@ -161,15 +165,16 @@ a.  Calcular los componentes principales del conjunto de variables numéricas y 
 
     ```{r}
     library(FactoMineR)
-    # Calculamos los componentes principales.
-    componentes <- df |> 
-        select(where(is.numeric)) |>
+    library(knitr)
+    # Seleccionamos las variables numéricas.
+    componentes <- df |> select(where(is.numeric)) |>
+        # Calculamos los componentes principales.
         PCA(scale.unit = TRUE, graph = FALSE)   
 
-    # Autovalores y varianza explicada
+    # Mostramos los autovalores y varianza explicada.
     kable(componentes$eig)
 
-    # Gráfico de la varianza explicada
+    # Dibujamos un gráfico de la varianza explicada
     library(factoextra)
     fviz_eig(componentes, addlabels = TRUE)
     ```
@@ -178,13 +183,20 @@ a.  Calcular los componentes principales del conjunto de variables numéricas y 
 
     ```{r}
     library(tidymodels)
+    # Creamos una receta de preprocesamiento.
     receta <- df |> recipe(~ .) |>
-        step_normalize(all_numeric_predictors()) |> # Normalizamos las variables numéricas.
-        step_pca(all_numeric_predictors(), threshold = 0.95, id = "pca") |>  # Calculamos los componentes principales con un umbral de varianza del 95%.
+        # Normalizamos las variables numéricas.
+        step_normalize(all_numeric_predictors()) |>
+        # Calculamos los componentes principales con un umbral de varianza del 95%.
+        step_pca(all_numeric_predictors(), threshold = 0.95, id = "pca") |>
+        # Estimamos los parámetros necesarios para aplicar la receta.
         prep()
 
+    # Obtenemos la varianza explicada con cada componente principal.
     receta |> tidy(id = "pca", type = "variance") |> 
+        # Filtramos los términos para quedarnos con el porcentaje de varianza.
         filter(terms == "percent variance") |> 
+        # Dibujamos un diagrama de barras de la varianza explicada.
         ggplot(aes(x = `component`, y = value)) +
         geom_col() +
         labs(title = "Varianza explicada por los componentes principales",
@@ -192,8 +204,7 @@ a.  Calcular los componentes principales del conjunto de variables numéricas y 
             y = "Porcentaje de Varianza") 
 
     # Aplicamos la receta a los datos.
-    df_componentes <- receta |> 
-        bake(new_data = NULL)
+    df_componentes <- receta |> bake(new_data = NULL)
     ```
     :::
     :::
@@ -245,18 +256,21 @@ a.  Dibujar un gráfico de dispersión de los dos primeros componentes principal
         labs(title = "Diagrama de dispersión de los dos primeros componentes principales según Especie",
             x = "Componente Principal 1",
             y = "Componente Principal 2")
-    ggplotly(grafico) # Convertimos el gráfico a interactivo
+    # Convertimos el gráfico en interactivo.
+    ggplotly(grafico) 
     ```
 
     ## `ggplot2`
 
     ```{r}
+    # Diagrama de dispersión de los dos primeros componentes principales.
     grafico <- df_componentes  |>  ggplot(aes(x = PC1, y = PC2, color = Especie)) +
         geom_point() +
         labs(title = "Diagrama de dispersión de los dos primeros componentes principales según Especie",
             x = "Componente Principal 1",
             y = "Componente Principal 2")
-    ggplotly(grafico) # Convertimos el gráfico a interactivo
+    # Convertimos el gráfico a interactivo
+    ggplotly(grafico)
     ```
     :::
     :::
@@ -292,20 +306,27 @@ a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y
     ## `stats`
 
     ```{r}
+    # Establecemos una semilla para la reproducibilidad.
     set.seed(123)
 
-    # Determinamos el número óptimo de grupos.
+    # Seleccionamos las variables numéricas.
     df |> select(where(is.numeric)) |>
+        # Determinamos el número óptimo de grupos.
         fviz_nbclust(kmeans, method = "wss")
     ```
 
     A la vista del gráfico anterior, el número óptimo de grupos, donde se ubica el "codo" del gráfico, sería 3 o 4, lo que se corresponde con las 3 especies de pingüinos.
 
     ```{r}
-    agrupacion <- df |> 
-        select(where(is.numeric)) |> 
+    # Seleccionamos las variables numéricas.
+    agrupacion <- df |> select(where(is.numeric)) |> 
+        # Realizamos el agrupamiento en 3 grupos.
         kmeans(centers = 3)
+
+    # Añadimos los grupos al data frame original.
     df$Grupo <- as.factor(agrupacion$cluster)
+
+    # Dibujamos un diagrama de dispersión de los dos primeros componentes principales coloreando los puntos según el grupo.
     componentes |> fviz_pca_ind(col.ind = df$Grupo, label = "none") +
         labs(title = "Diagrama de dispersión de los dos primeros componentes principales según Grupo",
             x = "Componente Principal 1",
@@ -316,19 +337,28 @@ a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y
 
     ```{r}
     library(tidyclust)
+    # Establecemos una semilla para la reproducibilidad.
     set.seed(123)
-    modelo_ajustado <- k_means(num_clusters = 3) |> 
+    # Creamos un modelo de agrupamiento en 3 grupos.
+    modelo_ajustado <- k_means(num_clusters = 3) |>
+        # Especificamos el motor a utilizar.
         set_engine("stats") |> 
+        # Ajustamos el modelo a los datos.
         fit(~., data = df)
 
+    # Creamos un nuevo data frame con los datos del conjunto de datos original y los grupos asignados.
     df_grupos <- modelo_ajustado |> augment(df)
+    # Mostramos el data frame con los grupos asignados.
     df_grupos |> head() |> 
         kable()
     ```
 
     ```{r}
+    # Creamos un data frame con lo valores de los componentes principales y el grupo asignado.
     df_componentes <- df_componentes |> 
         mutate(Grupo = df_grupos$.pred_cluster)
+
+    # Dibujamos un diagrama de dispersión de los dos primeros componentes principales coloreando los puntos según el grupo.
     df_componentes |> 
         ggplot(aes(x = PC1, y = PC2, color = Grupo)) +
         geom_point() +
@@ -343,7 +373,9 @@ a.  Obtener una tabla de contingencia para ver la relación entre las especies d
 
     :::{.callout-tip collapse="true"}
     ## Solución
+
     ```{r}
+    # Creamos una tabla de contingencia con la Especie en las filas y el Grupo en las columnas.
     table(df$Especie, df$Grupo) |> 
         kable()
     ```
@@ -364,6 +396,7 @@ a.  Calcular la kappa de Cohen para ver la concordancia entre las especies de pi
 
     ```{r}
     library(psych)
+    # Calculamos la kappa de Cohen.
     cohen.kappa(cbind(df$Especie, df$Grupo)) |> 
         tidy() |>
         kable()
@@ -398,7 +431,7 @@ a.  Realizar un análisis de agrupamiento jerárquico de las especies de pingüi
         dist(method = "euclidean")
     # Realizamos el agrupamiento jerárquico.    
     jerarquia <- hclust(distancias, method = "complete")
-    # Dendrograma coloreado por especie
+    # Dibujamos un dendrograma coloreado por especie.
     fviz_dend(jerarquia, 
         k = 3,  # número de grupos
         color_labels_by_k = TRUE,
@@ -410,20 +443,20 @@ a.  Realizar un análisis de agrupamiento jerárquico de las especies de pingüi
 :::
 
 :::{#exr-no-supervisado-glaucoma}
-El conjunto de datos [glaucoma.csv](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
+El conjunto de datos [glaucoma.csv](datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
 
 ![Tomografía de coherencia óptica](/img/aprendizaje-no-supervisado/tomografia-coherencia-optica.jpg)
 
-a.  Cargar el conjunto de datos del archivo [`glaucoma.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) en un data frame.
+a.  Cargar el conjunto de datos del archivo [`glaucoma.csv`](datos/glaucoma.csv) en un data frame.
 
     :::{.callout-tip collapse="true"}
     ## Solución
 
     ```{r}
     library(tidyverse)
-    library(knitr)
-    # Cargamos el conjunto de datos.
+    # Cargamos el conjunto de datos en un data frame.
     df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv", stringsAsFactors = TRUE)
+    # Mostramos un resumen del data frame.
     glimpse(df)
     ```
     :::
@@ -447,8 +480,9 @@ a.  Estudiar la correlación entre las variables numéricas del conjunto de dato
 
     ```{r}
     library(GGally)
-    # Diagrama de correlación entre las variables numéricas.
+    # Seleccionamos las variables numéricas (son las que empiezan por "Anillo").
     df |> select(starts_with("Anillo")) |>
+        # Diagrama de correlación entre las variables numéricas.
         ggcorr(label = TRUE, label_size = 3)
     ```
     :::
@@ -460,15 +494,15 @@ a.  Calcular los componentes principales del conjunto de variables numéricas y 
 
     ```{r}
     library(FactoMineR)
-    # Calculamos los componentes principales.
-    componentes <- df |> 
-        select(starts_with("Anillo")) |>
+    # Seleccionamos las variables numéricas (son las que empiezan por "Anillo").
+    componentes <- df |> select(starts_with("Anillo")) |>
+        # Calculamos los componentes principales.
         PCA(graph = FALSE)   
 
-    # Autovalores y varianza explicada
+    # Mostramos los autovalores y varianza explicada.
     kable(componentes$eig)
 
-    # Gráfico de la varianza explicada
+    # Dibujamos un gráfico de la varianza explicada
     library(factoextra)
     fviz_eig(componentes, addlabels = TRUE)
     ```
@@ -481,7 +515,7 @@ a.  Dibujar un diagrama de dispersión de los dos primeros componentes principal
 
     ```{r}
     library(plotly)
-    # Diagrama de dispersión de los dos primeros componentes principales.
+    # Dibujamos el diagrama de dispersión de los dos primeros componentes principales.
     plot <- componentes |> fviz_pca_ind(col.ind = df$Glaucoma, label = "none") +
         labs(title = "Gráfico de dispersión de los dos primeros componentes principales",
             x = "Componente Principal 1",
@@ -490,44 +524,55 @@ a.  Dibujar un diagrama de dispersión de los dos primeros componentes principal
     ```
     :::
 
-
 a.  Realizar un agrupamiento en grupos utilizando el método de las $k$-medias y representar los grupos en un diagrama de dispersión.
 
     :::{.callout-tip collapse="true"}
     ## Solución
 
     ```{r}
+    # Establecemos una semilla para la reproducibilidad.
     set.seed(123)
-    # Determinamos el número óptimo de grupos.
+    # Filtramos los datos para quedarnos solo con los pacientes con glaucoma.
     df |> filter(Glaucoma == "Sí") |> 
+        # Seleccionamos las variables numéricas (son las que empiezan por "Anillo").
         select(starts_with("Anillo")) |>
+        # Determinamos el número óptimo de grupos utilizando las distancias dentro de cada grupo al cuadrado.
         fviz_nbclust(kmeans, method = "wss")
     ```
 
     A la vista del gráfico anterior, el número óptimo de grupos, donde se ubica el "codo" del gráfico, sería 3 o 4.
 
     ```{r}
-    agrupacion <- df |> 
-        filter(Glaucoma == "Sí") |> 
+    # Filtramos los datos para quedarnos solo con los pacientes con glaucoma.
+    agrupacion <- df |> filter(Glaucoma == "Sí") |> 
+        # Seleccionamos las variables numéricas (son las que empiezan por "Anillo").
         select(starts_with("Anillo")) |>
+        # Realizamos el agrupamiento en 4 grupos.
         kmeans(centers = 4)
+    # Extraemos los centroides de los grupos y los ordenamos de mayor a menor por la primera componente.    
     centroides <- agrupacion$centers[order(agrupacion$centers[,1], decreasing = T),]
-    agrupacion <- df |> 
-        filter(Glaucoma == "Sí") |> 
+    # Filtramos de nuevo para quedarnos solo con los pacientes con glaucoma.
+    agrupacion <- df |> filter(Glaucoma == "Sí") |> 
+        # Seleccionamos las variables numéricas (son las que empiezan por "Anillo").
         select(starts_with("Anillo")) |>
+        # Volvemos a realizar el agrupamiento en 4 grupos, pero ahora partiendo de los centroides ordenados.
         kmeans(centers = centroides)
     # Convertimos los grupos en un factor.
     agrupacion$cluster <- as.factor(agrupacion$cluster)
     # Asignamos etiquetas a los niveles del factor.
     labels <- c("I", "II", "III", "IV")
     levels(agrupacion$cluster) <- labels
-    # Add cluster to data frame
+    # Creamos un data frame de los pacientes con glaucoma y le añadimos los grupos.
     df_glaucoma <- df |> filter(Glaucoma == "Sí") |> 
         mutate(Estadio = agrupacion$cluster)
+    # Filtramos el data frame original para quedarnos solo con los pacientes sin glaucoma.
     df <- df |> filter(Glaucoma == "No") |> 
+        # Añadimos al data frame original una nueva columna con el Estadio de glaucoma.
         mutate(Estadio = "Sano") |> 
+        # Unimos los data frames de pacientes con y sin glaucoma.
         bind_rows(df_glaucoma)
 
+    # Dibujamos un diagrama de dispersión de los dos primeros componentes principales coloreando los puntos según el estadio de glaucoma. Añadimos elipses alrededor de los grupos.
     plot <- componentes |> fviz_pca_ind(col.ind = df$Estadio, label = "none", addEllipses = T) +
         labs(title = "Gráfico de dispersión de los dos primeros componentes principales según estadio de Glaucoma")
     ggplotly(plot)

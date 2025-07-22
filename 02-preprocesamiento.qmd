@@ -43,7 +43,9 @@ a.  Crear un data frame con los datos de todos los pacientes del estudio a parti
     Con las funciones del paquete `base` de R.
 
     ```{r}
+    # Cargamos el conjunto de datos en un data frame.
     df <- read.csv("https://aprendeconalf.es/estadistica-practicas-r/datos/colesterol.csv")
+    # Mostramos las primeras filas del data frame.
     head(df)
     ```
     
@@ -52,8 +54,10 @@ a.  Crear un data frame con los datos de todos los pacientes del estudio a parti
 
     ```{r}
     library(tidyverse)
+    # Cargamos el conjunto de datos en un tibble.
     df <- read_csv("https://aprendeconalf.es/estadistica-practicas-r/datos/colesterol.csv")
-    head(df)
+    # Mostramos un resumen del data frame.
+    glimpse(df)
     ```
     :::
     :::
@@ -103,6 +107,7 @@ a.  Crear una nueva columna con la variable `obesidad` recodificando la columna 
     Con la función `cut` del paquete `base` de R.
 
     ```{r}
+    # Creamos una nueva columna con la variable obesidad recodificando la columna imc.
     df$Obesidad <- cut(df$imc, breaks = c(0, 18.5, 24.5, 30, Inf), labels = c("Bajo peso", "Saludable", "Sobrepeso", "Obeso"))
     head(df)
     ```
@@ -112,6 +117,7 @@ a.  Crear una nueva columna con la variable `obesidad` recodificando la columna 
 
     ```{r}
     df <- df |>
+        # Creamos una nueva columna con la variable obesidad recodificando la columna imc.
         mutate(Obesidad = cut(imc, breaks = c(0, 18.5, 24.5, 30, Inf), labels = c("Bajo peso", "Saludable", "Sobrepeso", "Obeso")))
     head(df)
     ```
@@ -337,8 +343,7 @@ a.  Ordenar el data frame ascendentemente por la columna `sexo` y descendentemen
     Con la función `arrange` del paquete `dplyr` de `tidyverse`. Para que la ordenación sea descendente con respecto a una variable se tiene que usar la función `desc` sobre la variable.
     
     ```{r}
-    df |>
-        arrange(sexo, desc(edad))
+    df |> arrange(sexo, desc(edad))
     ```
     :::
     :::
@@ -353,7 +358,10 @@ a.  Crear un data frame con los datos del curso a partir del fichero [`notas-cur
     ## Solución
 
     ```{r}
+    library(tidyverse)
+    # Cargamos el conjunto de datos en un data frame.
     df <- read_csv("https://aprendeconalf.es/estadistica-practicas-r/datos/notas-curso2.csv")
+    # Mostramos el data frame.
     df
     ```
     :::
@@ -366,7 +374,9 @@ a.  Convertir el data frame a formato largo.
     Para convertir un data frame de formato ancho a largo se puede usar la función [`pivot_longer`](https://tidyr.tidyverse.org/reference/pivot_longer.html) del paquete `tidyr` de `tidyverse`.
 
     ```{r}
+    # Convertimos el data frame a formato largo.
     df_largo <- df |> pivot_longer(notaA:notaE, names_to = "Asignatura", values_to = "Nota")
+    # Mostramos el data frame en formato largo.
     df_largo
     ```
     :::
@@ -378,7 +388,9 @@ a.  Crear una nueva columna con la variable `calificación` que contenga las cal
 
     ```{r}
     df_largo <- df_largo |>
-        mutate(Califiación = cut(Nota, breaks = c(0, 4.99, 6.99, 8.99, 10), labels = c("SS", "AP", "NT", "SB")))
+        # Creamos una nueva columna con la variable calificación recodificando la columna Nota.
+        mutate(Calificación = cut(Nota, breaks = c(0, 4.99, 6.99, 8.99, 10), labels = c("SS", "AP", "NT", "SB")))
+    # Mostramos el data frame con la nueva columna.
     df_largo
     ```
     :::
@@ -390,8 +402,11 @@ a.  Filtrar el conjunto de datos para obtener las asignaturas y las notas de las
 
     ```{r}
     df_largo |>
+        # Filtramos las filas para quedarnos con las mujeres del grupo A.
         filter(sexo == "Mujer", grupo == "A") |>
+        # Seleccionamos las columnas Asignatura y Nota.
         select(Asignatura, Nota) |>
+        # Ordenamos las filas por la columna Nota de mayor a menor.
         arrange(desc(Nota))
     ```
     :::
@@ -428,8 +443,10 @@ a.  Crear un data frame con los datos de los pacientes del hospital A del ficher
 
     ```{r}
     library(readxl)
+    # Cargamos el conjunto de datos del primer hospital en un data frame.
     dfA <- read_excel("datos/hipertension/datos-hospital-a.xls")
-    head(dfA)
+    # Mostramos un resumen del data frame.
+    glimpse(dfA)
     ```
     :::
 
@@ -439,8 +456,10 @@ a.  Crear un data frame con los datos de los pacientes del hospital B del ficher
     ## Solución
 
     ```{r}
+    # Cargamos el conjunto de datos del segundo hospital en un data frame.
     dfB <- read_csv("https://aprendeconalf.es/estadistica-practicas-r/datos/hipertension/datos-hospital-b.csv")
-    head(dfB)
+    # Mostramos un resumen del data frame.
+    glimpse(dfB)
     ```
     :::
 
@@ -474,8 +493,10 @@ a.  Crear un data frame con los datos de las claves de aleatorización del fiche
     ## Solución
 
     ```{r}
+    # Cargamos el conjunto de datos de las claves de aleatorización en un data frame.
     claves <- read_csv("https://aprendeconalf.es/estadistica-practicas-r/datos/hipertension/claves-aleatorizacion.csv")
-    head(claves)
+    # Mostramos un resumen del data frame.
+    glimpse(claves)
     ```
     :::
 

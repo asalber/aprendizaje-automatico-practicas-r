@@ -33,7 +33,7 @@ library(plotly) # para la visualización interactiva de gráficos.
 library(knitr) # para el formateo de tablas.
 ```
 
-::: {#exr-k-vecinos-1}
+:::{#exr-k-vecinos-pingüinos}
 El conjunto de datos [pingüinos.csv](datos/pingüinos.csv) contiene un conjunto de datos sobre tres especies de pingüinos con las siguientes variables:
 
 - Especie: Especie de pingüino (Adelie, Chinstrap o Gentoo).
@@ -52,7 +52,9 @@ a.  Cargar los datos del archivo [`pingüinos.csv`](datos/pingüinos.csv) en un 
     ```{r}
     library(tidyverse)
     library(knitr)
+    # Cargamos el conjunto de datos.
     df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/pingüinos.csv", stringsAsFactors = TRUE)
+    # Mostramos un resumen del data frame.
     glimpse(df)
     ```
     :::
@@ -64,6 +66,7 @@ a.  Realizar un análisis exploratorio de los datos.
 
     ```{r}
     library(skimr)
+    # Realizamos un análisis exploratorio de los datos.
     skim(df) 
     ```
     :::
@@ -74,8 +77,10 @@ a.  Eliminar del data frame las columnas `Isla`, `Sexo` y `Peso` y eliminar las 
     ## Solución
 
     ```{r}
-    df <- df |>
-        select(-Isla, -Sexo, -Peso) |>
+    # Eliminamos las columnas Isla, Sexo y Peso.
+    library(dplyr)
+    df <- df |> select(-Isla, -Sexo, -Peso) |>
+        # Eliminamos las filas con valores perdidos.
         drop_na()
     ```
     :::
@@ -96,6 +101,7 @@ a.  Realizar un diagrama de dispersión tridimensional de las variables `Longitu
 
     ```{r}
     library(plotly)
+    # Dibujamos el diagrama de dispersión tridimensional especificando la longitud del pico en el eje x, la profundidad del pico en el eje y y la longitud de la aleta en el eje z. Coloreamos los puntos según la especie de pingüino.
     df |> plot_ly(x = ~Longitud_pico, y = ~Profundidad_pico, z = ~Longitud_ala, 
             color = ~Especie,
             type = "scatter3d", mode = "markers") |>
@@ -123,10 +129,14 @@ a.  Dividir el conjunto de datos en un conjunto de entrenamiento (80%) y un conj
 
     ```{r}
     library(tidymodels)
-    set.seed(123) # Semilla aleatoria para la reproducibilidad.
-    df_particion <- initial_split(df, prop = 0.8, strata = "Especie")  # Dividir el conjunto de datos en entrenamiento (80%) y test (20%).
-    df_entrenamiento <- training(df_particion) # Extraemos el conjunto de entrenamiento.
-    df_test <- testing(df_particion) # Extraemos el conjunto de test.
+    # Establecemos una semilla aleatoria para la reproducibilidad.
+    set.seed(123)
+    # Dividimos el conjunto de datos en entrenamiento (80%) y test (20%).
+    df_particion <- initial_split(df, prop = 0.8, strata = "Especie")  
+     # Extraemos el conjunto de datos de entrenamiento.
+    df_entrenamiento <- training(df_particion)
+    # Extraemos el conjunto de datos de test.
+    df_test <- testing(df_particion)
     ```
     :::
 
@@ -148,8 +158,10 @@ a.  Normalizar las variables `Longitud_pico`, `Profundidad_pico` y `Longitud_ala
     :::{.callout-tip collapse="true"}
     ## Solución
     ```{r}
-    receta <- recipe(Especie ~ ., data = df_entrenamiento) |> # Definimos la receta de preprocesamiento.
-        step_normalize(all_numeric_predictors()) # Normalizamos las variables numéricas.
+    # Definimos la receta de preprocesamiento.
+    receta <- recipe(Especie ~ ., data = df_entrenamiento) |>
+        # Normalizamos las variables numéricas.
+        step_normalize(all_numeric_predictors()) 
     ```
     :::
 
@@ -171,13 +183,21 @@ a.  Construir un modelo de clasificación de K=11 vecinos más próximos (KNN) p
     ## Solución
 
     ```{r}
-    modelo <- nearest_neighbor(neighbors = 11) |> # Definimos el modelo KNN
-        set_engine("kknn") |> # Especificamos el motor de entrenamiento.
-        set_mode("classification") # Especificamos que es un modelo de clasificación.
-    modelo_entrenado <- workflow() |> # Definimos el flujo de trabajo.
-        add_recipe(receta) |> # Añadimos la receta de preprocesamiento.
-        add_model(modelo) |> # Añadimos el modelo KNN.
-        fit(data = df_entrenamiento) # Entrenamos el modelo con el conjunto de entrenamiento.
+    # Definimos el modelo de K vecinos más próximos con K=11.
+    modelo <- nearest_neighbor(neighbors = 11) |>
+        # Especificamos el motor de entrenamiento.
+        set_engine("kknn") |>
+        # Especificamos que es un modelo de clasificación.
+        set_mode("classification")
+
+    # Definimos el flujo de trabajo.
+    modelo_entrenado <- workflow() |> 
+        # Añadimos la receta de preprocesamiento.
+        add_recipe(receta) |>
+        # Añadimos el modelo KNN. 
+        add_model(modelo) |>
+        # Entrenamos el modelo con el conjunto de datos de entrenamiento.
+        fit(data = df_entrenamiento) 
     ```
     :::
 
@@ -205,16 +225,20 @@ a.  Evaluar el modelo de KNN en el conjunto de test y calcular la matriz de conf
 
     :::{.callout-tip collapse="true"}
     ## Solución
+    
     ```{r}
-    matriz_confusion <- modelo_entrenado |> augment(new_data = df_test) |> # Añadimos las predicciones al conjunto de test.
-        conf_mat(truth = Especie, estimate = .pred_class) # Calculamos la matriz de confusión.
-    matriz_confusion$table |> 
-        kable()
+    # Añadimos las predicciones al conjunto de test.
+    df_test_aumentado <- modelo_entrenado |> augment(new_data = df_test)
+
+    # Calculamos la matriz de confusión.
+    matriz_confusion <- df_test_aumentado |> 
+        conf_mat(truth = Especie, estimate = .pred_class)
+    kable(matriz_confusion$table)
     ```
 
     ```{r}
-    augment(modelo_entrenado, new_data = df_test) |>
-        metrics(truth = Especie, estimate = .pred_class) |> # Calculamos las métricas de evaluación del modelo.
+    # Calculamos las métricas de evaluación del modelo.
+    df_test_aumentado |> metrics(truth = Especie, estimate = .pred_class) |> 
         kable()
     ```
     :::
@@ -236,33 +260,41 @@ a.  Explorar para qué número de vecinos (K) el modelo de KNN tiene mejor preci
     ## Solución
 
     ```{r}
-    modelo <- nearest_neighbor(neighbors = tune()) |> # Definimos el modelo KNN con el parámetro neighbors a afinar.
-        set_engine("kknn") |> # Especificamos el motor de entrenamiento.
-        set_mode("classification") # Especificamos que es un modelo de clasificación.
-    flujo <- workflow() |> # Definimos el flujo de trabajo.
-        add_recipe(receta) |> # Añadimos la receta de preprocesamiento.
-        add_model(modelo) # Añadimos el modelo KNN.
+    # Definimos el modelo KNN con el parámetro neighbors a afinar.
+    modelo <- nearest_neighbor(neighbors = tune()) |> 
+        # Especificamos el motor de entrenamiento.
+        set_engine("kknn") |> 
+        # Especificamos que es un modelo de clasificación.
+        set_mode("classification") 
 
-    modelos_entrenados <- tune_grid(
-        flujo,
-        resamples = vfold_cv(df_entrenamiento, v = 5), # Validación cruzada con 5 pliegues
-        grid = tibble(neighbors = seq(1, 15, by = 2)), # Valores de K a probar
-        metrics = metric_set(accuracy, roc_auc)
-    ) # Entrenamos el modelo con los diferentes valores de K y calculamos las métricas de evaluación.
+    # Definimos el flujo de trabajo.
+    flujo <- workflow() |> 
+        # Añadimos la receta de preprocesamiento.
+        add_recipe(receta) |> 
+        # Añadimos el modelo KNN.
+        add_model(modelo) 
 
-    collect_metrics(modelos_entrenados) |>  # Extraemos las métricas de evaluación de los modelos entrenados.
-        kable()
+    # Entrenamos el modelo con los diferentes valores de K y calculamos las métricas de evaluación.
+    modelos_entrenados <- flujo |> tune_grid(
+        resamples = vfold_cv(df_entrenamiento, v = 5), # Validación cruzada con 5 pliegues.
+        grid = tibble(neighbors = seq(1, 15, by = 2)), # Valores de K a probar.
+        metrics = metric_set(accuracy, roc_auc) # Métricas de evaluación a calcular.
+    )
+
+    # Extraemos las métricas de evaluación de los modelos entrenados.
+    collect_metrics(modelos_entrenados) |> kable()
     ```
 
     ```{r}
-    # Seleccionamos el mejor valor de K según la precisión.
-    k_final <- select_best(modelos_entrenados, metric = "accuracy") 
+    # Seleccionamos el mejor valor de K según la exactitud.
+    k_final <- modelos_entrenados |> select_best(metric = "accuracy") 
     # Finalizamos el flujo de trabajo construyendo el modelo con el mejor valor de K.
-    modelo_final <- flujo |> finalize_workflow(k_final) |> 
+    modelo_final <- flujo |> finalize_workflow(k_final) |>
+        # Entrenamos el modelo con lo el número de vecinos óptimo.
         last_fit(modelo_final, split = df_particion)
 
-    collect_metrics(modelo_final) |>  # Extraemos las métricas de evaluación del modelo entrenado.
-        kable()
+    # Extraemos las métricas de evaluación del modelo entrenado.
+    collect_metrics(modelo_final) |> kable()
     ```
     :::
 
@@ -281,17 +313,20 @@ a.  Predecir la especie de un pingüino con las siguientes características: lon
     :::{.callout-tip collapse="true"}
     ## Solución
 
-    ```{r}
-    nuevo_pingüino <- tibble(Longitud_pico = 40, Profundidad_pico = 20, Longitud_ala = 200) # Creamos un data frame con las características del pingüino a predecir.
-    extract_workflow(modelo_entrenado) |> # Extraemos el modelo entrenado del flujo de trabajo.
-        predict(new_data = nuevo_pingüino) |>  # Predecimos la especie del pingüino.
+    ```{r prueba}
+    # Creamos un data frame con las características del pingüino a predecir.
+    nuevo_pingüino <- tibble(Longitud_pico = 40, Profundidad_pico = 20, Longitud_ala = 200) 
+    # Extraemos el modelo entrenado del flujo de trabajo.
+    extract_workflow(modelo_final) |> 
+        # Predecimos la especie del pingüino.
+        predict(new_data = nuevo_pingüino) |>  
         kable()
     ```
     :::
 :::
 
 :::{#exr-k-vecinos-vinos}
-El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
+El fichero [`vinos.csv`](datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
 
 
 | Variable             | Descripción                                                           | Tipo (unidades)        |
@@ -311,14 +346,16 @@ El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practic
 | alcohol              | Porcentaje de contenido de alcohol                          | Numérica(0-100)  |
 | calidad              | Calificación otorgada por un panel de expertos                   | Numérica(0-10)   |
 
-a.  Crear un data frame con los datos del archivo [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv).
+a.  Crear un data frame con los datos del archivo [`vinos.csv`](datos/vinos.csv).
 
     :::{.callout-tip collapse="true"}
     ## Solución
 
     ```{r}
     library(tidyverse)
+    # Cargamos el conjunto de datos.
     df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv", stringsAsFactors = TRUE)
+    # Mostramos un resumen del data frame.
     glimpse(df)
     ```
     :::
@@ -329,6 +366,7 @@ a.  Realizar un análisis exploratorio de los datos.
     ## Solución
     ```{r}
     library(skimr)
+    # Realizamos un análisis exploratorio de los datos.
     skim(df)
     ```
     :::
@@ -340,10 +378,14 @@ a.  Dividir el conjunto de datos en un conjunto de entrenamiento (80%) y un conj
 
     ```{r}
     library(tidymodels)
-    set.seed(123) # Semilla aleatoria para la reproducibilidad.
-    df_particion <- initial_split(df, prop = 0.8, strata = "tipo")  # Dividir el conjunto de datos en entrenamiento (80%) y test (20%).
-    df_entrenamiento <- training(df_particion) # Extraemos el conjunto de entrenamiento.
-    df_test <- testing(df_particion) # Extraemos el conjunto de test.
+    # Establecemos una semilla aleatoria para la reproducibilidad.
+    set.seed(123) 
+    # Dividimos el conjunto de datos en entrenamiento (80%) y test (20%) estratificando por la variable tipo.
+    df_particion <- initial_split(df, prop = 0.8, strata = "tipo")
+    # Extraemos el conjunto de datos de entrenamiento.
+    df_entrenamiento <- training(df_particion) 
+    # Extraemos el conjunto de datos de test.
+    df_test <- testing(df_particion)
     ```
     :::
 
@@ -353,8 +395,10 @@ a.  Normalizar las variables físico-químicas del vino.
     ## Solución
 
     ```{r}
-    receta <- recipe(tipo ~ ., data = df_entrenamiento) |> # Definimos la receta de preprocesamiento.
-        step_normalize(all_numeric_predictors()) # Normalizamos las variables numéricas.
+    # Definimos la receta de preprocesamiento.
+    receta <- recipe(tipo ~ ., data = df_entrenamiento) |> 
+        # Normalizamos las variables numéricas.
+        step_normalize(all_numeric_predictors())
     ```
     :::
 
@@ -365,25 +409,41 @@ a.  Construir un modelo de K vecinos más próximos para clasificar el vino como
 
     ```{r}
     library(knitr)
-    modelo <- nearest_neighbor(neighbors = tune()) |> # Definimos el modelo KNN con el parámetro neighbors a afinar.
-        set_engine("kknn") |> # Especificamos el motor de entrenamiento.
-        set_mode("classification") # Especificamos que es un modelo de clasificación.
-    flujo <- workflow() |> # Definimos el flujo de trabajo.
-        add_recipe(receta) |> # Añadimos la receta de preprocesamiento.
-        add_model(modelo) # Añadimos el modelo KNN.
-    modelos_entrenados <- tune_grid(
-        flujo,
-        resamples = vfold_cv(df_entrenamiento, v = 10), # Validación cruzada con 10 pliegues
-        grid = tibble(neighbors = seq(1, 15, by = 2)), # Valores de K a probar
-        metrics = metric_set(accuracy, roc_auc)
-    ) # Entrenamos el modelo con los diferentes valores de K y calculamos las métricas de evaluación.
-    k_final <- select_best(modelos_entrenados, metric = "accuracy") # Seleccionamos el mejor valor de K según la precisión.
-    modelo_entrenado <- finalize_workflow(flujo, k_final) |> # Finalizamos el flujo de trabajo con el mejor valor de K.
-        last_fit(modelo_entrenado, split = df_particion) # Entrenamos el modelo con el conjunto de entrenamiento.
-    collect_metrics(modelo_entrenado) |>  # Extraemos las métricas de evaluación del modelo entrenado.
-        kable()
-    ```
+    # Definimos el modelo KNN con el parámetro neighbors a afinar.
+    modelo <- nearest_neighbor(neighbors = tune()) |> 
+        # Especificamos el motor de entrenamiento.
+        set_engine("kknn") |> 
+        # Especificamos que es un modelo de clasificación.
+        set_mode("classification")
 
+    # Definimos el flujo de trabajo.
+    flujo <- workflow() |>
+        # Añadimos la receta de preprocesamiento.
+        add_recipe(receta) |>
+        # Añadimos el modelo KNN.
+        add_model(modelo)
+
+    # Entrenamos el modelo con los diferentes valores de K y calculamos las métricas de evaluación utilizando validación cruzada de 10 pliegues.
+    modelos_entrenados <- flujo |> tune_grid(
+        resamples = vfold_cv(df_entrenamiento, v = 10), # Validación cruzada con 10 pliegues.
+        grid = tibble(neighbors = seq(1, 15, by = 2)), # Valores de K a probar.
+        metrics = metric_set(accuracy, roc_auc) # Métricas de evaluación a calcular.
+    ) 
+
+    # Dibujamos la exactitud y el área bajo la curva ROC en función del número de vecinos.
+    autoplot(modelos_entrenados)
+
+     # Seleccionamos el mejor valor de K según la exactitud.
+    k_final <- select_best(modelos_entrenados, metric = "accuracy")
+    # Finalizamos el flujo de trabajo con el mejor valor de K.
+    modelo_entrenado <- finalize_workflow(flujo, k_final) |> 
+        # Entrenamos el modelo con el número de vecinos óptimo.
+        last_fit(modelo_entrenado, split = df_particion)
+
+    # Extraemos las métricas de evaluación del modelo entrenado.
+    collect_metrics(modelo_entrenado) |> kable()
+    ```
+    :::
 
 a.  Construir otro modelo de K vecinos más próximos para predecir la calidad del vino a partir de todas las variables físico-químicas del vino. Explorar para qué número de vecinos (K) el modelo de KNN tiene mejor precisión. Para ello, entrenar el modelo de KNN con diferentes valores de K (por ejemplo de 10 a 30) y calcular la precisión para cada valor de K mediante validación cruzada de 10 pliegues. Dibujar un gráfico con el RMSE en función del número de vecinos (K).
 
@@ -391,35 +451,39 @@ a.  Construir otro modelo de K vecinos más próximos para predecir la calidad d
     ## Solución
 
     ```{r}
-    receta <- recipe(calidad ~ ., data = df_entrenamiento) |> # Definimos la receta de preprocesamiento.
-        step_normalize(all_numeric_predictors()) # Normalizamos las variables numéricas.
+    # Definimos la receta de preprocesamiento.
+    receta <- recipe(calidad ~ ., data = df_entrenamiento) |> 
+        # Normalizamos las variables numéricas.
+        step_normalize(all_numeric_predictors())
     
-    modelo <- nearest_neighbor(neighbors = tune()) |> # Definimos el modelo KNN con el parámetro neighbors a afinar.
-        set_engine("kknn") |> # Especificamos el motor de entrenamiento.
-        set_mode("regression") # Especificamos que es un modelo de regresión.
-    
-    flujo <- workflow() |> # Definimos el flujo de trabajo.
-        add_recipe(receta) |> # Añadimos la receta de preprocesamiento.
-        add_model(modelo) # Añadimos el modelo KNN.
-    
-    modelos_entrenados <- tune_grid(
-        flujo,
-        resamples = vfold_cv(df_entrenamiento, v = 10), # Validación cruzada con 10 pliegues
-        grid = tibble(neighbors = 20:40), # Valores de K a probar
-        metrics = metric_set(rmse, rsq)
-    ) # Entrenamos el modelo con los diferentes valores de K y calculamos las métricas de evaluación.
+    # Definimos el modelo KNN con el parámetro neighbors a afinar.
+    modelo <- nearest_neighbor(neighbors = tune()) |> 
+        # Especificamos el motor de entrenamiento.
+        set_engine("kknn") |>
+        # Especificamos que es un modelo de regresión.
+        set_mode("regression")
 
-    collect_metrics(modelos_entrenados) |>  # Extraemos las métricas de evaluación de los modelos entrenados.
-        filter(.metric == "rmse") |> # Filtramos las métricas para quedarnos con el RMSE.
-        ggplot(aes(x = neighbors, y = mean)) + # Graficamos el RMSE en función del número de vecinos.
-        geom_line() +
-        labs(title = "RMSE en función del número de vecinos (K)",
-            x = "Número de vecinos (K)",
-            y = "RMSE")
+    # Definimos el flujo de trabajo.
+    flujo <- workflow() |>
+        # Añadimos la receta de preprocesamiento.
+        add_recipe(receta) |>
+        # Añadimos el modelo KNN.
+        add_model(modelo)
+
+    # Establecemos una semilla aleatoria para la reproducibilidad.
+    set.seed(123) 
+    # Entrenamos el modelo con los diferentes valores de K y calculamos las métricas de evaluación utilizando validación cruzada de 10 pliegues.
+    modelos_entrenados <- flujo |>  tune_grid(
+        resamples = vfold_cv(df_entrenamiento, v = 10), # Validación cruzada con 10 pliegues.
+        grid = tibble(neighbors = 20:40), # Valores de K a probar.
+        metrics = metric_set(rmse, rsq) # Métricas de evaluación a calcular.
+    ) 
+
+    # Dibujamos el RMSE en función del número de vecinos.
+    autoplot(modelos_entrenados)
     ```
 
     A la vista del gráfico, el mejor modelo se obtiene para K=31 vecinos.
-
     :::
 
 a.  Construir el modelo de K vecinos más próximos con el mejor valor de K y evaluarlo en el conjunto de test.
@@ -440,10 +504,11 @@ a.  Construir el modelo de K vecinos más próximos con el mejor valor de K y ev
 ## Ejercicios Propuestos
 
 :::{#exr-k-vecinos-glaucoma}
-El conjunto de datos [glaucoma.csv](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
+El conjunto de datos [glaucoma.csv](datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripapilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
 
 ![Tomografía de coherencia óptica](/img/aprendizaje-no-supervisado/tomografia-coherencia-optica.jpg)
 
-a.  Cargar el conjunto de datos del archivo [`glaucoma.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) en un data frame.
+a.  Cargar el conjunto de datos del archivo [`glaucoma.csv`](datos/glaucoma.csv) en un data frame.
 
 a.  Construir otro modelo de K vecinos más próximos para predecir el glaucoma a partir del grosor de los anillos peripapilares usando el número de vecinos óptimo.
+:::

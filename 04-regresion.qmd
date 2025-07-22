@@ -40,8 +40,9 @@ a.  Cargar los datos del archivo [`medidas-fisicas.csv`](https://aprendeconalf.e
 
     ```{r}
     library(tidyverse)
-    library(knitr)
+    # Cargamos los datos del fichero CSV en un data frame.
     df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/medidas-fisicas.csv", stringsAsFactors = TRUE)
+    # Mostramos un resumen de los datos.
     glimpse(df)
     ```
     :::
@@ -53,8 +54,8 @@ a.  Realizar un análisis exploratorio de los datos.
 
     ```{r}
     library(skimr)
-    df |> 
-        skim() 
+    # Realizamos un análisis exploratorio de los datos.
+    skim(df) 
     ```
     :::
 
@@ -64,8 +65,9 @@ a.  Preprocesar el conjunto de datos filtrando las personas mayores de edad y el
     ## Solución
 
     ```{r}
-    df <- df  |> 
-        filter(Edad >= 18)  |> 
+    # Filtramos las personas mayores de edad.
+    df <- df  |> filter(Edad >= 18)  |> 
+        # Eliminamos las filas con datos perdidos.
         drop_na()
     ```
     :::
@@ -82,6 +84,7 @@ a.  Dibujar un diagrama de relación entre todos los pares de variables del conj
 
     ```{r}
     library(GGally)
+    # Dibujamos un diagrama de relación entre todos los pares de variables del conjunto de datos diferenciando por el sexo.
     ggpairs(df, aes(color = Sexo, alpha = 0.5))
     ```
     :::
@@ -102,12 +105,13 @@ a.  Descomponer el conjunto de datos en un subconjunto de entrenamiento con el 8
 
     ```{r}
     library(tidymodels)
-    set.seed(123) # Semilla aleatoria para reproducibilidad
+    # Establecemos una semilla aleatoria para la reproducibilidad.
+    set.seed(123)
     # Dividimos el conjunto de datos en entrenamiento (80%) y test (20%).
     df_particion <- initial_split(df, prop = 0.8)
-    # Extraemos el conjunto de entrenamiento.
+    # Extraemos el conjunto de datos de entrenamiento.
     df_entrenamiento <- training(df_particion)
-    # Extraemos el conjunto de test.
+    # Extraemos el conjunto de datos de test.
     df_test <- testing(df_particion)
     ```
     :::
@@ -118,6 +122,7 @@ a.  Dibujar el diagrama de dispersión de la estatura y el peso.
     ## Solución
 
     ```{r}
+    # Dibujamos el diagrama de dispersión de la estatura y el peso.
     diagrama_dispersion <- ggplot(df_entrenamiento, aes(x = Estatura, y = Peso)) +
       geom_point() +
       labs(title = "Diagrama de dispersión de Estatura y Peso")
@@ -142,22 +147,29 @@ a.  Construir un modelo de regresión lineal para predecir el peso en función d
     ## Base
 
     ```{r}
+    library(knitr)
     # Creamos un modelo de regresión lineal.
-    modelo <- lm(Peso ~ Estatura, data = df_entrenamiento) 
+    modelo <- lm(Peso ~ Estatura, data = df_entrenamiento)
+    # Mostramos un resumen del modelo.
     tidy(modelo) |> kable()
     ```
 
     ## Tidymodels
 
     ```{r}
+    library(knitr)
     # Creamos un modelo de regresión lineal.
     modelo <- linear_reg() |>  
         # Establecemos como motor de cálculo el ajuste por mínimos cuadrados.
-        set_engine("lm")  
+        set_engine("lm") |> 
+        # Establecemos el modo del modelo como regresión.
+        set_mode("regression")
 
     modelo_entrenado <- modelo |>
         # Entrenamos el modelo con los datos de entrenamiento.
         fit(Peso ~ Estatura, data = df_entrenamiento) 
+
+    # Mostramos un resumen del modelo.
     tidy(modelo_entrenado) |> kable()
     ```
     :::
@@ -169,8 +181,8 @@ a.  Dibujar el modelo de regresión lineal sobre el diagrama de dispersión de l
     ## Solución
 
     ```{r}
-    diagrama_dispersion +
-      geom_smooth(method = "lm") 
+    # Dibujamos el modelo de regresión lineal sobre el diagrama de dispersión de la estatura y el peso.
+    diagrama_dispersion + geom_smooth(method = "lm") 
     ```
     :::
 
@@ -196,16 +208,17 @@ a.  Predecir el peso de las personas del conjunto de test utilizando el modelo d
     ## Base
 
     ```{r}
-    df_test <- df_test |> 
-        # Predecir el peso de las personas 
-        mutate(Peso_Predicho = predict(modelo_entrenado, new_data = df_test)$.pred)  # Predecir el peso de las personas del conjunto de test.
+    # Añadimos al conjunto de datos de test las predicciones del peso según el modelo ajustado.
+    df_test <- df_test |>
+        mutate(Peso_Predicho = predict(modelo_entrenado, new_data = df_test)$.pred)  
     head(df_test) |> kable()
     ```
 
     ## Tidymodels
+
     ```{r}
-    modelo_entrenado |> 
-        augment(new_data = df_test) |> 
+    # Añadimos al conjunto de datos de test las predicciones del peso según el modelo ajustado.
+    modelo_entrenado |> augment(new_data = df_test) |> 
         head() |> 
         kable()
     ```
@@ -218,6 +231,7 @@ a.  Dibujar los errores predictivos entre el peso real y el peso predicho en el 
     ## Solución
 
     ```{r}
+    # Dibujamos los errores predictivos entre el peso real y el peso predicho en el conjunto de datos de test.
     ggplot(df_test, aes(x = Peso, y = Peso_Predicho)) +
       geom_abline(slope = 1, intercept = 0, color = "red") +
       geom_point() +
@@ -244,8 +258,8 @@ a.  Evaluar el modelo de regresión lineal calculando el error cuadrático medio
     ## Solución
 
     ```{r}
-    df_test |> 
-        metrics(truth = Peso, estimate = Peso_Predicho) |> 
+    # Evaluamos el modelo de regresión lineal calculando el error cuadrático medio (RMSE) y el coeficiente de determinación (R^2).
+    df_test |> metrics(truth = Peso, estimate = Peso_Predicho) |> 
         kable()
     ```
     :::
@@ -256,8 +270,12 @@ a.  Incluir en el modelo de regresión lineal la variable sexo como variable cat
     ## Solución
 
     ```{r}
+    # Creamos otro modelo de regresión lineal añadiendo al modelo anterior la variable predictiva Sexo.
     modelo_entrenado_sexo <- modelo |>
+        # Ajustamos el nuevo modelo con los datos del conjunto de entrenamiento.
         fit(Peso ~ Estatura * Sexo, data = df_entrenamiento)
+
+    # Mostramos un resumen del nuevo modelo.
     tidy(modelo_entrenado_sexo) |> 
         kable()
     ```
@@ -269,8 +287,8 @@ a.  Dibujar el modelo de regresión lineal con la variable sexo sobre el diagram
     ## Solución
     
     ```{r}
-    df_entrenamiento  |> 
-        ggplot(aes(x = Estatura, y = Peso, color = Sexo)) +
+    # Dibujamos el modelo de regresión lineal con la variable sexo sobre el diagrama de dispersión de la estatura y el peso.
+    df_entrenamiento  |> ggplot(aes(x = Estatura, y = Peso, color = Sexo)) +
         geom_point() +
         geom_smooth(method = "lm") 
         labs(title = "Diagrama de dispersión de Estatura y Peso según Sexo") 
@@ -283,8 +301,9 @@ a.  Predecir el peso de las personas del conjunto de test utilizando el modelo d
     ## Solución
 
     ```{r prediccion}
-    modelo_entrenado_sexo |> 
-        augment(new_data = df_test) |> 
+    # Añadimos al conjunto de datos de test las predicciones del peso según el nuevo modelo ajustado.
+    modelo_entrenado_sexo |> augment(new_data = df_test) |> 
+        # Calculamos las métricas de evaluación del nuevo modelo.
         metrics(truth = Peso, estimate = .pred) |> 
         kable()
     ```
@@ -299,8 +318,12 @@ a.  Construir un nuevo modelo que explique el peso en función de la estatura y 
     ## Solución
 
     ```{r}
+    # Creamos un nuevo modelo de regresión lineal añadiendo al modelo inicial la variable predictiva DiasDeporte.
     modelo_entrenado_deporte <- modelo |>
+        # Ajustamos el nuevo modelo con los datos del conjunto de entrenamiento.
         fit(Peso ~ Estatura + DiasDeporte, data = df_entrenamiento)
+
+    # Mostramos un resumen del nuevo modelo.
     tidy(modelo_entrenado_deporte) |> 
         kable()
     ```
@@ -312,8 +335,8 @@ a.  Dibujar el modelo de regresión lineal con la variable deporte sobre el diag
     ## Solución
 
     ```{r}
-    df_entrenamiento  |> 
-        ggplot(aes(x = Estatura, y = Peso, color = DiasDeporte)) +
+    # Dibujamos el modelo de regresión lineal con la variable deporte sobre el diagrama de dispersión de la estatura y el peso.
+    df_entrenamiento  |> ggplot(aes(x = Estatura, y = Peso, color = DiasDeporte)) +
         geom_point() +
         geom_smooth(method = "lm") +
         labs(title = "Diagrama de dispersión de Estatura y Peso según Días de Deporte") 
@@ -326,8 +349,9 @@ a.  Evaluar el nuevo modelo de regresión lineal calculando el error cuadrático
     ## Solución
 
     ```{r}
-    modelo_entrenado_deporte |> 
-        augment(new_data = df_test) |> 
+    # Añadimos al conjunto de datos de test las predicciones del peso según el nuevo modelo ajustado.
+    modelo_entrenado_deporte |> augment(new_data = df_test) |> 
+        # Calculamos las métricas de evaluación del nuevo modelo.
         metrics(truth = Peso, estimate = .pred) |> 
         kable()
     ```
@@ -346,7 +370,9 @@ a.  Crear un data frame con los datos de la dieta a partir del fichero [`dieta.c
 
     ```{r}
     library(tidyverse)
+    # Cargamos los datos del fichero CSV en un data frame.
     df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/dieta.csv", stringsAsFactors = TRUE)
+    # Mostramos un resumen de los datos.
     glimpse(df)
     ```
     :::
@@ -356,6 +382,7 @@ a.  Dibujar el diagrama de dispersión de los kilos perdidos en función del nú
     :::{.callout-tip collapse="true"} 
     ## Solución
     ```{r}
+    # Dibujamos el diagrama de dispersión de los kilos perdidos en función del número de días con la dieta.
     ggplot(df, aes(x = dias, y = peso_perdido)) +
         geom_point() +
         labs(title = "Diagrama de dispersión del peso perdido y los días de dieta", x = "Días de dieta", y = "Peso perdido en Kg")
@@ -369,10 +396,14 @@ a.  Dividir el conjunto de datos en un subconjunto de entrenamiento con el 75% d
     ## Solución
 
     ```{r}
-    set.seed(123) # Semilla aleatoria para reproducibilidad
+    library(tidymodels)
+    # Establecemos una semilla aleatoria para la reproducibilidad.
+    set.seed(123) 
     # Dividimos el conjunto de datos en entrenamiento (75%) y test (25%)
-    df_particion <- initial_split(df, prop = 0.75)  # Dividir el conjunto de datos en entrenamiento (75%) y test (25%)
+    df_particion <- initial_split(df, prop = 0.75)
+    # Extraemos el conjunto de datos de entrenamiento.
     df_entrenamiento <- training(df_particion)
+    # Extraemos el conjunto de datos de test.
     df_test <- testing(df_particion)
     ```
     :::
@@ -383,13 +414,26 @@ a.  Ajustar un modelo de regresión sigmoidal a los datos de la dieta y evaluarl
     ## Solución
 
     ```{r}
+    library(knitr)
+    # Definimos el modelo de regresión lineal.
     modelo <- linear_reg() |> 
+        # Establecemos como motor de cálculo el ajuste por mínimos cuadrados.
         set_engine("lm") 
-    df_cv <- vfold_cv(df_entrenamiento, v = 5) # Validación cruzada con 10 pliegues.
-    workflow() |> 
+
+    # Establecemos una semilla aleatoria para la reproducibilidad.
+    set.seed(123)
+    # Definimos el conjunto de validación mediante validación cruzada con 10 pliegues.
+    df_cv <- vfold_cv(df_entrenamiento, v = 5)
+
+    # Creamos un flujo de trabajo para entrenar el modelo.
+    workflow() |>
+        # Añadimos el modelo de regresión lineal.
         add_model(modelo) |> 
-        add_formula(log(peso_perdido) ~ I(1/dias))  |>  # Añadir el modelo y la fórmula al flujo de ajuste.
-        fit_resamples(resamples = df_cv)  |> # Ajustar el modelo a los pliegues de validación cruzada.
+        # Añadimos la fórmula del modelo de regresión sigmoidal.
+        add_formula(log(peso_perdido) ~ I(1/dias))  |>
+        # Añadimos el conjunto de datos de validación.
+        fit_resamples(resamples = df_cv)  |>
+        # Calculamos las métricas de evaluación del modelo.
         collect_metrics() |> 
         kable() 
     ```
@@ -402,9 +446,13 @@ a.  Ajustar un modelo de regresión inverso a los datos de la dieta y evaluarlo 
 
     ```{r}
     workflow() |> 
+        # Añadimos el modelo de regresión lineal.
         add_model(modelo) |> 
-        add_formula(peso_perdido ~ I(1/dias))  |>  # Añadir el modelo y la fórmula al flujo de ajuste.
-        fit_resamples(resamples = df_cv)  |> # Ajustar el modelo a los pliegues de validación cruzada.
+        # Añadimos la fórmula del modelo de regresión inverso.
+        add_formula(peso_perdido ~ I(1/dias))  |>
+        # Añadimos el conjunto de datos de validación.
+        fit_resamples(resamples = df_cv)  |>
+        # Calculamos las métricas de evaluación del modelo.
         collect_metrics() |> 
         kable() 
     ```
@@ -417,9 +465,13 @@ a.  Ajustar un modelo de regresión potencial a los datos de la dieta y evaluarl
 
     ```{r}
     workflow() |> 
+        # Añadimos el modelo de regresión lineal.
         add_model(modelo) |> 
-        add_formula(log(peso_perdido) ~ log(dias))  |>  # Añadir el modelo y la fórmula al flujo de ajuste.
-        fit_resamples(resamples = df_cv)  |> # Ajustar el modelo a los pliegues de validación cruzada.
+        # Añadimos la fórmula del modelo de regresión potencial.
+        add_formula(log(peso_perdido) ~ log(dias))  |>
+        # Añadimos el conjunto de datos de validación.
+        fit_resamples(resamples = df_cv)  |>
+        # Calculamos las métricas de evaluación del modelo.
         collect_metrics() |> 
         kable() 
     ```
@@ -442,15 +494,16 @@ El fichero [`infartos.csv`](datos/infartos.csv) contiene información sobre dist
 - `PendienteST`: Pendiente del segmento ST en el pico de ejercicio (Ascendente, Plano, Descencdente).
 - `Infarto`: Riesgo de infarto (1: Sí, 0: No)
 
-a.  Cargar los datos del archivo [`infartos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv) en un data frame.
+a.  Cargar los datos del archivo [`infartos.csv`](datos/infartos.csv) en un data frame.
 
     :::{.callout-tip collapse="true"}
     ## Solución 
 
     ```{r}
     library(tidyverse)
-    library(knitr)
-    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv", stringsAsFactors = TRUE) 
+    # Cargamos los datos del fichero CSV en un data frame.
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv", stringsAsFactors = TRUE)
+    # Mostramos un resumen de los datos.
     glimpse(df)
     ```
     :::
@@ -461,8 +514,8 @@ a.  Convertir las variables cualitativas en factores.
     ## Solución
         
     ```{r}
-    df <- df |> 
-        mutate(Infarto = factor(Infarto, levels = c("0", "1"), labels = c("No", "Sí")),
+    # Convertimos las variables Infarto y Glucemia en factores.
+    df <- df |> mutate(Infarto = factor(Infarto, levels = c("0", "1"), labels = c("No", "Sí")),
         Glucemia = factor(Glucemia, levels = c("0", "1"), labels = c("No", "Sí")))
     ```
     :::
@@ -474,6 +527,7 @@ a.  Realizar un análisis exploratorio de los datos.
 
     ```{r}
     library(skimr)
+    # Realizamos un análisis exploratorio de los datos.
     skim(df) 
     ```
     :::
@@ -495,10 +549,13 @@ a.  Dibujar los diagramas de barras con la distribución de frecuencias de las v
     ## Solución
 
     ```{r}
-    df |> 
-        select(where(is.factor)) |> 
+    # Seleccionamos los factores.
+    df |> select(where(is.factor)) |> 
+        # Convertimos el data frame en formato largo.
         pivot_longer(cols = where(is.factor) & !all_of("Infarto"), names_to = "variable", values_to = "valor") |> 
+        # Dibujamos el diagrama de barras de las variables cualitativas coloreando según el riesgo de infarto.
         ggplot(aes(x = valor, fill = Infarto)) +
+        # Separamos los diagramas para cada variable.
         facet_wrap(~ variable, scales = "free") +
         geom_bar() +
         labs(title = "Distribución de frecuencias de variables cualitativas")
@@ -511,11 +568,14 @@ a.  Dibujar los diagramas de cajas de las variables numéricas según el riesgo 
     ## Solución
 
     ```{r}
-    df |>
-        select(Infarto, where(is.numeric)) |> 
+    # Seleccionamos las variables numéricas.
+    df |> select(Infarto, where(is.numeric)) |>
+        # Convertimos el data frame en formato largo. 
         pivot_longer(cols = where(is.numeric), names_to = "variable", values_to = "valor") |>
+        # Dibujamos el diagrama de cajas de las variables numéricas coloreando según el riesgo de infarto.
         ggplot(aes(x = Infarto, y = valor, fill = Infarto)) +
         geom_boxplot() +
+        # Separamos los diagramas para cada variable.
         facet_wrap(~ variable, scales = "free") +
         labs(title = "Diagramas de cajas de las variables numéricas según Infarto")
     ```
@@ -535,7 +595,9 @@ a.  Dibujar un diagrama de correlación entre las variables numéricas del conju
     ## Solución
 
     ```{r}
+    # Seleccionamos las variables numéricas.
     df |> select_if(is.numeric) |> 
+        # Dibujamos el diagrama de correlación entre las variables numéricas.
         ggcorr(label = TRUE, label_size = 5)
     ```
     :::
@@ -547,8 +609,13 @@ a.  Descomponer el conjunto de datos en un subconjunto de entrenamiento con el 8
 
     ```{r}
     library(tidymodels)
-    df_particion <- initial_split(df, prop = 0.8)  # Dividir el conjunto de datos en entrenamiento (80%) y test (20%)
+    # Establecemos una semilla aleatoria para la reproducibilidad.
+    set.seed(123)
+    # Dividimos el conjunto de datos en entrenamiento (80%) y test (20%) estratificando por la variable Infarto.
+    df_particion <- initial_split(df, prop = 0.8, strata = "Infarto")
+    # Extraemos el conjunto de datos de entrenamiento.
     df_entrenamiento <- training(df_particion)
+    # Extraemos el conjunto de datos de test.   
     df_test <- testing(df_particion)
     ```
     :::
@@ -577,10 +644,14 @@ a.  Preprocesar el conjunto de datos de entrenamiento para eliminar las variable
     ## Solución
 
     ```{r}
+    # Creamos una receta de preprocesamiento para el conjunto de datos de entrenamiento indicando que la variable respuesta es Infarto y las variables predictivas todas las demás.
     receta <- recipe(Infarto ~ ., data = df_entrenamiento) |> 
-        step_corr(all_numeric_predictors(), threshold = 0.8) |> # Eliminamos las variables numéricas con alta correlación para evitar multicolinealidad.
-        step_normalize(all_numeric_predictors()) |> # Normalizamos las variables predictivas numéricas.
-        step_dummy(all_nominal_predictors()) # Creamos variables dummy para las variables categóricas.
+        # Eliminamos las variables numéricas con alta correlación para evitar colinealidad.
+        step_corr(all_numeric_predictors(), threshold = 0.8) |> 
+        # Normalizamos las variables predictivas numéricas.
+        step_normalize(all_numeric_predictors()) |> 
+        # Creamos variables dummy para las variables categóricas.
+        step_dummy(all_nominal_predictors()) 
     summary(receta)
     ```
     :::
@@ -596,14 +667,22 @@ a.  Ajustar un modelo de regresión logística a los datos de entrenamiento util
     ## Solución
 
     ```{r}
-    modelo <- logistic_reg() |> 
-        set_engine("glm") |>  # Establecer como motor de cálculo el ajuste por máxima verosimilitud.
-        set_mode("classification") # Establecer el modo de clasificación para el modelo de regresión logística.
+    library(knitr)
+    # Definimos el modelo de regresión logística.
+    modelo <- logistic_reg() |>
+        # Establecemos como motor de cálculo el ajuste por máxima verosimilitud. 
+        set_engine("glm") |>
+        # Establecemos el modo del modelo como clasificación.
+        set_mode("classification") 
 
+    # Creamos un flujo de trabajo para entrenar el modelo.
     modelo_entrenado <- workflow() |> 
-        add_recipe(receta) |> # Añadir la receta al flujo de ajuste.
-        add_model(modelo) |> # Añadir el modelo al flujo de ajuste.
-        fit(data = df_entrenamiento) # Ajustar el modelo a los datos de entrenamiento.
+        # Añadimos la receta de preprocesamiento.
+        add_recipe(receta) |> 
+        # Añadimos el modelo de regresión logística.
+        add_model(modelo) |>
+        # Entrenamos el modelo a los datos de entrenamiento.
+        fit(data = df_entrenamiento) 
 
     tidy(modelo_entrenado) |> 
     kable()
@@ -615,7 +694,8 @@ a.  Usar el modelo de regresión logística ajustado para predecir el riesgo de 
     :::{.callout-tip collapse="true"}
     ## Solución
     ```{r}
-    predict(modelo_entrenado, new_data = df_test) |> 
+    # Predecimos el riesgo de infarto en el conjunto de test utilizando el modelo de regresión logística ajustado.
+    modelo_entrenado |> predict(new_data = df_test) |> 
         head() |> 
         kable()
     ```
@@ -635,9 +715,9 @@ a.  Añadir al conjunto de test la clase predicha con el modelo de regresión lo
     ## Solución
 
     ```{r}
-    df_test <- augment(modelo_entrenado, new_data = df_test)
-    df_test |> 
-        head() |> 
+    # Añadimos al conjunto de test las probabilidades de infarto predichas por el modelo de regresión logística.
+    df_test <- modelo_entrenado |> augment(new_data = df_test)
+    df_test |> head() |> 
         kable()
     ```
     :::
@@ -665,9 +745,10 @@ a.  Evaluar el rendimiento del modelo de regresión logística en el conjunto de
     :::{.callout-tip collapse="true"}
     ## Solución
     ```{r}
+    # Creamos un conjunto de métricas de clasificación incluyendo exactitud, sensibilidad, especificidad, precisión y F1-score.
     metricas <- metric_set(accuracy, sensitivity, specificity, precision, f_meas)
-    df_test |> 
-        metricas(truth = Infarto, estimate = .pred_class) |> 
+    # Calculamos las métricas de clasificación en el conjunto de test.
+    df_test |> metricas(truth = Infarto, estimate = .pred_class) |> 
         kable()
     ```
     :::
@@ -687,12 +768,12 @@ a.  Dibujar la curva ROC del modelo de regresión logística y calcular el área
     ## Solución
 
     ```{r}
-    df_test|> 
-        roc_curve(truth = Infarto, .pred_No) |>
+    # Dibujamos la curva ROC del modelo de regresión logística.
+    df_test|> roc_curve(truth = Infarto, .pred_No) |>
         autoplot()
 
-    df_test |> 
-        roc_auc(truth = Infarto, .pred_No) |>
+    # Calculamos el área bajo la curva (AUC).
+    df_test |> roc_auc(truth = Infarto, .pred_No) |>
         kable()
     ```
     :::
@@ -701,7 +782,7 @@ a.  Dibujar la curva ROC del modelo de regresión logística y calcular el área
 ## Ejercicios propuestos
 
 :::{#exr-regresion-neonatos}
-El conjunto de datos [`neonatos`](https://aprendeconalf.es/estadistica-practicas-r/datos/neonatos.csv) contiene información sobre una muestra de 320 recién nacidos en un hospital durante un año que cumplieron el tiempo normal de gestación. 
+El conjunto de datos [`neonatos`](datos/neonatos.csv) contiene información sobre una muestra de 320 recién nacidos en un hospital durante un año que cumplieron el tiempo normal de gestación. 
 
 a.  Crear un data frame a con los datos de los neonatos a partir del fichero anterior.
 
@@ -719,9 +800,9 @@ a.  ¿Existe la misma relación lineal entre el peso de los recién nacidos y el
 :::
 
 :::{#exr-regresion-glaucoma}
-El conjunto de datos [`glaucoma.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
+El conjunto de datos [`glaucoma.csv`](datos/glaucoma.csv) contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.
 
-a.  Crear un data frame con los datos del fichero [`glaucoma`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv).
+a.  Crear un data frame con los datos del fichero [`glaucoma`](datos/glaucoma.csv).
 
 a.  Construir un modelo de regresión logística para predecir si un paciente tiene glaucoma o no a partir de los datos de la OTC. Utilizar la variable `Glaucoma` como variable dependiente y las variables de los anillos y sectores como variables independientes.
 

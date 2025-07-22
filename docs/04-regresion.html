@@ -500,16 +500,17 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargamos los datos del fichero CSV en un data frame.</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/medidas-fisicas.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(df)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostramos un resumen de los datos.</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(df)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 6,779
 Columns: 5
 $ Edad        &lt;int&gt; 34, 4, 49, 9, 8, 45, 66, 58, 54, 10, 58, 50, 9, 33, 60, 16…
 $ Sexo        &lt;fct&gt; hombre, hombre, mujer, hombre, hombre, mujer, hombre, homb…
 $ Estatura    &lt;dbl&gt; 164.7, 105.4, 168.4, 133.1, 130.6, 166.7, 169.5, 181.9, 16…
-$ Peso        &lt;dbl&gt; 87.4, 17.0, 86.7, 29.8, 35.2, 70.2, 60.2, 72.3, 73.6, 38.6…
+$ Peso        &lt;dbl&gt; 87.4, 17.0, 86.7, 29.8, 35.2, 67.7, 56.7, 69.8, 73.1, 38.6…
 $ DiasDeporte &lt;int&gt; 0, 0, 0, 0, 0, 5, 7, 5, 1, 0, 2, 7, 0, 0, 0, 3, 7, 3, 3, 0…</code></pre>
 </div>
 </div>
@@ -531,8 +532,8 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">skim</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Realizamos un análisis exploratorio de los datos.</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(df) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Data summary</caption>
@@ -617,7 +618,7 @@ Solución
 <col style="width: 5%">
 <col style="width: 6%">
 <col style="width: 6%">
-<col style="width: 6%">
+<col style="width: 8%">
 <col style="width: 6%">
 <col style="width: 6%">
 </colgroup>
@@ -646,7 +647,7 @@ Solución
 <td style="text-align: right;">0.0</td>
 <td style="text-align: right;">15.0</td>
 <td style="text-align: right;">34.0</td>
-<td style="text-align: right;">54.0</td>
+<td style="text-align: right;">54.00</td>
 <td style="text-align: right;">80.0</td>
 <td style="text-align: left;">▇▆▆▅▅</td>
 </tr>
@@ -659,7 +660,7 @@ Solución
 <td style="text-align: right;">83.6</td>
 <td style="text-align: right;">155.4</td>
 <td style="text-align: right;">165.1</td>
-<td style="text-align: right;">173.7</td>
+<td style="text-align: right;">173.70</td>
 <td style="text-align: right;">200.4</td>
 <td style="text-align: left;">▁▁▂▇▂</td>
 </tr>
@@ -667,14 +668,14 @@ Solución
 <td style="text-align: left;">Peso</td>
 <td style="text-align: right;">55</td>
 <td style="text-align: right;">0.99</td>
-<td style="text-align: right;">66.93</td>
-<td style="text-align: right;">29.86</td>
-<td style="text-align: right;">-4.4</td>
-<td style="text-align: right;">50.6</td>
-<td style="text-align: right;">68.9</td>
-<td style="text-align: right;">85.7</td>
+<td style="text-align: right;">66.08</td>
+<td style="text-align: right;">29.90</td>
+<td style="text-align: right;">-7.9</td>
+<td style="text-align: right;">49.4</td>
+<td style="text-align: right;">67.9</td>
+<td style="text-align: right;">84.73</td>
 <td style="text-align: right;">230.7</td>
-<td style="text-align: left;">▂▇▂▁▁</td>
+<td style="text-align: left;">▂▇▃▁▁</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">DiasDeporte</td>
@@ -685,7 +686,7 @@ Solución
 <td style="text-align: right;">0.0</td>
 <td style="text-align: right;">0.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">3.00</td>
 <td style="text-align: right;">7.0</td>
 <td style="text-align: left;">▇▁▂▁▁</td>
 </tr>
@@ -710,9 +711,10 @@ Solución
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df  <span class="sc">|&gt;</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(Edad <span class="sc">&gt;=</span> <span class="dv">18</span>)  <span class="sc">|&gt;</span> </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_na</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtramos las personas mayores de edad.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df  <span class="sc">|&gt;</span> <span class="fu">filter</span>(Edad <span class="sc">&gt;=</span> <span class="dv">18</span>)  <span class="sc">|&gt;</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Eliminamos las filas con datos perdidos.</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_na</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -748,7 +750,8 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GGally)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggpairs</span>(df, <span class="fu">aes</span>(<span class="at">color =</span> Sexo, <span class="at">alpha =</span> <span class="fl">0.5</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Dibujamos un diagrama de relación entre todos los pares de variables del conjunto de datos diferenciando por el sexo.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggpairs</span>(df, <span class="fu">aes</span>(<span class="at">color =</span> Sexo, <span class="at">alpha =</span> <span class="fl">0.5</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -796,13 +799,14 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># Semilla aleatoria para reproducibilidad</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Dividimos el conjunto de datos en entrenamiento (80%) y test (20%).</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>df_particion <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(df, <span class="at">prop =</span> <span class="fl">0.8</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraemos el conjunto de entrenamiento.</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>df_entrenamiento <span class="ot">&lt;-</span> <span class="fu">training</span>(df_particion)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraemos el conjunto de test.</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(df_particion)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Establecemos una semilla aleatoria para la reproducibilidad.</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Dividimos el conjunto de datos en entrenamiento (80%) y test (20%).</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>df_particion <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(df, <span class="at">prop =</span> <span class="fl">0.8</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraemos el conjunto de datos de entrenamiento.</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>df_entrenamiento <span class="ot">&lt;-</span> <span class="fu">training</span>(df_particion)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraemos el conjunto de datos de test.</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(df_particion)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -821,10 +825,11 @@ Solución
 <div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>diagrama_dispersion <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df_entrenamiento, <span class="fu">aes</span>(<span class="at">x =</span> Estatura, <span class="at">y =</span> Peso)) <span class="sc">+</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Diagrama de dispersión de Estatura y Peso"</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>diagrama_dispersion</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dibujamos el diagrama de dispersión de la estatura y el peso.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>diagrama_dispersion <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df_entrenamiento, <span class="fu">aes</span>(<span class="at">x =</span> Estatura, <span class="at">y =</span> Peso)) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Diagrama de dispersión de Estatura y Peso"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>diagrama_dispersion</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -871,9 +876,11 @@ Solución
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos un modelo de regresión lineal.</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>modelo <span class="ot">&lt;-</span> <span class="fu">lm</span>(Peso <span class="sc">~</span> Estatura, <span class="at">data =</span> df_entrenamiento) </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo) <span class="sc">|&gt;</span> <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos un modelo de regresión lineal.</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>modelo <span class="ot">&lt;-</span> <span class="fu">lm</span>(Peso <span class="sc">~</span> Estatura, <span class="at">data =</span> df_entrenamiento)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostramos un resumen del modelo.</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo) <span class="sc">|&gt;</span> <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -888,16 +895,16 @@ Solución
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">-69.3891158</td>
-<td style="text-align: right;">5.3537125</td>
-<td style="text-align: right;">-12.96093</td>
+<td style="text-align: right;">-69.3115840</td>
+<td style="text-align: right;">5.4317717</td>
+<td style="text-align: right;">-12.7604</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Estatura</td>
-<td style="text-align: right;">0.8856683</td>
-<td style="text-align: right;">0.0317594</td>
-<td style="text-align: right;">27.88677</td>
+<td style="text-align: right;">0.8799128</td>
+<td style="text-align: right;">0.0322225</td>
+<td style="text-align: right;">27.3074</td>
 <td style="text-align: right;">0</td>
 </tr>
 </tbody>
@@ -907,15 +914,20 @@ Solución
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos un modelo de regresión lineal.</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>modelo <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span>  </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Establecemos como motor de cálculo el ajuste por mínimos cuadrados.</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">"lm"</span>)  </span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>modelo_entrenado <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Entrenamos el modelo con los datos de entrenamiento.</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(Peso <span class="sc">~</span> Estatura, <span class="at">data =</span> df_entrenamiento) </span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado) <span class="sc">|&gt;</span> <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos un modelo de regresión lineal.</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>modelo <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span>  </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Establecemos como motor de cálculo el ajuste por mínimos cuadrados.</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Establecemos el modo del modelo como regresión.</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>modelo_entrenado <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Entrenamos el modelo con los datos de entrenamiento.</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(Peso <span class="sc">~</span> Estatura, <span class="at">data =</span> df_entrenamiento) </span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostramos un resumen del modelo.</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado) <span class="sc">|&gt;</span> <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -930,16 +942,16 @@ Solución
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">-69.3891158</td>
-<td style="text-align: right;">5.3537125</td>
-<td style="text-align: right;">-12.96093</td>
+<td style="text-align: right;">-69.3115840</td>
+<td style="text-align: right;">5.4317717</td>
+<td style="text-align: right;">-12.7604</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Estatura</td>
-<td style="text-align: right;">0.8856683</td>
-<td style="text-align: right;">0.0317594</td>
-<td style="text-align: right;">27.88677</td>
+<td style="text-align: right;">0.8799128</td>
+<td style="text-align: right;">0.0322225</td>
+<td style="text-align: right;">27.3074</td>
 <td style="text-align: right;">0</td>
 </tr>
 </tbody>
@@ -966,8 +978,8 @@ Solución
 <div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>diagrama_dispersion <span class="sc">+</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dibujamos el modelo de regresión lineal sobre el diagrama de dispersión de la estatura y el peso.</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>diagrama_dispersion <span class="sc">+</span> <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1022,9 +1034,9 @@ Solución
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> df_test <span class="sc">|&gt;</span> </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Predecir el peso de las personas </span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Peso_Predicho =</span> <span class="fu">predict</span>(modelo_entrenado, <span class="at">new_data =</span> df_test)<span class="sc">$</span>.pred)  <span class="co"># Predecir el peso de las personas del conjunto de test.</span></span>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadimos al conjunto de datos de test las predicciones del peso según el modelo ajustado.</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> df_test <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Peso_Predicho =</span> <span class="fu">predict</span>(modelo_entrenado, <span class="at">new_data =</span> df_test)<span class="sc">$</span>.pred)  </span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_test) <span class="sc">|&gt;</span> <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1043,17 +1055,17 @@ Solución
 <td style="text-align: right;">54</td>
 <td style="text-align: left;">hombre</td>
 <td style="text-align: right;">169.4</td>
-<td style="text-align: right;">73.6</td>
+<td style="text-align: right;">73.1</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">80.64310</td>
+<td style="text-align: right;">79.74564</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">50</td>
 <td style="text-align: left;">hombre</td>
 <td style="text-align: right;">177.8</td>
-<td style="text-align: right;">75.0</td>
+<td style="text-align: right;">71.5</td>
 <td style="text-align: right;">7</td>
-<td style="text-align: right;">88.08271</td>
+<td style="text-align: right;">87.13690</td>
 </tr>
 <tr class="odd">
 <td style="text-align: right;">33</td>
@@ -1061,15 +1073,15 @@ Solución
 <td style="text-align: right;">181.3</td>
 <td style="text-align: right;">93.8</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">91.18255</td>
+<td style="text-align: right;">90.21660</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">37</td>
 <td style="text-align: left;">mujer</td>
 <td style="text-align: right;">154.8</td>
-<td style="text-align: right;">45.4</td>
+<td style="text-align: right;">42.9</td>
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">67.71234</td>
+<td style="text-align: right;">66.89891</td>
 </tr>
 <tr class="odd">
 <td style="text-align: right;">28</td>
@@ -1077,7 +1089,7 @@ Solución
 <td style="text-align: right;">169.6</td>
 <td style="text-align: right;">134.3</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">80.82023</td>
+<td style="text-align: right;">79.92162</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">30</td>
@@ -1085,7 +1097,7 @@ Solución
 <td style="text-align: right;">175.8</td>
 <td style="text-align: right;">88.4</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">86.31137</td>
+<td style="text-align: right;">85.37708</td>
 </tr>
 </tbody>
 </table>
@@ -1094,8 +1106,8 @@ Solución
 </div>
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>modelo_entrenado <span class="sc">|&gt;</span> </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">augment</span>(<span class="at">new_data =</span> df_test) <span class="sc">|&gt;</span> </span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadimos al conjunto de datos de test las predicciones del peso según el modelo ajustado.</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>modelo_entrenado <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">new_data =</span> df_test) <span class="sc">|&gt;</span> </span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>() <span class="sc">|&gt;</span> </span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1124,64 +1136,64 @@ Solución
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">80.64310</td>
-<td style="text-align: right;">-7.043096</td>
+<td style="text-align: right;">79.74564</td>
+<td style="text-align: right;">-6.645638</td>
 <td style="text-align: right;">54</td>
 <td style="text-align: left;">hombre</td>
 <td style="text-align: right;">169.4</td>
-<td style="text-align: right;">73.6</td>
+<td style="text-align: right;">73.1</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">80.64310</td>
+<td style="text-align: right;">79.74564</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">88.08271</td>
-<td style="text-align: right;">-13.082710</td>
+<td style="text-align: right;">87.13690</td>
+<td style="text-align: right;">-15.636905</td>
 <td style="text-align: right;">50</td>
 <td style="text-align: left;">hombre</td>
 <td style="text-align: right;">177.8</td>
-<td style="text-align: right;">75.0</td>
+<td style="text-align: right;">71.5</td>
 <td style="text-align: right;">7</td>
-<td style="text-align: right;">88.08271</td>
+<td style="text-align: right;">87.13690</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">91.18255</td>
-<td style="text-align: right;">2.617451</td>
+<td style="text-align: right;">90.21660</td>
+<td style="text-align: right;">3.583400</td>
 <td style="text-align: right;">33</td>
 <td style="text-align: left;">hombre</td>
 <td style="text-align: right;">181.3</td>
 <td style="text-align: right;">93.8</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">91.18255</td>
+<td style="text-align: right;">90.21660</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">67.71234</td>
-<td style="text-align: right;">-22.312339</td>
+<td style="text-align: right;">66.89891</td>
+<td style="text-align: right;">-23.998911</td>
 <td style="text-align: right;">37</td>
 <td style="text-align: left;">mujer</td>
 <td style="text-align: right;">154.8</td>
-<td style="text-align: right;">45.4</td>
+<td style="text-align: right;">42.9</td>
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">67.71234</td>
+<td style="text-align: right;">66.89891</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">80.82023</td>
-<td style="text-align: right;">53.479770</td>
+<td style="text-align: right;">79.92162</td>
+<td style="text-align: right;">54.378380</td>
 <td style="text-align: right;">28</td>
 <td style="text-align: left;">mujer</td>
 <td style="text-align: right;">169.6</td>
 <td style="text-align: right;">134.3</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">80.82023</td>
+<td style="text-align: right;">79.92162</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">86.31137</td>
-<td style="text-align: right;">2.088627</td>
+<td style="text-align: right;">85.37708</td>
+<td style="text-align: right;">3.022921</td>
 <td style="text-align: right;">30</td>
 <td style="text-align: left;">hombre</td>
 <td style="text-align: right;">175.8</td>
 <td style="text-align: right;">88.4</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">86.31137</td>
+<td style="text-align: right;">85.37708</td>
 </tr>
 </tbody>
 </table>
@@ -1207,13 +1219,14 @@ Solución
 <div id="callout-14" class="callout-14-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_test, <span class="fu">aes</span>(<span class="at">x =</span> Peso, <span class="at">y =</span> Peso_Predicho)) <span class="sc">+</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> Peso, <span class="at">yend =</span> Peso), <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Errores predictivos (líneas verticales) entre Peso Real y Predicho"</span>,</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Peso Real"</span>,</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Peso Predicho"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dibujamos los errores predictivos entre el peso real y el peso predicho en el conjunto de datos de test.</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_test, <span class="fu">aes</span>(<span class="at">x =</span> Peso, <span class="at">y =</span> Peso_Predicho)) <span class="sc">+</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> Peso, <span class="at">yend =</span> Peso), <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Errores predictivos (líneas verticales) entre Peso Real y Predicho"</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Peso Real"</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Peso Predicho"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1260,8 +1273,8 @@ Solución
 <div id="callout-16" class="callout-16-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> Peso, <span class="at">estimate =</span> Peso_Predicho) <span class="sc">|&gt;</span> </span>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluamos el modelo de regresión lineal calculando el error cuadrático medio (RMSE) y el coeficiente de determinación (R^2).</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> Peso, <span class="at">estimate =</span> Peso_Predicho) <span class="sc">|&gt;</span> </span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -1276,17 +1289,17 @@ Solución
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">18.9199192</td>
+<td style="text-align: right;">19.1912493</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.1797746</td>
+<td style="text-align: right;">0.1715209</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">mae</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">14.7371167</td>
+<td style="text-align: right;">14.9523600</td>
 </tr>
 </tbody>
 </table>
@@ -1309,10 +1322,14 @@ Solución
 <div id="callout-17" class="callout-17-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>modelo_entrenado_sexo <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(Peso <span class="sc">~</span> Estatura <span class="sc">*</span> Sexo, <span class="at">data =</span> df_entrenamiento)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado_sexo) <span class="sc">|&gt;</span> </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos otro modelo de regresión lineal añadiendo al modelo anterior la variable predictiva Sexo.</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>modelo_entrenado_sexo <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Ajustamos el nuevo modelo con los datos del conjunto de entrenamiento.</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(Peso <span class="sc">~</span> Estatura <span class="sc">*</span> Sexo, <span class="at">data =</span> df_entrenamiento)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostramos un resumen del nuevo modelo.</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado_sexo) <span class="sc">|&gt;</span> </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -1327,31 +1344,31 @@ Solución
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">-94.5844614</td>
-<td style="text-align: right;">10.6755800</td>
-<td style="text-align: right;">-8.859890</td>
+<td style="text-align: right;">-94.2039913</td>
+<td style="text-align: right;">10.8315382</td>
+<td style="text-align: right;">-8.697194</td>
 <td style="text-align: right;">0.0000000</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Estatura</td>
-<td style="text-align: right;">1.0285309</td>
-<td style="text-align: right;">0.0608118</td>
-<td style="text-align: right;">16.913350</td>
+<td style="text-align: right;">1.0211716</td>
+<td style="text-align: right;">0.0617002</td>
+<td style="text-align: right;">16.550548</td>
 <td style="text-align: right;">0.0000000</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Sexomujer</td>
-<td style="text-align: right;">43.3734929</td>
-<td style="text-align: right;">14.5741032</td>
-<td style="text-align: right;">2.976066</td>
-<td style="text-align: right;">0.0029380</td>
+<td style="text-align: right;">43.6315911</td>
+<td style="text-align: right;">14.7870144</td>
+<td style="text-align: right;">2.950669</td>
+<td style="text-align: right;">0.0031901</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Estatura:Sexomujer</td>
-<td style="text-align: right;">-0.2545163</td>
-<td style="text-align: right;">0.0863572</td>
-<td style="text-align: right;">-2.947251</td>
-<td style="text-align: right;">0.0032255</td>
+<td style="text-align: right;">-0.2565078</td>
+<td style="text-align: right;">0.0876188</td>
+<td style="text-align: right;">-2.927545</td>
+<td style="text-align: right;">0.0034367</td>
 </tr>
 </tbody>
 </table>
@@ -1374,8 +1391,8 @@ Solución
 <div id="callout-18" class="callout-18-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df_entrenamiento  <span class="sc">|&gt;</span> </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Estatura, <span class="at">y =</span> Peso, <span class="at">color =</span> Sexo)) <span class="sc">+</span></span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dibujamos el modelo de regresión lineal con la variable sexo sobre el diagrama de dispersión de la estatura y el peso.</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df_entrenamiento  <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Estatura, <span class="at">y =</span> Peso, <span class="at">color =</span> Sexo)) <span class="sc">+</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1411,10 +1428,11 @@ Solución
 <div id="callout-19" class="callout-19-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>modelo_entrenado_sexo <span class="sc">|&gt;</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">augment</span>(<span class="at">new_data =</span> df_test) <span class="sc">|&gt;</span> </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> Peso, <span class="at">estimate =</span> .pred) <span class="sc">|&gt;</span> </span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadimos al conjunto de datos de test las predicciones del peso según el nuevo modelo ajustado.</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>modelo_entrenado_sexo <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">new_data =</span> df_test) <span class="sc">|&gt;</span> </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculamos las métricas de evaluación del nuevo modelo.</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> Peso, <span class="at">estimate =</span> .pred) <span class="sc">|&gt;</span> </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -1428,17 +1446,17 @@ Solución
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">18.9138422</td>
+<td style="text-align: right;">19.1858999</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.1803926</td>
+<td style="text-align: right;">0.1720853</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">mae</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">14.7235413</td>
+<td style="text-align: right;">14.9409558</td>
 </tr>
 </tbody>
 </table>
@@ -1462,10 +1480,14 @@ Solución
 <div id="callout-20" class="callout-20-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>modelo_entrenado_deporte <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(Peso <span class="sc">~</span> Estatura <span class="sc">+</span> DiasDeporte, <span class="at">data =</span> df_entrenamiento)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado_deporte) <span class="sc">|&gt;</span> </span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos un nuevo modelo de regresión lineal añadiendo al modelo inicial la variable predictiva DiasDeporte.</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>modelo_entrenado_deporte <span class="ot">&lt;-</span> modelo <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Ajustamos el nuevo modelo con los datos del conjunto de entrenamiento.</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(Peso <span class="sc">~</span> Estatura <span class="sc">+</span> DiasDeporte, <span class="at">data =</span> df_entrenamiento)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostramos un resumen del nuevo modelo.</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado_deporte) <span class="sc">|&gt;</span> </span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -1494,9 +1516,9 @@ Solución
 </tr>
 <tr class="odd">
 <td style="text-align: left;">DiasDeporte</td>
-<td style="text-align: right;">-2.0440654</td>
+<td style="text-align: right;">-2.5440654</td>
 <td style="text-align: right;">0.1390180</td>
-<td style="text-align: right;">-14.70360</td>
+<td style="text-align: right;">-18.30026</td>
 <td style="text-align: right;">0</td>
 </tr>
 </tbody>
@@ -1520,8 +1542,8 @@ Solución
 <div id="callout-21" class="callout-21-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df_entrenamiento  <span class="sc">|&gt;</span> </span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Estatura, <span class="at">y =</span> Peso, <span class="at">color =</span> DiasDeporte)) <span class="sc">+</span></span>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dibujamos el modelo de regresión lineal con la variable deporte sobre el diagrama de dispersión de la estatura y el peso.</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>df_entrenamiento  <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Estatura, <span class="at">y =</span> Peso, <span class="at">color =</span> DiasDeporte)) <span class="sc">+</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Diagrama de dispersión de Estatura y Peso según Días de Deporte"</span>) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1550,10 +1572,11 @@ Solución
 <div id="callout-22" class="callout-22-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>modelo_entrenado_deporte <span class="sc">|&gt;</span> </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">augment</span>(<span class="at">new_data =</span> df_test) <span class="sc">|&gt;</span> </span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> Peso, <span class="at">estimate =</span> .pred) <span class="sc">|&gt;</span> </span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadimos al conjunto de datos de test las predicciones del peso según el nuevo modelo ajustado.</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>modelo_entrenado_deporte <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">new_data =</span> df_test) <span class="sc">|&gt;</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculamos las métricas de evaluación del nuevo modelo.</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> Peso, <span class="at">estimate =</span> .pred) <span class="sc">|&gt;</span> </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -1567,17 +1590,17 @@ Solución
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">18.4402558</td>
+<td style="text-align: right;">18.4424646</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.2210429</td>
+<td style="text-align: right;">0.2351604</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">mae</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">14.3097452</td>
+<td style="text-align: right;">14.3124504</td>
 </tr>
 </tbody>
 </table>
@@ -1607,8 +1630,10 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/dieta.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(df)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargamos los datos del fichero CSV en un data frame.</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/dieta.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostramos un resumen de los datos.</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(df)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 40
 Columns: 3
@@ -1634,9 +1659,10 @@ Solución
 <div id="callout-24" class="callout-24-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> dias, <span class="at">y =</span> peso_perdido)) <span class="sc">+</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Diagrama de dispersión del peso perdido y los días de dieta"</span>, <span class="at">x =</span> <span class="st">"Días de dieta"</span>, <span class="at">y =</span> <span class="st">"Peso perdido en Kg"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dibujamos el diagrama de dispersión de los kilos perdidos en función del número de días con la dieta.</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> dias, <span class="at">y =</span> peso_perdido)) <span class="sc">+</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Diagrama de dispersión del peso perdido y los días de dieta"</span>, <span class="at">x =</span> <span class="st">"Días de dieta"</span>, <span class="at">y =</span> <span class="st">"Peso perdido en Kg"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1663,11 +1689,15 @@ Solución
 <div id="callout-25" class="callout-25-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># Semilla aleatoria para reproducibilidad</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Dividimos el conjunto de datos en entrenamiento (75%) y test (25%)</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>df_particion <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(df, <span class="at">prop =</span> <span class="fl">0.75</span>)  <span class="co"># Dividir el conjunto de datos en entrenamiento (75%) y test (25%)</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>df_entrenamiento <span class="ot">&lt;-</span> <span class="fu">training</span>(df_particion)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(df_particion)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Establecemos una semilla aleatoria para la reproducibilidad.</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Dividimos el conjunto de datos en entrenamiento (75%) y test (25%)</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>df_particion <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(df, <span class="at">prop =</span> <span class="fl">0.75</span>)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraemos el conjunto de datos de entrenamiento.</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>df_entrenamiento <span class="ot">&lt;-</span> <span class="fu">training</span>(df_particion)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraemos el conjunto de datos de test.</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(df_particion)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1686,15 +1716,28 @@ Solución
 <div id="callout-26" class="callout-26-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>modelo <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">"lm"</span>) </span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>df_cv <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(df_entrenamiento, <span class="at">v =</span> <span class="dv">5</span>) <span class="co"># Validación cruzada con 10 pliegues.</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo) <span class="sc">|&gt;</span> </span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_formula</span>(<span class="fu">log</span>(peso_perdido) <span class="sc">~</span> <span class="fu">I</span>(<span class="dv">1</span><span class="sc">/</span>dias))  <span class="sc">|&gt;</span>  <span class="co"># Añadir el modelo y la fórmula al flujo de ajuste.</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> df_cv)  <span class="sc">|&gt;</span> <span class="co"># Ajustar el modelo a los pliegues de validación cruzada.</span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Definimos el modelo de regresión lineal.</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>modelo <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Establecemos como motor de cálculo el ajuste por mínimos cuadrados.</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">"lm"</span>) </span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Establecemos una semilla aleatoria para la reproducibilidad.</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Definimos el conjunto de validación mediante validación cruzada con 10 pliegues.</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>df_cv <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(df_entrenamiento, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos un flujo de trabajo para entrenar el modelo.</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos el modelo de regresión lineal.</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo) <span class="sc">|&gt;</span> </span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos la fórmula del modelo de regresión sigmoidal.</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_formula</span>(<span class="fu">log</span>(peso_perdido) <span class="sc">~</span> <span class="fu">I</span>(<span class="dv">1</span><span class="sc">/</span>dias))  <span class="sc">|&gt;</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos el conjunto de datos de validación.</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> df_cv)  <span class="sc">|&gt;</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculamos las métricas de evaluación del modelo.</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -1711,17 +1754,17 @@ Solución
 <tr class="odd">
 <td style="text-align: left;">rmse</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.3296714</td>
+<td style="text-align: right;">0.3263752</td>
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">0.0472280</td>
+<td style="text-align: right;">0.0416058</td>
 <td style="text-align: left;">Preprocessor1_Model1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">rsq</td>
 <td style="text-align: left;">standard</td>
-<td style="text-align: right;">0.6360074</td>
+<td style="text-align: right;">0.5761779</td>
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">0.0529945</td>
+<td style="text-align: right;">0.1606296</td>
 <td style="text-align: left;">Preprocessor1_Model1</td>
 </tr>
 </tbody>
@@ -1746,11 +1789,15 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo) <span class="sc">|&gt;</span> </span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_formula</span>(peso_perdido <span class="sc">~</span> <span class="fu">I</span>(<span class="dv">1</span><span class="sc">/</span>dias))  <span class="sc">|&gt;</span>  <span class="co"># Añadir el modelo y la fórmula al flujo de ajuste.</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> df_cv)  <span class="sc">|&gt;</span> <span class="co"># Ajustar el modelo a los pliegues de validación cruzada.</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos el modelo de regresión lineal.</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo) <span class="sc">|&gt;</span> </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos la fórmula del modelo de regresión inverso.</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_formula</span>(peso_perdido <span class="sc">~</span> <span class="fu">I</span>(<span class="dv">1</span><span class="sc">/</span>dias))  <span class="sc">|&gt;</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos el conjunto de datos de validación.</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> df_cv)  <span class="sc">|&gt;</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculamos las métricas de evaluación del modelo.</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -1802,11 +1849,15 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo) <span class="sc">|&gt;</span> </span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_formula</span>(<span class="fu">log</span>(peso_perdido) <span class="sc">~</span> <span class="fu">log</span>(dias))  <span class="sc">|&gt;</span>  <span class="co"># Añadir el modelo y la fórmula al flujo de ajuste.</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> df_cv)  <span class="sc">|&gt;</span> <span class="co"># Ajustar el modelo a los pliegues de validación cruzada.</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos el modelo de regresión lineal.</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo) <span class="sc">|&gt;</span> </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos la fórmula del modelo de regresión potencial.</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_formula</span>(<span class="fu">log</span>(peso_perdido) <span class="sc">~</span> <span class="fu">log</span>(dias))  <span class="sc">|&gt;</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos el conjunto de datos de validación.</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> df_cv)  <span class="sc">|&gt;</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculamos las métricas de evaluación del modelo.</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -1862,7 +1913,7 @@ Solución
 <li><code>Infarto</code>: Riesgo de infarto (1: Sí, 0: No)</li>
 </ul>
 <ol type="a">
-<li><p>Cargar los datos del archivo <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv"><code>infartos.csv</code></a> en un data frame.</p>
+<li><p>Cargar los datos del archivo <a href="datos/infartos.csv"><code>infartos.csv</code></a> en un data frame.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1877,9 +1928,10 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">TRUE</span>) </span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(df)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargamos los datos del fichero CSV en un data frame.</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostramos un resumen de los datos.</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(df)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 918
 Columns: 12
@@ -1914,8 +1966,8 @@ Solución
 <div id="callout-30" class="callout-30-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span> </span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Infarto =</span> <span class="fu">factor</span>(Infarto, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"0"</span>, <span class="st">"1"</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No"</span>, <span class="st">"Sí"</span>)),</span>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convertimos las variables Infarto y Glucemia en factores.</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Infarto =</span> <span class="fu">factor</span>(Infarto, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"0"</span>, <span class="st">"1"</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No"</span>, <span class="st">"Sí"</span>)),</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Glucemia =</span> <span class="fu">factor</span>(Glucemia, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"0"</span>, <span class="st">"1"</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No"</span>, <span class="st">"Sí"</span>)))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
@@ -1936,7 +1988,8 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(df) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Realizamos un análisis exploratorio de los datos.</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(df) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Data summary</caption>
@@ -2202,13 +2255,16 @@ Solución
 <div id="callout-33" class="callout-33-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> </span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">where</span>(is.factor)) <span class="sc">|&gt;</span> </span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">where</span>(is.factor) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">all_of</span>(<span class="st">"Infarto"</span>), <span class="at">names_to =</span> <span class="st">"variable"</span>, <span class="at">values_to =</span> <span class="st">"valor"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">fill =</span> Infarto)) <span class="sc">+</span></span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> variable, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribución de frecuencias de variables cualitativas"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Seleccionamos los factores.</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="fu">where</span>(is.factor)) <span class="sc">|&gt;</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convertimos el data frame en formato largo.</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">where</span>(is.factor) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">all_of</span>(<span class="st">"Infarto"</span>), <span class="at">names_to =</span> <span class="st">"variable"</span>, <span class="at">values_to =</span> <span class="st">"valor"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Dibujamos el diagrama de barras de las variables cualitativas coloreando según el riesgo de infarto.</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">fill =</span> Infarto)) <span class="sc">+</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Separamos los diagramas para cada variable.</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> variable, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribución de frecuencias de variables cualitativas"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2234,13 +2290,16 @@ Solución
 <div id="callout-34" class="callout-34-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Infarto, <span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span> </span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">where</span>(is.numeric), <span class="at">names_to =</span> <span class="st">"variable"</span>, <span class="at">values_to =</span> <span class="st">"valor"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Infarto, <span class="at">y =</span> valor, <span class="at">fill =</span> Infarto)) <span class="sc">+</span></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> variable, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Diagramas de cajas de las variables numéricas según Infarto"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Seleccionamos las variables numéricas.</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> <span class="fu">select</span>(Infarto, <span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convertimos el data frame en formato largo. </span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">where</span>(is.numeric), <span class="at">names_to =</span> <span class="st">"variable"</span>, <span class="at">values_to =</span> <span class="st">"valor"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Dibujamos el diagrama de cajas de las variables numéricas coloreando según el riesgo de infarto.</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Infarto, <span class="at">y =</span> valor, <span class="at">fill =</span> Infarto)) <span class="sc">+</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Separamos los diagramas para cada variable.</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> variable, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Diagramas de cajas de las variables numéricas según Infarto"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2286,8 +2345,10 @@ Solución
 <div id="callout-36" class="callout-36-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> <span class="fu">select_if</span>(is.numeric) <span class="sc">|&gt;</span> </span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggcorr</span>(<span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">label_size =</span> <span class="dv">5</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Seleccionamos las variables numéricas.</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> <span class="fu">select_if</span>(is.numeric) <span class="sc">|&gt;</span> </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Dibujamos el diagrama de correlación entre las variables numéricas.</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggcorr</span>(<span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">label_size =</span> <span class="dv">5</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2314,9 +2375,14 @@ Solución
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>df_particion <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(df, <span class="at">prop =</span> <span class="fl">0.8</span>)  <span class="co"># Dividir el conjunto de datos en entrenamiento (80%) y test (20%)</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>df_entrenamiento <span class="ot">&lt;-</span> <span class="fu">training</span>(df_particion)</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(df_particion)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Establecemos una semilla aleatoria para la reproducibilidad.</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Dividimos el conjunto de datos en entrenamiento (80%) y test (20%) estratificando por la variable Infarto.</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>df_particion <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(df, <span class="at">prop =</span> <span class="fl">0.8</span>, <span class="at">strata =</span> <span class="st">"Infarto"</span>)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraemos el conjunto de datos de entrenamiento.</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>df_entrenamiento <span class="ot">&lt;-</span> <span class="fu">training</span>(df_particion)</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraemos el conjunto de datos de test.   </span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(df_particion)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -2365,11 +2431,15 @@ Solución
 <div id="callout-39" class="callout-39-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>receta <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Infarto <span class="sc">~</span> ., <span class="at">data =</span> df_entrenamiento) <span class="sc">|&gt;</span> </span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_corr</span>(<span class="fu">all_numeric_predictors</span>(), <span class="at">threshold =</span> <span class="fl">0.8</span>) <span class="sc">|&gt;</span> <span class="co"># Eliminamos las variables numéricas con alta correlación para evitar multicolinealidad.</span></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span> <span class="co"># Normalizamos las variables predictivas numéricas.</span></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="co"># Creamos variables dummy para las variables categóricas.</span></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(receta)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos una receta de preprocesamiento para el conjunto de datos de entrenamiento indicando que la variable respuesta es Infarto y las variables predictivas todas las demás.</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>receta <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Infarto <span class="sc">~</span> ., <span class="at">data =</span> df_entrenamiento) <span class="sc">|&gt;</span> </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Eliminamos las variables numéricas con alta correlación para evitar colinealidad.</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_corr</span>(<span class="fu">all_numeric_predictors</span>(), <span class="at">threshold =</span> <span class="fl">0.8</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Normalizamos las variables predictivas numéricas.</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Creamos variables dummy para las variables categóricas.</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) </span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(receta)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 12 × 4
    variable        type      role      source  
@@ -2421,17 +2491,25 @@ Solución
 <div id="callout-41" class="callout-41-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>modelo <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">"glm"</span>) <span class="sc">|&gt;</span>  <span class="co"># Establecer como motor de cálculo el ajuste por máxima verosimilitud.</span></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="co"># Establecer el modo de clasificación para el modelo de regresión logística.</span></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>modelo_entrenado <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span> <span class="co"># Añadir la receta al flujo de ajuste.</span></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo) <span class="sc">|&gt;</span> <span class="co"># Añadir el modelo al flujo de ajuste.</span></span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(<span class="at">data =</span> df_entrenamiento) <span class="co"># Ajustar el modelo a los datos de entrenamiento.</span></span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado) <span class="sc">|&gt;</span> </span>
-<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Definimos el modelo de regresión logística.</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>modelo <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Establecemos como motor de cálculo el ajuste por máxima verosimilitud. </span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">"glm"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Establecemos el modo del modelo como clasificación.</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_mode</span>(<span class="st">"classification"</span>) </span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos un flujo de trabajo para entrenar el modelo.</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>modelo_entrenado <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos la receta de preprocesamiento.</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span> </span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Añadimos el modelo de regresión logística.</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo) <span class="sc">|&gt;</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Entrenamos el modelo a los datos de entrenamiento.</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(<span class="at">data =</span> df_entrenamiento) </span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(modelo_entrenado) <span class="sc">|&gt;</span> </span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -2446,114 +2524,114 @@ Solución
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">-0.2407826</td>
-<td style="text-align: right;">0.3300296</td>
-<td style="text-align: right;">-0.7295788</td>
-<td style="text-align: right;">0.4656477</td>
+<td style="text-align: right;">0.0445124</td>
+<td style="text-align: right;">0.3287908</td>
+<td style="text-align: right;">0.1353820</td>
+<td style="text-align: right;">0.8923099</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Edad</td>
-<td style="text-align: right;">0.1389386</td>
-<td style="text-align: right;">0.1373853</td>
-<td style="text-align: right;">1.0113060</td>
-<td style="text-align: right;">0.3118700</td>
+<td style="text-align: right;">0.1411774</td>
+<td style="text-align: right;">0.1392874</td>
+<td style="text-align: right;">1.0135688</td>
+<td style="text-align: right;">0.3107886</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">PresionArterial</td>
-<td style="text-align: right;">0.0605694</td>
-<td style="text-align: right;">0.1213331</td>
-<td style="text-align: right;">0.4991994</td>
-<td style="text-align: right;">0.6176389</td>
+<td style="text-align: right;">0.0558248</td>
+<td style="text-align: right;">0.1230773</td>
+<td style="text-align: right;">0.4535754</td>
+<td style="text-align: right;">0.6501345</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Colesterol</td>
-<td style="text-align: right;">-0.4125356</td>
-<td style="text-align: right;">0.1286008</td>
-<td style="text-align: right;">-3.2078782</td>
-<td style="text-align: right;">0.0013372</td>
+<td style="text-align: right;">-0.4652817</td>
+<td style="text-align: right;">0.1331610</td>
+<td style="text-align: right;">-3.4941296</td>
+<td style="text-align: right;">0.0004756</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Pulsaciones</td>
-<td style="text-align: right;">0.0156100</td>
-<td style="text-align: right;">0.1431990</td>
-<td style="text-align: right;">0.1090092</td>
-<td style="text-align: right;">0.9131952</td>
+<td style="text-align: right;">-0.1118208</td>
+<td style="text-align: right;">0.1405529</td>
+<td style="text-align: right;">-0.7955778</td>
+<td style="text-align: right;">0.4262775</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">DepresionST</td>
-<td style="text-align: right;">0.3627497</td>
-<td style="text-align: right;">0.1377281</td>
-<td style="text-align: right;">2.6338109</td>
-<td style="text-align: right;">0.0084432</td>
+<td style="text-align: right;">0.4001500</td>
+<td style="text-align: right;">0.1409236</td>
+<td style="text-align: right;">2.8394806</td>
+<td style="text-align: right;">0.0045187</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Sexo_M</td>
-<td style="text-align: right;">-1.5678374</td>
-<td style="text-align: right;">0.3128149</td>
-<td style="text-align: right;">-5.0120300</td>
-<td style="text-align: right;">0.0000005</td>
+<td style="text-align: right;">-1.4845959</td>
+<td style="text-align: right;">0.3087981</td>
+<td style="text-align: right;">-4.8076586</td>
+<td style="text-align: right;">0.0000015</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">DolorPecho_ATA</td>
-<td style="text-align: right;">-2.0664503</td>
-<td style="text-align: right;">0.3752431</td>
-<td style="text-align: right;">-5.5069646</td>
-<td style="text-align: right;">0.0000000</td>
+<td style="text-align: right;">-1.7750427</td>
+<td style="text-align: right;">0.3498923</td>
+<td style="text-align: right;">-5.0731123</td>
+<td style="text-align: right;">0.0000004</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">DolorPecho_NAP</td>
-<td style="text-align: right;">-1.7653680</td>
-<td style="text-align: right;">0.2965727</td>
-<td style="text-align: right;">-5.9525639</td>
+<td style="text-align: right;">-1.7982335</td>
+<td style="text-align: right;">0.2977537</td>
+<td style="text-align: right;">-6.0393330</td>
 <td style="text-align: right;">0.0000000</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">DolorPecho_TA</td>
-<td style="text-align: right;">-1.4448772</td>
-<td style="text-align: right;">0.4494827</td>
-<td style="text-align: right;">-3.2145333</td>
-<td style="text-align: right;">0.0013066</td>
+<td style="text-align: right;">-1.3953657</td>
+<td style="text-align: right;">0.5170118</td>
+<td style="text-align: right;">-2.6989048</td>
+<td style="text-align: right;">0.0069568</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Glucemia_Sí</td>
-<td style="text-align: right;">1.0373449</td>
-<td style="text-align: right;">0.3126080</td>
-<td style="text-align: right;">3.3183567</td>
-<td style="text-align: right;">0.0009055</td>
+<td style="text-align: right;">1.0399133</td>
+<td style="text-align: right;">0.3051837</td>
+<td style="text-align: right;">3.4074994</td>
+<td style="text-align: right;">0.0006556</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Electro_Normal</td>
-<td style="text-align: right;">-0.1145730</td>
-<td style="text-align: right;">0.3004416</td>
-<td style="text-align: right;">-0.3813487</td>
-<td style="text-align: right;">0.7029445</td>
+<td style="text-align: right;">-0.4813833</td>
+<td style="text-align: right;">0.3010275</td>
+<td style="text-align: right;">-1.5991338</td>
+<td style="text-align: right;">0.1097909</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Electro_ST</td>
-<td style="text-align: right;">0.0286894</td>
-<td style="text-align: right;">0.3840225</td>
-<td style="text-align: right;">0.0747076</td>
-<td style="text-align: right;">0.9404474</td>
+<td style="text-align: right;">-0.5114357</td>
+<td style="text-align: right;">0.3832521</td>
+<td style="text-align: right;">-1.3344630</td>
+<td style="text-align: right;">0.1820522</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">AnginaEjercicio_S</td>
-<td style="text-align: right;">0.8841124</td>
-<td style="text-align: right;">0.2707438</td>
-<td style="text-align: right;">3.2654949</td>
-<td style="text-align: right;">0.0010927</td>
+<td style="text-align: right;">0.7350136</td>
+<td style="text-align: right;">0.2730957</td>
+<td style="text-align: right;">2.6914144</td>
+<td style="text-align: right;">0.0071150</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">PendienteST_Descendente</td>
-<td style="text-align: right;">0.9493212</td>
-<td style="text-align: right;">0.5078145</td>
-<td style="text-align: right;">1.8694250</td>
-<td style="text-align: right;">0.0615637</td>
+<td style="text-align: right;">0.7830317</td>
+<td style="text-align: right;">0.5133892</td>
+<td style="text-align: right;">1.5252205</td>
+<td style="text-align: right;">0.1272041</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">PendienteST_Plano</td>
-<td style="text-align: right;">2.3608114</td>
-<td style="text-align: right;">0.2750711</td>
-<td style="text-align: right;">8.5825485</td>
+<td style="text-align: right;">2.3945237</td>
+<td style="text-align: right;">0.2767187</td>
+<td style="text-align: right;">8.6532781</td>
 <td style="text-align: right;">0.0000000</td>
 </tr>
 </tbody>
@@ -2577,9 +2655,10 @@ Solución
 <div id="callout-42" class="callout-42-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(modelo_entrenado, <span class="at">new_data =</span> df_test) <span class="sc">|&gt;</span> </span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predecimos el riesgo de infarto en el conjunto de test utilizando el modelo de regresión logística ajustado.</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>modelo_entrenado <span class="sc">|&gt;</span> <span class="fu">predict</span>(<span class="at">new_data =</span> df_test) <span class="sc">|&gt;</span> </span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -2589,7 +2668,7 @@ Solución
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Sí</td>
+<td style="text-align: left;">No</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">No</td>
@@ -2647,9 +2726,9 @@ Solución
 <div id="callout-44" class="callout-44-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">augment</span>(modelo_entrenado, <span class="at">new_data =</span> df_test)</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> </span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>() <span class="sc">|&gt;</span> </span>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadimos al conjunto de test las probabilidades de infarto predichas por el modelo de regresión logística.</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> modelo_entrenado <span class="sc">|&gt;</span> <span class="fu">augment</span>(<span class="at">new_data =</span> df_test)</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> <span class="fu">head</span>() <span class="sc">|&gt;</span> </span>
 <span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -2691,17 +2770,51 @@ Solución
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Sí</td>
-<td style="text-align: right;">0.1988451</td>
-<td style="text-align: right;">0.8011549</td>
-<td style="text-align: right;">48</td>
-<td style="text-align: left;">M</td>
-<td style="text-align: left;">ASY</td>
-<td style="text-align: right;">138</td>
-<td style="text-align: right;">214</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">0.9623340</td>
+<td style="text-align: right;">0.0376660</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: left;">H</td>
+<td style="text-align: left;">ATA</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: right;">289</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Normal</td>
-<td style="text-align: right;">108</td>
+<td style="text-align: right;">172</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: left;">Ascendente</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">0.9525000</td>
+<td style="text-align: right;">0.0475000</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: left;">H</td>
+<td style="text-align: left;">ATA</td>
+<td style="text-align: right;">130</td>
+<td style="text-align: right;">283</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">ST</td>
+<td style="text-align: right;">98</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: left;">Ascendente</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sí</td>
+<td style="text-align: right;">0.0629385</td>
+<td style="text-align: right;">0.9370615</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: left;">H</td>
+<td style="text-align: left;">ASY</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: right;">207</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Normal</td>
+<td style="text-align: right;">130</td>
 <td style="text-align: left;">S</td>
 <td style="text-align: right;">1.5</td>
 <td style="text-align: left;">Plano</td>
@@ -2709,84 +2822,50 @@ Solución
 </tr>
 <tr class="even">
 <td style="text-align: left;">No</td>
-<td style="text-align: right;">0.9600342</td>
-<td style="text-align: right;">0.0399658</td>
-<td style="text-align: right;">39</td>
-<td style="text-align: left;">H</td>
-<td style="text-align: left;">NAP</td>
-<td style="text-align: right;">120</td>
-<td style="text-align: right;">339</td>
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">Normal</td>
-<td style="text-align: right;">170</td>
-<td style="text-align: left;">N</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: left;">Ascendente</td>
-<td style="text-align: left;">No</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Sí</td>
-<td style="text-align: right;">0.0595393</td>
-<td style="text-align: right;">0.9404607</td>
-<td style="text-align: right;">49</td>
-<td style="text-align: left;">H</td>
-<td style="text-align: left;">ASY</td>
-<td style="text-align: right;">140</td>
-<td style="text-align: right;">234</td>
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">Normal</td>
-<td style="text-align: right;">140</td>
-<td style="text-align: left;">S</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: left;">Plano</td>
-<td style="text-align: left;">Sí</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">No</td>
-<td style="text-align: right;">0.9627125</td>
-<td style="text-align: right;">0.0372875</td>
-<td style="text-align: right;">32</td>
-<td style="text-align: left;">H</td>
-<td style="text-align: left;">ATA</td>
-<td style="text-align: right;">125</td>
-<td style="text-align: right;">254</td>
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">Normal</td>
-<td style="text-align: right;">155</td>
-<td style="text-align: left;">N</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: left;">Ascendente</td>
-<td style="text-align: left;">No</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Sí</td>
-<td style="text-align: right;">0.0563320</td>
-<td style="text-align: right;">0.9436680</td>
-<td style="text-align: right;">43</td>
-<td style="text-align: left;">H</td>
-<td style="text-align: left;">ASY</td>
-<td style="text-align: right;">120</td>
-<td style="text-align: right;">175</td>
-<td style="text-align: left;">No</td>
-<td style="text-align: left;">Normal</td>
-<td style="text-align: right;">120</td>
-<td style="text-align: left;">S</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: left;">Plano</td>
-<td style="text-align: left;">Sí</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">No</td>
-<td style="text-align: right;">0.9904237</td>
-<td style="text-align: right;">0.0095763</td>
-<td style="text-align: right;">41</td>
+<td style="text-align: right;">0.9880635</td>
+<td style="text-align: right;">0.0119365</td>
+<td style="text-align: right;">48</td>
 <td style="text-align: left;">M</td>
 <td style="text-align: left;">ATA</td>
-<td style="text-align: right;">130</td>
-<td style="text-align: right;">245</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: right;">284</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Normal</td>
-<td style="text-align: right;">150</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: left;">N</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: left;">Ascendente</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sí</td>
+<td style="text-align: right;">0.1544145</td>
+<td style="text-align: right;">0.8455855</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: left;">H</td>
+<td style="text-align: left;">ATA</td>
+<td style="text-align: right;">136</td>
+<td style="text-align: right;">164</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">ST</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: left;">S</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: left;">Plano</td>
+<td style="text-align: left;">Sí</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">0.9449769</td>
+<td style="text-align: right;">0.0550231</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: left;">H</td>
+<td style="text-align: left;">ATA</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: right;">204</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Normal</td>
+<td style="text-align: right;">145</td>
 <td style="text-align: left;">N</td>
 <td style="text-align: right;">0.0</td>
 <td style="text-align: left;">Ascendente</td>
@@ -2863,10 +2942,11 @@ Solución
 <div id="callout-46" class="callout-46-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>metricas <span class="ot">&lt;-</span> <span class="fu">metric_set</span>(accuracy, sensitivity, specificity, precision, f_meas)</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> </span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metricas</span>(<span class="at">truth =</span> Infarto, <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span> </span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos un conjunto de métricas de clasificación incluyendo exactitud, sensibilidad, especificidad, precisión y F1-score.</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>metricas <span class="ot">&lt;-</span> <span class="fu">metric_set</span>(accuracy, sensitivity, specificity, precision, f_meas)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculamos las métricas de clasificación en el conjunto de test.</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> <span class="fu">metricas</span>(<span class="at">truth =</span> Infarto, <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span> </span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -2880,27 +2960,27 @@ Solución
 <tr class="odd">
 <td style="text-align: left;">accuracy</td>
 <td style="text-align: left;">binary</td>
-<td style="text-align: right;">0.8913043</td>
+<td style="text-align: right;">0.9021739</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">sensitivity</td>
 <td style="text-align: left;">binary</td>
-<td style="text-align: right;">0.8444444</td>
+<td style="text-align: right;">0.8536585</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">specificity</td>
 <td style="text-align: left;">binary</td>
-<td style="text-align: right;">0.9361702</td>
+<td style="text-align: right;">0.9411765</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">precision</td>
 <td style="text-align: left;">binary</td>
-<td style="text-align: right;">0.9268293</td>
+<td style="text-align: right;">0.9210526</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">f_meas</td>
 <td style="text-align: left;">binary</td>
-<td style="text-align: right;">0.8837209</td>
+<td style="text-align: right;">0.8860759</td>
 </tr>
 </tbody>
 </table>
@@ -2944,8 +3024,8 @@ Solución
 <div id="callout-48" class="callout-48-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>df_test<span class="sc">|&gt;</span> </span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">roc_curve</span>(<span class="at">truth =</span> Infarto, .pred_No) <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dibujamos la curva ROC del modelo de regresión logística.</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>df_test<span class="sc">|&gt;</span> <span class="fu">roc_curve</span>(<span class="at">truth =</span> Infarto, .pred_No) <span class="sc">|&gt;</span></span>
 <span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">autoplot</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -2954,8 +3034,8 @@ Solución
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> </span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">roc_auc</span>(<span class="at">truth =</span> Infarto, .pred_No) <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculamos el área bajo la curva (AUC).</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(<span class="at">truth =</span> Infarto, .pred_No) <span class="sc">|&gt;</span></span>
 <span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -2970,7 +3050,7 @@ Solución
 <tr class="odd">
 <td style="text-align: left;">roc_auc</td>
 <td style="text-align: left;">binary</td>
-<td style="text-align: right;">0.9419622</td>
+<td style="text-align: right;">0.9414156</td>
 </tr>
 </tbody>
 </table>
@@ -2985,7 +3065,7 @@ Solución
 <section id="ejercicios-propuestos" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="ejercicios-propuestos"><span class="header-section-number">4.2</span> Ejercicios propuestos</h2>
 <div id="exr-regresion-neonatos" class="theorem exercise">
-<p><span class="theorem-title"><strong>Ejercicio 4.4</strong></span> El conjunto de datos <a href="https://aprendeconalf.es/estadistica-practicas-r/datos/neonatos.csv"><code>neonatos</code></a> contiene información sobre una muestra de 320 recién nacidos en un hospital durante un año que cumplieron el tiempo normal de gestación.</p>
+<p><span class="theorem-title"><strong>Ejercicio 4.4</strong></span> El conjunto de datos <a href="datos/neonatos.csv"><code>neonatos</code></a> contiene información sobre una muestra de 320 recién nacidos en un hospital durante un año que cumplieron el tiempo normal de gestación.</p>
 <ol type="a">
 <li><p>Crear un data frame a con los datos de los neonatos a partir del fichero anterior.</p></li>
 <li><p>Construir la recta de regresión del peso de los recién nacidos sobre el número de cigarros fumados al día por las madres. ¿Existe una relación lineal fuerte entre el peso y el número de cigarros?</p></li>
@@ -2997,9 +3077,9 @@ Solución
 </ol>
 </div>
 <div id="exr-regresion-glaucoma" class="theorem exercise">
-<p><span class="theorem-title"><strong>Ejercicio 4.5</strong></span> El conjunto de datos <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv"><code>glaucoma.csv</code></a> contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.</p>
+<p><span class="theorem-title"><strong>Ejercicio 4.5</strong></span> El conjunto de datos <a href="datos/glaucoma.csv"><code>glaucoma.csv</code></a> contiene información sobre el grosor de los sectores de los anillos peripalilares de la capa de fibras nerviosas de la retina obtenidos mediante tomografía de coherencia óptica (OTC) en pacientes con y sin glaucoma. En la OTC se toman 4 anillos con distintos radios (BMO, 3.5 mm, 4.1 mm y 4.7 mm) y para cada anillo se miden 6 sectores (Nasal Superior, Nasal, Nasal Inferior, Temporal Inferior, Temporal y Temporal Superior) y también la media global. Los datos están ya normalizados.</p>
 <ol type="a">
-<li><p>Crear un data frame con los datos del fichero <a href="https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/glaucoma.csv"><code>glaucoma</code></a>.</p></li>
+<li><p>Crear un data frame con los datos del fichero <a href="datos/glaucoma.csv"><code>glaucoma</code></a>.</p></li>
 <li><p>Construir un modelo de regresión logística para predecir si un paciente tiene glaucoma o no a partir de los datos de la OTC. Utilizar la variable <code>Glaucoma</code> como variable dependiente y las variables de los anillos y sectores como variables independientes.</p></li>
 <li><p>Evaluar el modelo de regresión logística calculando la matriz de confusión y las métricas de clasificación. Dibujar la curva ROC del modelo.</p></li>
 </ol>

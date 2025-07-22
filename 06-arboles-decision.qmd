@@ -53,17 +53,17 @@ El fichero [`infartos.csv`](datos/infartos.csv) contiene información sobre dist
 - `PendienteST`: Pendiente del segmento ST en el pico de ejercicio (Ascendente, Plano, Descencdente).
 - `Infarto`: Riesgo de infarto (1: Sí, 0: No)
 
-a.  Cargar los datos del archivo [`infartos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv) en un data frame.
+a.  Cargar los datos del archivo [`infartos.csv`](datos/infartos.csv) en un data frame.
 
     :::{.callout-tip collapse="true"}
     ## Solución 
 
     ```{r}
     library(tidyverse)
-    library(knitr)
-    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv", stringsAsFactors = TRUE) 
-    df |> 
-        glimpse()
+    # Cargamos los datos del fichero infartos.csv en un data frame.
+    df <- read.csv("https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/infartos.csv", stringsAsFactors = TRUE)
+    # Mostramos un resumen del data frame.
+    glimpse(df)
     ```
     :::
 
@@ -73,12 +73,11 @@ a.  Convertir la variable `Infarto` a un factor con dos niveles: Sí (1) y No (0
     ## Solución
 
     ```{r}
-    df <- df |> 
-        # Recodificamos los valores de Infarto y lo convertimos en un factor.
-        mutate(Infarto = factor(case_match(Infarto,
-            0 ~ "No",
-            1 ~ "Sí"
-        )))
+    # Recodificamos los valores de Infarto y lo convertimos en un factor.
+    df <- df |> mutate(Infarto = factor(case_match(Infarto,
+        0 ~ "No",
+        1 ~ "Sí"
+    )))
     ```
     :::
 
@@ -89,6 +88,7 @@ a.  Realizar un análisis exploratorio de los datos. ¿Qué variables son numér
 
     ```{r}
     library(skimr)
+    # Realizamos un análisis exploratorio de los datos.
     skim(df)
     ```
     :::
@@ -110,9 +110,13 @@ a.  Dividir el conjunto de datos en dos subconjuntos, uno de entrenamiento y otr
 
     ```{r}
     library(tidymodels)
+    # Establecemos la semilla para la reproducibilidad.
     set.seed(123)
+    # Dividimos el conjunto de datos en entrenamiento (80%) y test (20%) estratificando por la variable Infarto.
     df_particion <- initial_split(df, prop = 0.8, strata = Infarto)
+    # Extraemos el conjunto de datos de entrenamiento.
     df_entrenamiento <- training(df_particion)
+    # Extraemos el conjunto de datos de test.
     df_test <- testing(df_particion)
     ```
     :::
@@ -167,9 +171,8 @@ a.  Dibujar el árbol de decisión construido.
 
     ```{r}
     library(rpart.plot)
-    modelo_entrenado |> 
-        # Extraemos el modelo ajustado.
-        extract_fit_engine() |> 
+    # Extraemos el modelo ajustado.
+    modelo_entrenado |> extract_fit_engine() |> 
         # Dibujamos el árbol de decisión.
         rpart.plot()
     ```
@@ -204,11 +207,10 @@ a.  Evaluar el modelo de árbol de decisión con el conjunto de test. Calcular l
 
     ```{r}
     # Ampliamos el conjunto de test con las predicciones del modelo.
-    df_test_aumentado <- augment(modelo_entrenado, new_data = df_test) 
+    df_test_aumentado <- modelo_entrenado |> augment(new_data = df_test) 
     # Calculamos la matriz de confusión.
     matriz_confusion <- df_test_aumentado |> conf_mat(truth = Infarto, estimate = .pred_class)
-    matriz_confusion$table |> 
-        kable()
+    matriz_confusion$table |> kable()
 
     # Calculamos la precisión, sensibilidad y especificidad.
     metricas <- metric_set(accuracy, sensitivity, specificity)
@@ -237,12 +239,15 @@ a.  Explorar para qué parámetros del árbol se obtiene el mejor modelo. En par
     ## Solución
 
     ```{r}
+    # Definimos el modelo de árbol de decisión con los parámetros a optimizar.
     modelo <- decision_tree(
         tree_depth = tune(), # Profundidad máxima del árbol.
         cost_complexity = tune(), # Coste por complejidad.
         min_n = tune() # Mínimo número de casos necesario para dividir un nodo.
     ) |> 
+        # Establecemos el motor de entrenamiento de rpart.
         set_engine("rpart") |> 
+        # Establecemos el modo de clasificación.
         set_mode("classification")
 
     # Creamos un flujo de trabajo con el modelo y los datos de entrenamiento.
@@ -252,14 +257,15 @@ a.  Explorar para qué parámetros del árbol se obtiene el mejor modelo. En par
         # Añadimos el modelo de árbol de decisión.
         add_model(modelo)
 
+    # Entrenamos el modelo con validación cruzada de 5 pliegues.
     modelos_entrenados <- flujo |> tune_grid(
-            resamples = vfold_cv(df_entrenamiento, v = 5), # Validación cruzada con 5 pliegues
+            resamples = vfold_cv(df_entrenamiento, v = 5),
             grid = expand.grid(
-                tree_depth = 3:6, # Profundidad máxima del árbol
-                cost_complexity = seq(0, 0.5, by = 0.02), # Coste por complejidad
-                min_n = 10:15 # Mínimo número de casos necesario para dividir un nodo
+                tree_depth = 3:6, # Profundidad máxima del árbol.
+                cost_complexity = seq(0, 0.5, by = 0.02), # Coste por complejidad.
+                min_n = 10:15 # Mínimo número de casos necesario para dividir un nodo.
             ),
-            metrics = metric_set(accuracy) # Métricas a calcular
+            metrics = metric_set(accuracy) # Métricas a calcular.
         ) 
     ```
     :::
@@ -287,14 +293,15 @@ a.  Construir el árbol de decisión con los parámetros óptimos obtenidos en e
     :::
 
     :::{.callout-tip collapse="true"}
-    ## Solución 
+    ## Solución
+
     ```{r}
     # Extraemos los mejores parámetros.
-    parametros_optimos <- select_best(modelos_entrenados, metric = "accuracy") 
+    parametros_optimos <- modelos_entrenados |> select_best(metric = "accuracy") 
     parametros_optimos |> kable()
-    # Construimos el modelo con los mejores parámetros.
+    # Entrenamos el modelo con los mejores parámetros.
     modelo_final <- flujo |> finalize_workflow(parametros_optimos) |>
-            last_fit(split = df_particion, metrics = metricas) 
+        last_fit(split = df_particion, metrics = metricas) 
 
     # Extraemos las métricas de evaluación del modelo entrenado.
     collect_metrics(modelo_final) |> kable()
@@ -307,9 +314,8 @@ a.  Dibujar el árbol de decisión final.
     ## Solución
 
     ```{r}
-    modelo_final |> 
-        # Extraemos el modelo ajustado.
-        extract_fit_engine() |> 
+    # Extraemos el modelo ajustado.
+    modelo_final |> extract_fit_engine() |> 
         # Dibujamos el árbol de decisión.
         rpart.plot()
     ```
@@ -371,23 +377,28 @@ a.  Construir bosques aleatorios para predecir el riesgo de infarto, explorando 
         # Añadimos el modelo de bosque aleatorio.
         add_model(modelo_bosque)
 
-    df_validacion <- validation_split(df_entrenamiento, prop = 0.8, strata = Infarto) # Dividimos el conjunto de entrenamiento en entrenamiento y validación.
+    # Dividimos el conjunto de entrenamiento en entrenamiento y validación estratificando por la variable Infarto.
+    df_validacion <- validation_split(df_entrenamiento, prop = 0.8, strata = Infarto) 
 
+    # Establecemos una semilla aleatoria para la reproducibilidad.
     set.seed(123)
+    # Entrenamos el modelo con validación cruzada de 5 pliegues.
+    # Utilizamos la función tune_grid para optimizar los parámetros mtry y min_n.
     modelos_entrenados <- flujo_bosque |> tune_grid(
-        # Validación cruzada con 5 pliegues,
+        # Utilizamos validación cruzada de 5 pliegues.
         resamples = vfold_cv(df_entrenamiento, v = 5), 
         # Indicamos que pruebe con 25 valores distintos de mtry y min_n.
         grid = 25,
         # Guardamos las predicciones para cada pliegue.
         control = control_grid(save_pred = TRUE), 
         # Definimos como métricas la precisión y el área bajo la curva ROC.
-        metrics = metric_set(accuracy, roc_auc))
+        metrics = metric_set(accuracy, roc_auc)
+    )
 
     # Visualizamos los resultados de la validación cruzada.
     autoplot(modelos_entrenados) 
 
-    # Extraemos los parámetros del mejor modelo entrenado.
+    # Extraemos los parámetros del mejor modelo entrenado según el área bajo la curva ROC.
     parametros_optimos <- modelos_entrenados |> select_best(metric = "roc_auc")
     ```
     :::
@@ -434,7 +445,7 @@ a.  Dibujar un diagrama con la importancia de las variables del bosque aleatorio
 ## Ejercicios Propuestos
 
 :::{#exr-no-supervisado-vinos}
-El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
+El fichero [`vinos.csv`](datos/vinos.csv) contiene información sobre las características de vinos blancos y tintos portugueses de la denominación "Vinho Verde". Las variables que contiene son las siguientes:
 
 | Variable             | Descripción                                                           | Tipo (unidades)        |
 |----------------------------------------|-----------------------------------------------------------------------|------------------------|
@@ -453,7 +464,7 @@ El fichero [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practic
 | alcohol              | Porcentaje de contenido de alcohol                          | Numérica(0-100)  |
 | calidad              | Calificación otorgada por un panel de expertos                   | Numérica(0-10)   |
 
-a.  Crear un dataframe con los datos del archivo [`vinos.csv`](https://aprendeconalf.es/aprendizaje-automatico-practicas-r/datos/vinos.csv).
+a.  Crear un dataframe con los datos del archivo [`vinos.csv`](datos/vinos.csv).
 
 a.  Realizar un análisis exploratorio de los datos.
 
